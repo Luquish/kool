@@ -2,13 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Poppins Font Family */
+:root {
+  --scroll-padding: 120px;
+}
+
+html {
+  scroll-padding-top: var(--scroll-padding);
+  scroll-behavior: smooth;
+}
+
+/* Poppins Font */
 @font-face {
   font-family: 'Poppins';
   src: url('/font/Poppins-Thin.ttf') format('truetype');
   font-weight: 100;
   font-style: normal;
-  font-display: swap;
 }
 
 @font-face {
@@ -16,7 +24,6 @@
   src: url('/font/Poppins-ThinItalic.ttf') format('truetype');
   font-weight: 100;
   font-style: italic;
-  font-display: swap;
 }
 
 @font-face {
@@ -24,7 +31,6 @@
   src: url('/font/Poppins-ExtraLight.ttf') format('truetype');
   font-weight: 200;
   font-style: normal;
-  font-display: swap;
 }
 
 @font-face {
@@ -32,7 +38,6 @@
   src: url('/font/Poppins-ExtraLightItalic.ttf') format('truetype');
   font-weight: 200;
   font-style: italic;
-  font-display: swap;
 }
 
 @font-face {
@@ -40,7 +45,6 @@
   src: url('/font/Poppins-Light.ttf') format('truetype');
   font-weight: 300;
   font-style: normal;
-  font-display: swap;
 }
 
 @font-face {
@@ -48,7 +52,6 @@
   src: url('/font/Poppins-LightItalic.ttf') format('truetype');
   font-weight: 300;
   font-style: italic;
-  font-display: swap;
 }
 
 @font-face {
@@ -56,7 +59,6 @@
   src: url('/font/Poppins-Regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
-  font-display: swap;
 }
 
 @font-face {
@@ -64,7 +66,6 @@
   src: url('/font/Poppins-Italic.ttf') format('truetype');
   font-weight: 400;
   font-style: italic;
-  font-display: swap;
 }
 
 @font-face {
@@ -72,7 +73,6 @@
   src: url('/font/Poppins-Medium.ttf') format('truetype');
   font-weight: 500;
   font-style: normal;
-  font-display: swap;
 }
 
 @font-face {
@@ -80,7 +80,6 @@
   src: url('/font/Poppins-MediumItalic.ttf') format('truetype');
   font-weight: 500;
   font-style: italic;
-  font-display: swap;
 }
 
 @font-face {
@@ -88,7 +87,6 @@
   src: url('/font/Poppins-SemiBold.ttf') format('truetype');
   font-weight: 600;
   font-style: normal;
-  font-display: swap;
 }
 
 @font-face {
@@ -96,7 +94,6 @@
   src: url('/font/Poppins-SemiBoldItalic.ttf') format('truetype');
   font-weight: 600;
   font-style: italic;
-  font-display: swap;
 }
 
 @font-face {
@@ -104,7 +101,6 @@
   src: url('/font/Poppins-Bold.ttf') format('truetype');
   font-weight: 700;
   font-style: normal;
-  font-display: swap;
 }
 
 @font-face {
@@ -112,7 +108,6 @@
   src: url('/font/Poppins-BoldItalic.ttf') format('truetype');
   font-weight: 700;
   font-style: italic;
-  font-display: swap;
 }
 
 @font-face {
@@ -120,7 +115,6 @@
   src: url('/font/Poppins-ExtraBold.ttf') format('truetype');
   font-weight: 800;
   font-style: normal;
-  font-display: swap;
 }
 
 @font-face {
@@ -128,7 +122,6 @@
   src: url('/font/Poppins-ExtraBoldItalic.ttf') format('truetype');
   font-weight: 800;
   font-style: italic;
-  font-display: swap;
 }
 
 @font-face {
@@ -136,7 +129,6 @@
   src: url('/font/Poppins-Black.ttf') format('truetype');
   font-weight: 900;
   font-style: normal;
-  font-display: swap;
 }
 
 @font-face {
@@ -144,79 +136,77 @@
   src: url('/font/Poppins-BlackItalic.ttf') format('truetype');
   font-weight: 900;
   font-style: italic;
-  font-display: swap;
 }
 
 /* Bebas Neue Font */
 @font-face {
   font-family: 'Bebas Neue';
   src: url('/font/BebasNeue-Regular.ttf') format('truetype');
-  font-weight: 400;
+  font-weight: normal;
   font-style: normal;
-  font-display: swap;
 }
 
 @layer base {
   :root {
-    --background: #f4f4f4;
-    --foreground: 0 0% 3.9%;
+    --background: 0 0% 96%;
+    --foreground: 0 0% 0%;
+
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
+    --card-foreground: 0 0% 0%;
+
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: #bb0000;
+    --popover-foreground: 0 0% 0%;
+
+    --primary: 0 73% 37%;
     --primary-foreground: 0 0% 100%;
-    --secondary: #010101;
-    --secondary-foreground: 0 0% 0%;
-    --third: 0 0% 0.5%;
-    --third-foreground: 0 0% 100%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
+
+    --secondary: 0 0% 0%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 40%;
+
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 0%;
+
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 0 100% 37%;
+
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 100% 37%;
+    --background: 0 0% 96%;
+    --foreground: 0 0% 0%;
+
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 0 73% 37%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 0%;
-    --third: 0 0% 0.5%;
-    --third-foreground: 0 0% 100%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --secondary: 0 0% 0%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 0 0% 20%;
+    --muted-foreground: 0 0% 60%;
+
+    --accent: 0 0% 20%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 0 100% 37%;
   }
 }
 
@@ -228,84 +218,7 @@
     @apply bg-background text-foreground;
     font-family: 'Poppins', sans-serif;
   }
-}
-
-/* Mid-century modern jazz styling */
-.heading-display {
-  font-family: 'Bebas Neue', sans-serif;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-}
-
-.heading-serif {
-  font-family: var(--font-dm-serif), serif;
-}
-
-/* Utility classes */
-.container {
-  max-width: 1280px;
-}
-
-.diagonal-slice {
-  clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
-}
-
-.diagonal-slice-reverse {
-  clip-path: polygon(0 0, 100% 15%, 100% 100%, 0 100%);
-}
-
-/* Patterns */
-.circle-pattern {
-  background-image: radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0);
-  background-size: 16px 16px;
-}
-
-.dot-pattern {
-  background-image: radial-gradient(currentColor 1px, transparent 1px);
-  background-size: 8px 8px;
-}
-
-.zigzag-pattern {
-  background: linear-gradient(135deg, currentColor 25%, transparent 25%) -10px 0,
-    linear-gradient(225deg, currentColor 25%, transparent 25%) -10px 0,
-    linear-gradient(315deg, currentColor 25%, transparent 25%),
-    linear-gradient(45deg, currentColor 25%, transparent 25%);
-  background-size: 20px 20px;
-}
-
-/* Icon utilities */
-.i-globe {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='2' y1='12' x2='22' y2='12'/%3E%3Cpath d='M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z'/%3E%3C/svg%3E");
-  display: inline-block;
-  background-repeat: no-repeat;
-}
-
-.i-chevron-down {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-  display: inline-block;
-  background-repeat: no-repeat;
-}
-
-/* Record spinning animation */
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Bebas Neue', sans-serif;
   }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-spin-slow {
-  animation: spin 8s linear infinite;
-}
-
-/* Brand specific */
-.kool-brand {
-  font-family: 'Bebas Neue', sans-serif;
-  color: #bb0000 !important; /* Primary color */
-  letter-spacing: 0.05em;
-  font-weight: 400;
-  display: inline-block;
-  text-transform: uppercase;
 }

@@ -20,9 +20,8 @@ const config = {
     },
     extend: {
       fontFamily: {
-        sans: ['Poppins', 'Arial', 'sans-serif'],
-        poppins: ['Poppins', 'sans-serif'],
-        bebas: ['"Bebas Neue"', 'cursive'],
+        sans: ['Poppins', 'sans-serif'],
+        display: ['Bebas Neue', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -31,16 +30,12 @@ const config = {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#bb0000",
-          foreground: "#ffffff",
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: "#f4f4f4",
-          foreground: "#000000",
-        },
-        third: {
-          DEFAULT: "#010101",
-          foreground: "#ffffff",
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
@@ -62,11 +57,6 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        cream: "#F5F1E3",
-        "orange-500": "#E76F51",
-        "orange-600": "#D55F41",
-        "navy-blue": "#264653",
-        mustard: "#E9C46A",
       },
       borderRadius: {
         lg: "var(--radius)",

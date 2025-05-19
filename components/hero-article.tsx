@@ -1,0 +1,73 @@
+import { Button } from "@/components/ui/button"
+
+export default function HeroArticle() {
+  return (
+    <section className="my-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Main feature */}
+        <div className="lg:col-span-8 relative">
+          <div className="absolute top-0 left-0 bg-primary text-white px-4 py-1 text-sm font-bold z-10">
+            EXCLUSIVE
+          </div>
+          <div className="relative aspect-[16/9] overflow-hidden">
+            <img
+              src="/placeholder.svg?height=600&width=1000"
+              alt="AI Music Revolution"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+            <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+              <h2 className="text-4xl md:text-6xl font-black leading-tight mb-4">
+                THE FUTURE OF MUSIC MANAGEMENT
+              </h2>
+              <p className="text-xl md:text-2xl font-medium mb-6 max-w-3xl">
+                Kool is the AI-powered music management platform that helps independent artists compete with major labels and transform their careers.
+              </p>
+              <div className="flex items-center text-white/80 text-sm mb-4">
+                <span className="font-bold mr-2">By ALEX MARTINEZ</span>
+                <span>May 19, 2025</span>
+              </div>
+              <Button className="bg-primary hover:bg-primary/90 text-white">Read More</Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Side articles */}
+        <div className="lg:col-span-4 flex flex-col space-y-6">
+          <div className="border-b border-secondary pb-6">
+            <div className="bg-secondary text-white inline-block px-3 py-1 text-xs font-bold mb-3">THE FUTURE</div>
+            <h3 className="text-2xl font-bold mb-2">How AI Is Changing The Way Artists Create Music</h3>
+            <p className="text-secondary/70 mb-2">
+              KOOL's AI tools are helping independent musicians produce studio-quality tracks without the big budget
+            </p>
+            <div className="text-xs text-secondary/60">
+              <span className="font-bold">By MARIA JOHNSON</span> • May 15, 2025
+            </div>
+          </div>
+
+          <div className="border-b border-secondary pb-6">
+            <div className="bg-primary text-white inline-block px-3 py-1 text-xs font-bold mb-3">SUCCESS STORY</div>
+            <h3 className="text-2xl font-bold mb-2">"I Went From 100 to 100,000 Monthly Listeners"</h3>
+            <p className="text-secondary/70 mb-2">
+              Indie artist Jamie Taylor shares how KOOL's AI manager transformed his career in just 6 months
+            </p>
+            <div className="text-xs text-secondary/60">
+              <span className="font-bold">By CHRIS WONG</span> • May 12, 2025
+            </div>
+          </div>
+
+          <div>
+            <div className="bg-secondary text-white inline-block px-3 py-1 text-xs font-bold mb-3">NEW RELEASE</div>
+            <h3 className="text-2xl font-bold mb-2">KOOL Launches Advanced Task Tracking Feature</h3>
+            <p className="text-secondary/70 mb-2">
+              New AI-powered tool helps artists track and maximize their streaming across all platforms
+            </p>
+            <div className="text-xs text-secondary/60">
+              <span className="font-bold">By SARAH MILLER</span> • May 10, 2025
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
