@@ -1,22 +1,21 @@
 import { Button } from "@/components/ui/button"
 
-export default function MusicLists() {
+export default function HowItWorks() {
   return (
-    <section className="my-12">
+    <section id="how-it-works" className="mb-12 border-t-2 border-secondary pt-12">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-4">
-          <div className="bg-primary text-white inline-block px-3 py-1 text-xs font-bold mb-3">MUSIC LISTS</div>
-          <h2 className="text-3xl font-black mb-4">THE TOP 5 AI TOOLS CHANGING MUSIC PRODUCTION</h2>
+          <div className="bg-primary text-white inline-block px-3 py-1 text-xs font-bold mb-3">HOW IT WORKS</div>
+          <h2 className="text-3xl font-black mb-4">This is what being Kool looks like.</h2>
           <div className="aspect-[4/3] bg-background mb-4">
             <img
               src="/placeholder.svg?height=400&width=600"
-              alt="AI Music Production"
+              alt="KOOL Process"
               className="w-full h-full object-cover"
             />
           </div>
           <p className="text-secondary/70 mb-4">
-            From automated mastering to AI-generated melodies, these tools are revolutionizing how independent artists
-            create music
+            Discover how KOOL's AI-powered platform transforms your music career with automated management and strategic growth.
           </p>
           <div className="text-xs text-secondary/60 mb-4">
             <span className="font-bold">By KOOL EDITORIAL TEAM</span> • May 8, 2025
@@ -28,17 +27,16 @@ export default function MusicLists() {
 
         <div className="lg:col-span-8">
           <div className="bg-secondary text-white p-8">
-            <div className="text-primary font-bold text-lg mb-2">THE LISTS</div>
-            <h2 className="text-4xl font-black mb-6 text-white">5 WAYS AI IS HELPING INDEPENDENT ARTISTS SUCCEED</h2>
+            <div className="text-primary font-bold text-lg mb-2">STEPS</div>
+            <h2 className="text-4xl font-black mb-6 text-white">YOUR PATH TO SUCCESS WITH KOOL</h2>
             <div className="space-y-6">
               <div className="border-b border-white/20 pb-4">
                 <div className="flex items-start">
                   <span className="text-5xl font-black text-primary mr-4">1</span>
                   <div>
-                    <h3 className="text-xl font-bold mb-2">Personalized Marketing Strategies</h3>
+                    <h3 className="text-xl font-bold mb-2">Create your strategy</h3>
                     <p className="text-white/80">
-                      KOOL's AI analyzes your audience data to create targeted marketing campaigns that actually convert
-                      to streams and sales
+                      Define your goals, upload your content, and let KOOL analyze your project to generate a custom roadmap.
                     </p>
                   </div>
                 </div>
@@ -48,9 +46,9 @@ export default function MusicLists() {
                 <div className="flex items-start">
                   <span className="text-5xl font-black text-primary mr-4">2</span>
                   <div>
-                    <h3 className="text-xl font-bold mb-2">Automated Release Planning</h3>
+                    <h3 className="text-xl font-bold mb-2">Execute with AI</h3>
                     <p className="text-white/80">
-                      Strategic scheduling based on industry trends, audience behavior, and platform algorithms
+                      KOOL doesn't just advise — it takes action. From pitching to scheduling and outreach, your AI agent works for you. Just like a manager, but 100% autonomous and scalable.
                     </p>
                   </div>
                 </div>
@@ -60,9 +58,9 @@ export default function MusicLists() {
                 <div className="flex items-start">
                   <span className="text-5xl font-black text-primary mr-4">3</span>
                   <div>
-                    <h3 className="text-xl font-bold mb-2">Royalty Tracking & Optimization</h3>
+                    <h3 className="text-xl font-bold mb-2">Optimize Your Content</h3>
                     <p className="text-white/80">
-                      AI-powered tools that ensure you're getting paid for every stream across all platforms
+                      Let KOOL's AI analyze your music and content to suggest improvements, optimal release times, and platform-specific strategies for maximum impact.
                     </p>
                   </div>
                 </div>
@@ -72,10 +70,9 @@ export default function MusicLists() {
                 <div className="flex items-start">
                   <span className="text-5xl font-black text-primary mr-4">4</span>
                   <div>
-                    <h3 className="text-xl font-bold mb-2">Fan Engagement Automation</h3>
+                    <h3 className="text-xl font-bold mb-2">Track your results</h3>
                     <p className="text-white/80">
-                      Tools that help you maintain meaningful connections with fans without spending hours on social
-                      media
+                      Visualize your growth with real-time reports and strategic feedback loops in your personalized dashboard. Adjust your path as you grow.
                     </p>
                   </div>
                 </div>
@@ -85,9 +82,9 @@ export default function MusicLists() {
                 <div className="flex items-start">
                   <span className="text-5xl font-black text-primary mr-4">5</span>
                   <div>
-                    <h3 className="text-xl font-bold mb-2">Production Enhancement</h3>
+                    <h3 className="text-xl font-bold mb-2">Scale Your Success</h3>
                     <p className="text-white/80">
-                      AI-assisted mixing, mastering, and arrangement tools that give your music a professional sound
+                      As your audience grows, KOOL's AI automatically adapts your strategy, scaling your reach while maintaining authentic connections with your fanbase.
                     </p>
                   </div>
                 </div>

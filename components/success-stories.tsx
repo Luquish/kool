@@ -3,12 +3,14 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 
 export default function SuccessStories() {
   return (
-    <section id="artists" className="my-12 border-t-2 border-secondary pt-12">
+    <section id="artists" className="mb-12 border-t-2 border-secondary pt-12">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8">
         <div>
           <div className="bg-primary text-white inline-block px-3 py-1 text-xs font-bold mb-3">SUCCESS STORIES</div>
-          <h2 className="text-3xl md:text-4xl font-black mb-2">ARTISTS TRANSFORMING THEIR CAREERS WITH AI</h2>
-          <p className="text-lg text-secondary/70 max-w-2xl">
+          <h2 className="text-3xl md:text-4xl font-black mb-2">
+            ARTISTS TRANSFORMING THEIR CAREERS WITH <span className="text-primary">KOOL</span>
+          </h2>
+          <p className="text-lg text-secondary/70">
             Meet the independent musicians who are using KOOL to reach new heights
           </p>
         </div>
