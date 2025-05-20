@@ -21,7 +21,7 @@ export default function OnboardingPage() {
   const [currentUser, setCurrentUser] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [progress, setProgress] = useState(0);
-  const { reset, loadFromStorage, saveToStorage } = useOnboardingStore();
+  const { reset, loadFromStorage, saveToStorage, finishOnboarding } = useOnboardingStore();
 
   useEffect(() => {
     const checkUser = async () => {
@@ -46,6 +46,7 @@ export default function OnboardingPage() {
   useEffect(() => {
     if (currentUser && currentStep > 1) {
       // Solo guardamos automáticamente después del primer paso
+      // Guardamos el progreso temporal, no el definitivo
       saveToStorage();
     }
   }, [currentStep, currentUser, saveToStorage]);
@@ -69,8 +70,8 @@ export default function OnboardingPage() {
         return;
       }
       
-      // Guardar todos los datos de onboarding en el perfil
-      const saved = await saveToStorage();
+      // Guardar todos los datos de onboarding en el perfil de forma definitiva
+      const saved = await finishOnboarding();
       
       if (!saved) {
         throw new Error("Error al guardar los datos");

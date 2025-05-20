@@ -124,20 +124,6 @@ export default function SocialsStep() {
               className="w-full p-2 border rounded-md bg-background"
             />
           </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Presupuesto por Lanzamiento (ARS)</label>
-            <input
-              type="number"
-              name="budget_per_launch_ars"
-              value={formData.budget_per_launch_ars}
-              onChange={handleInputChange}
-              min="0"
-              placeholder="0"
-              className="w-full p-2 border rounded-md bg-background"
-            />
-            <p className="text-xs text-muted-foreground">Cuánto inviertes en cada lanzamiento musical</p>
-          </div>
         </div>
       </div>
     </div>

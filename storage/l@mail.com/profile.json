@@ -1,7 +1,7 @@
 {
-  "name": "s",
+  "name": "luca",
   "email": "l@mail.com",
-  "password": "$2b$10$sNfJznDNpvkxhPy0dN9i3.NH0bRwd0qAzkoHXZKn1fiKS4Iac6QSa",
+  "password": "$2b$10$dGwl27PoXTtG.TyFc2mrcOK4RmNlk4tZbH0xo7Yj8Rn81kRQ1gmCa",
   "subscription_plan": null,
   "language": "es",
   "project_type": "",
@@ -17,46 +17,39 @@
   ],
   "distributor": "s",
   "label_status": "independent",
+  "label_name": "",
   "socials": {
     "instagram_followers": 1,
     "spotify_monthly_listeners": 1,
     "tiktok_followers": 1,
     "youtube_subscribers": 1,
-    "mailing_list_size": 1,
-    "budget_per_launch_ars": 1
+    "mailing_list_size": 1
   },
-  "budget_per_launch_ars": 0,
   "discography": {
     "eps": [
       {
-        "title": "s",
+        "title": "1",
         "tracks": 1,
-        "year": 2000
+        "year": 1
       }
     ],
     "singles_released": [
       {
-        "title": "s",
-        "year": 2000
+        "title": "1",
+        "year": 1
       }
     ],
-    "upcoming_releases": [
-      {
-        "title": "a",
-        "type": "single",
-        "concept": "d"
-      }
-    ],
-    "visual_concept": "s"
+    "upcoming_releases": [],
+    "visual_concept": "1"
   },
   "live_history": {
     "highlights": [],
-    "avg_capacity": 0,
-    "avg_ticket_price_ars": 0
+    "avg_capacity": 1,
+    "avg_ticket_price_ars": 2
   },
   "financials": {
-    "annual_expenses_ars": 0,
-    "budget_per_launch_ars": 0
+    "annual_expenses_ars": 2,
+    "budget_per_launch_ars": 2
   },
-  "label_name": ""
+  "is_onboarding_in_progress": false
 }

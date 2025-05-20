@@ -13,11 +13,25 @@ interface Release {
 
 export default function DiscographyStep() {
   const store = useOnboardingStore();
+  
+  // Convertir los datos almacenados a tipo Release si existen
+  const existingEPs = store.discography?.eps 
+    ? (store.discography.eps as unknown as Release[]) 
+    : [];
+  
+  const existingSingles = store.discography?.singles_released 
+    ? (store.discography.singles_released as unknown as Release[]) 
+    : [];
+  
+  const existingUpcoming = store.discography?.upcoming_releases 
+    ? (store.discography.upcoming_releases as unknown as Release[]) 
+    : [];
+  
   const [formData, setFormData] = useState({
-    eps: store.eps || [],
-    singles_released: store.singles_released || [],
-    upcoming_releases: store.upcoming_releases || [],
-    visual_concept: store.visual_concept || "",
+    eps: existingEPs,
+    singles_released: existingSingles,
+    upcoming_releases: existingUpcoming,
+    visual_concept: store.discography?.visual_concept || "",
   });
 
   // Estados temporales para nuevos lanzamientos
@@ -35,7 +49,7 @@ export default function DiscographyStep() {
     if (!newEP.title) return;
     const updatedEPs = [...formData.eps, newEP];
     setFormData((prev) => ({ ...prev, eps: updatedEPs }));
-    store.setDiscography({ eps: updatedEPs });
+    store.setDiscography({ discography: { ...store.discography, eps: updatedEPs } });
     setNewEP({ title: "", tracks: undefined, year: undefined });
   };
 
@@ -43,7 +57,7 @@ export default function DiscographyStep() {
     if (!newSingle.title) return;
     const updatedSingles = [...formData.singles_released, newSingle];
     setFormData((prev) => ({ ...prev, singles_released: updatedSingles }));
-    store.setDiscography({ singles_released: updatedSingles });
+    store.setDiscography({ discography: { ...store.discography, singles_released: updatedSingles } });
     setNewSingle({ title: "", year: undefined });
   };
 
@@ -51,14 +65,14 @@ export default function DiscographyStep() {
     if (!newUpcoming.title || !newUpcoming.type) return;
     const updatedUpcoming = [...formData.upcoming_releases, newUpcoming];
     setFormData((prev) => ({ ...prev, upcoming_releases: updatedUpcoming }));
-    store.setDiscography({ upcoming_releases: updatedUpcoming });
+    store.setDiscography({ discography: { ...store.discography, upcoming_releases: updatedUpcoming } });
     setNewUpcoming({ title: "", type: "", concept: "" });
   };
 
   const handleRemoveRelease = (type: "eps" | "singles_released" | "upcoming_releases", index: number) => {
     const updatedReleases = formData[type].filter((_, i) => i !== index);
     setFormData((prev) => ({ ...prev, [type]: updatedReleases }));
-    store.setDiscography({ [type]: updatedReleases });
+    store.setDiscography({ discography: { ...store.discography, [type]: updatedReleases }});
   };
 
   return (

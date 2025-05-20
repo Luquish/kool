@@ -126,7 +126,7 @@ export default function BasicInfoStep() {
             {formData.members.map((member, index) => (
               <span
                 key={index}
-                className="px-3 py-1 bg-secondary rounded-full flex items-center gap-2"
+                className="px-3 py-1 bg-secondary rounded-full flex items-center gap-2 text-white"
               >
                 {member}
                 <button
@@ -161,7 +161,7 @@ export default function BasicInfoStep() {
             {formData.guest_members.map((member, index) => (
               <span
                 key={index}
-                className="px-3 py-1 bg-secondary rounded-full flex items-center gap-2"
+                className="px-3 py-1 bg-secondary rounded-full flex items-center gap-2 text-white"
               >
                 {member}
                 <button
@@ -196,7 +196,7 @@ export default function BasicInfoStep() {
             {formData.creative_team.map((member, index) => (
               <span
                 key={index}
-                className="px-3 py-1 bg-secondary rounded-full flex items-center gap-2"
+                className="px-3 py-1 bg-secondary rounded-full flex items-center gap-2 text-white"
               >
                 {member}
                 <button

@@ -15,26 +15,28 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const userPath = `users/${email}/profile.json`;
+      const userPath = `storage/${email}/profile.json`;
       const userData = await storage.getItem(userPath);
       
       if (!userData) {
-        setError("Usuario no encontrado");
+        setError("User not found");
         return;
       }
 
-      const user = JSON.parse(userData);
       // Verificar la contraseña hasheada
-      const isValidPassword = await bcrypt.compare(password, user.password);
+      const isValidPassword = await bcrypt.compare(password, userData.password);
       
       if (isValidPassword) {
-        await storage.setItem("currentUser", email);
-        router.push("/dashboard");
+        await storage.saveItem("currentUser", email);
+        // Establecer el usuario actual
+        await storage.setCurrentUser(email);
+        
+        router.push("/");
       } else {
-        setError("Contraseña incorrecta");
+        setError("Incorrect password");
       }
     } catch (err) {
-      setError("Error al iniciar sesión");
+      setError("Error logging in");
       console.error(err);
     }
   };
@@ -44,10 +46,10 @@ export default function LoginPage() {
       <div className="w-full max-w-md space-y-8 p-10 bg-card rounded-xl shadow-lg">
         <div className="text-center">
           <h2 className="mt-6 text-3xl font-bold text-primary">
-            Bienvenido a Kool
+            Be Kool
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Inicia sesión para continuar
+            Login to continue
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleLogin}>
@@ -71,7 +73,7 @@ export default function LoginPage() {
             </div>
             <div>
               <label htmlFor="password" className="text-sm font-medium text-foreground">
-                Contraseña
+                Password
               </label>
               <input
                 id="password"
@@ -90,16 +92,16 @@ export default function LoginPage() {
               type="submit"
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
             >
-              Iniciar Sesión
+              Login
             </button>
           </div>
         </form>
 
         <div className="mt-6 text-center">
           <p className="text-sm text-muted-foreground">
-            ¿No tienes una cuenta?{" "}
+            Don't have an account?{" "}
             <Link href="/auth/signup" className="font-medium text-primary hover:text-primary/90">
-              Regístrate aquí
+              Sign up here
             </Link>
           </p>
         </div>

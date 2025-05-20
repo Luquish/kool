@@ -92,7 +92,7 @@ export default function SignupPage() {
         await storage.setCurrentUser(email);
         
         // Redirigir al usuario al onboarding
-        router.push('/onboarding');
+        router.push('/');
       } catch (error) {
         console.error('Error al guardar el perfil:', error);
         setError('Hubo un error al crear tu cuenta. Por favor, intenta de nuevo.');
@@ -108,10 +108,10 @@ export default function SignupPage() {
       <div className="w-full max-w-md space-y-8 p-10 bg-card rounded-xl shadow-lg">
         <div className="text-center">
           <h2 className="mt-6 text-3xl font-bold text-primary">
-            Únete a Kool
+            Be Kool
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Crea tu cuenta para empezar
+            Create your account to get started
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSignup}>
@@ -120,8 +120,8 @@ export default function SignupPage() {
           )}
           <div className="space-y-4">
             <div>
-              <label htmlFor="name" className="text-sm font-medium text-foreground">
-                Nombre
+              <label htmlFor="name" className="text-sm font-medium text-secondary">
+                Name
               </label>
               <input
                 id="name"
@@ -134,7 +134,7 @@ export default function SignupPage() {
               />
             </div>
             <div>
-              <label htmlFor="email" className="text-sm font-medium text-foreground">
+              <label htmlFor="email" className="text-sm font-medium text-secondary">
                 Email
               </label>
               <input
@@ -148,8 +148,8 @@ export default function SignupPage() {
               />
             </div>
             <div>
-              <label htmlFor="password" className="text-sm font-medium text-foreground">
-                Contraseña
+              <label htmlFor="password" className="text-sm font-medium text-secondary">
+                Password
               </label>
               <input
                 id="password"
@@ -162,8 +162,8 @@ export default function SignupPage() {
               />
             </div>
             <div>
-              <label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">
-                Confirmar Contraseña
+              <label htmlFor="confirmPassword" className="text-sm font-medium text-secondary">
+                Confirm Password
               </label>
               <input
                 id="confirmPassword"
@@ -182,16 +182,16 @@ export default function SignupPage() {
               type="submit"
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
             >
-              Crear Cuenta
+              Create Account
             </button>
           </div>
         </form>
 
         <div className="mt-6 text-center">
           <p className="text-sm text-muted-foreground">
-            ¿Ya tienes una cuenta?{" "}
+            Already have an account?{" "}
             <Link href="/auth/login" className="font-medium text-primary hover:text-primary/90">
-              Inicia sesión aquí
+              Login here
             </Link>
           </p>
         </div>

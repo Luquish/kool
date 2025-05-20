@@ -18,18 +18,24 @@ export default function LiveHistoryStep() {
 
   const [formData, setFormData] = useState({
     live_highlights: existingHighlights,
-    avg_capacity: store.live_history?.avg_capacity || 0,
-    avg_ticket_price_ars: store.live_history?.avg_ticket_price_ars || 0,
-    annual_expenses_ars: store.financials?.annual_expenses_ars || 0,
-    budget_per_launch_ars: store.financials?.budget_per_launch_ars || 0
+    avg_capacity: store.live_history?.avg_capacity || "",
+    avg_ticket_price_ars: store.live_history?.avg_ticket_price_ars || "",
+    annual_expenses_ars: store.financials?.annual_expenses_ars || "",
+    budget_per_launch_ars: store.financials?.budget_per_launch_ars || ""
   });
 
   const [newHighlight, setNewHighlight] = useState<LiveHighlight>({ venue: "", note: "" });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    const numericValue = value === "" ? 0 : parseInt(value, 10);
-    setFormData((prev) => ({ ...prev, [name]: numericValue }));
+    
+    // Eliminar cualquier signo de pesos y espacios
+    const cleanValue = value.replace(/[^\d]/g, '');
+    // Convertir a número para almacenar en el store (0 si está vacío)
+    const numericValue = cleanValue === "" ? 0 : parseInt(cleanValue, 10);
+    
+    // Para los campos monetarios, almacenamos en el estado el valor limpio
+    setFormData((prev) => ({ ...prev, [name]: cleanValue }));
     
     // Determinar si el campo pertenece a live_history o financials
     if (name === 'annual_expenses_ars' || name === 'budget_per_launch_ars') {
@@ -83,6 +89,12 @@ export default function LiveHistoryStep() {
         highlights: updatedHighlights 
       } 
     });
+  };
+
+  // Función para formatear el valor con signo de pesos
+  const formatCurrency = (value: string) => {
+    if (value === "") return "";
+    return `$ ${value}`;
   };
 
   return (
@@ -142,11 +154,10 @@ export default function LiveHistoryStep() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Capacidad Promedio</label>
               <input
-                type="number"
+                type="text"
                 name="avg_capacity"
                 value={formData.avg_capacity}
                 onChange={handleInputChange}
-                min="0"
                 className="w-full p-2 border rounded-md bg-background"
                 placeholder="0"
               />
@@ -154,15 +165,17 @@ export default function LiveHistoryStep() {
 
             <div className="space-y-2">
               <label className="text-sm font-medium">Precio Promedio de Entrada (ARS)</label>
-              <input
-                type="number"
-                name="avg_ticket_price_ars"
-                value={formData.avg_ticket_price_ars}
-                onChange={handleInputChange}
-                min="0"
-                className="w-full p-2 border rounded-md bg-background"
-                placeholder="0"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  name="avg_ticket_price_ars"
+                  value={formData.avg_ticket_price_ars}
+                  onChange={handleInputChange}
+                  className="w-full p-2 pl-6 border rounded-md bg-background"
+                  placeholder="0"
+                />
+                <div className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">$</div>
+              </div>
             </div>
           </div>
         </div>
@@ -173,34 +186,38 @@ export default function LiveHistoryStep() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Gastos Anuales Estimados (ARS)</label>
-              <input
-                type="number"
-                name="annual_expenses_ars"
-                value={formData.annual_expenses_ars}
-                onChange={handleInputChange}
-                min="0"
-                className="w-full p-2 border rounded-md bg-background"
-                placeholder="0"
-              />
-              <p className="text-sm text-muted-foreground mt-1">
-                Incluye gastos de producción, ensayo, equipamiento, etc.
-              </p>
+              <div className="relative">
+                <input
+                  type="text"
+                  name="annual_expenses_ars"
+                  value={formData.annual_expenses_ars}
+                  onChange={handleInputChange}
+                  className="w-full p-2 pl-6 border rounded-md bg-background"
+                  placeholder="0"
+                />
+                <div className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">$</div>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Incluye gastos de producción, ensayo, equipamiento, etc.
+                </p>
+              </div>
             </div>
             
             <div className="space-y-2">
               <label className="text-sm font-medium">Presupuesto por Lanzamiento (ARS)</label>
-              <input
-                type="number"
-                name="budget_per_launch_ars"
-                value={formData.budget_per_launch_ars}
-                onChange={handleInputChange}
-                min="0"
-                className="w-full p-2 border rounded-md bg-background"
-                placeholder="0"
-              />
-              <p className="text-sm text-muted-foreground mt-1">
-                Cuánto inviertes en cada lanzamiento musical
-              </p>
+              <div className="relative">
+                <input
+                  type="text"
+                  name="budget_per_launch_ars"
+                  value={formData.budget_per_launch_ars}
+                  onChange={handleInputChange}
+                  className="w-full p-2 pl-6 border rounded-md bg-background"
+                  placeholder="0"
+                />
+                <div className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">$</div>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Cuánto inviertes en cada lanzamiento musical
+                </p>
+              </div>
             </div>
           </div>
         </div>
