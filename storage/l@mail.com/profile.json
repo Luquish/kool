@@ -1,0 +1,62 @@
+{
+  "name": "s",
+  "email": "l@mail.com",
+  "password": "$2b$10$sNfJznDNpvkxhPy0dN9i3.NH0bRwd0qAzkoHXZKn1fiKS4Iac6QSa",
+  "subscription_plan": null,
+  "language": "es",
+  "project_type": "",
+  "artist_name": "s",
+  "members": [
+    "s"
+  ],
+  "guest_members": [
+    "s"
+  ],
+  "creative_team": [
+    "s"
+  ],
+  "distributor": "s",
+  "label_status": "independent",
+  "socials": {
+    "instagram_followers": 1,
+    "spotify_monthly_listeners": 1,
+    "tiktok_followers": 1,
+    "youtube_subscribers": 1,
+    "mailing_list_size": 1,
+    "budget_per_launch_ars": 1
+  },
+  "budget_per_launch_ars": 0,
+  "discography": {
+    "eps": [
+      {
+        "title": "s",
+        "tracks": 1,
+        "year": 2000
+      }
+    ],
+    "singles_released": [
+      {
+        "title": "s",
+        "year": 2000
+      }
+    ],
+    "upcoming_releases": [
+      {
+        "title": "a",
+        "type": "single",
+        "concept": "d"
+      }
+    ],
+    "visual_concept": "s"
+  },
+  "live_history": {
+    "highlights": [],
+    "avg_capacity": 0,
+    "avg_ticket_price_ars": 0
+  },
+  "financials": {
+    "annual_expenses_ars": 0,
+    "budget_per_launch_ars": 0
+  },
+  "label_name": ""
+}
