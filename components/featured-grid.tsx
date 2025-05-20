@@ -37,7 +37,7 @@ export default function FeaturedGrid() {
   return (
     <section id="features" className="mb-12 border-t-2 border-secondary pt-12">
       <div className="mb-8">
-        <div className="bg-secondary text-white inline-block px-3 py-1 text-xs font-bold mb-3">FEATURES</div>
+        <div className="bg-secondary text-white inline-block px-3 py-1 text-xs font-bold mb-3">ESSENTIAL KOOLKIT</div>
         <h2 className="text-3xl md:text-4xl font-black mb-4">THE 6 TOOLS EVERY INDEPENDENT ARTIST NEEDS</h2>
         <p className="text-lg text-secondary/70 max-w-3xl">
           <span className="text-primary">KOOL</span> combines AI intelligence with music industry expertise to give independent

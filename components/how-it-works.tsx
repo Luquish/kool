@@ -5,8 +5,8 @@ export default function HowItWorks() {
     <section id="how-it-works" className="mb-12 border-t-2 border-secondary pt-12">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-4">
-          <div className="bg-primary text-white inline-block px-3 py-1 text-xs font-bold mb-3">HOW IT WORKS</div>
-          <h2 className="text-3xl font-black mb-4">This is what being Kool looks like.</h2>
+          <div className="bg-primary text-white inline-block px-3 py-1 text-xs font-bold mb-3">THE KOOL WAY</div>
+          <h2 className="text-3xl font-black mb-4">This is what being <span className="text-primary">Kool</span> looks like.</h2>
           <div className="aspect-[4/3] bg-background mb-4">
             <img
               src="/placeholder.svg?height=400&width=600"
@@ -36,7 +36,7 @@ export default function HowItWorks() {
                   <div>
                     <h3 className="text-xl font-bold mb-2">Create your strategy</h3>
                     <p className="text-white/80">
-                      Define your goals, upload your content, and let KOOL analyze your project to generate a custom roadmap.
+                      Define your goals, upload your content, and let KOOL analyze your career to generate a custom roadmap for your next steps.
                     </p>
                   </div>
                 </div>

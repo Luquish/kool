@@ -2,7 +2,7 @@ import MagazineHeader from "@/components/magazine-header"
 import HeroArticle from "@/components/hero-article"
 import FeaturedGrid from "@/components/featured-grid"
 import SuccessStories from "@/components/success-stories"
-import LatestNews from "@/components/latest-news"
+import AboutUs from "@/components/about-us"
 import PricingSection from "@/components/pricing-section"
 import MagazineFooter from "@/components/magazine-footer"
 import HowItWorks from "@/components/how-it-works"
@@ -16,7 +16,7 @@ export default function Home() {
         <FeaturedGrid />
         <HowItWorks />
         <SuccessStories />
-        <LatestNews />
+        <AboutUs />
         <PricingSection />
       </main>
       <MagazineFooter />

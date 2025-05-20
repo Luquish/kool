@@ -41,7 +41,7 @@ export default function PricingSection() {
   return (
     <section id="pricing" className="my-12 border-t-2 border-secondary pt-12">
       <div className="mb-8">
-        <div className="bg-primary text-white inline-block px-3 py-1 text-xs font-bold mb-3">PRICING</div>
+        <div className="bg-primary text-white inline-block px-3 py-1 text-xs font-bold mb-3">GET KOOL</div>
         <h2 className="text-3xl md:text-4xl font-black mb-2">JOIN THE <span className="text-primary">KOOL</span>TURE</h2>
         <p className="text-lg text-secondary/70">
           All plans include our core AI management features. Start with a 14-day free trial today and see how <span className="text-primary">KOOL</span>'s AI-powered management can take your career to the next level.
@@ -75,7 +75,7 @@ export default function PricingSection() {
                     : "bg-secondary hover:bg-secondary/90 text-white"
                 }`}
               >
-                Start Free Trial
+                Subscribe
               </Button>
               <ul className="mt-6 space-y-3 flex-grow">
                 {plan.features.map((feature, i) => (

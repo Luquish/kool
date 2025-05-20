@@ -73,6 +73,9 @@ export default function MagazineHeader() {
           <Link href="#artists" className="hover:text-primary">
             Artists
           </Link>
+          <Link href="#about" className="hover:text-primary">
+            About
+          </Link>
           <Link href="#pricing" className="hover:text-primary">
             Pricing
           </Link>

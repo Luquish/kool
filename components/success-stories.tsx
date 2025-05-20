@@ -6,7 +6,7 @@ export default function SuccessStories() {
     <section id="artists" className="mb-12 border-t-2 border-secondary pt-12">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8">
         <div>
-          <div className="bg-primary text-white inline-block px-3 py-1 text-xs font-bold mb-3">SUCCESS STORIES</div>
+          <div className="bg-primary text-white inline-block px-3 py-1 text-xs font-bold mb-3">KOOL STORIES</div>
           <h2 className="text-3xl md:text-4xl font-black mb-2">
             ARTISTS TRANSFORMING THEIR CAREERS WITH <span className="text-primary">KOOL</span>
           </h2>
