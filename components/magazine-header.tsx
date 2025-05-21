@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Search, Menu, X, User } from "lucide-react"
+import { Search, Menu, X, User, Home } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import storage from "@/lib/storage"
 
@@ -74,11 +74,11 @@ export default function MagazineHeader() {
             onMouseEnter={() => setShowJoke(true)}
             onMouseLeave={() => setShowJoke(false)}
           >
-            {showJoke ? "Just kidding!" : "Got A Tip?"}
+            {showJoke ? "Just kidding!" : "Got a tip?"}
           </Link>
         </div>
         <div className="flex-1 flex justify-center">
-          <Link href="/" className="block">
+          <Link href="/" className="block transition-transform hover:scale-105 duration-200">
             <div className="font-logo text-6xl text-primary transform relative">
               <span className="relative text-stroke-1 text-stroke-white">KOOL</span>
               <div className="absolute inset-0 transform translate-x-0.5 translate-y-0.5 text-black -z-10">KOOL</div>
@@ -133,6 +133,14 @@ export default function MagazineHeader() {
         </button>
 
         <nav className="hidden md:flex items-center space-x-8 font-bold text-sm uppercase">
+          <Link 
+            href="/" 
+            className="flex items-center gap-1 text-primary hover:text-primary/80 transition-colors"
+          >
+            <Home size={16} />
+            <span>Home</span>
+          </Link>
+          
           <Link href="#features" className="hover:text-primary">
             Features
           </Link>
@@ -176,6 +184,10 @@ export default function MagazineHeader() {
       {isMenuOpen && (
         <div className="md:hidden border-t-2 border-secondary">
           <nav className="container mx-auto px-4 py-4 flex flex-col space-y-4 font-bold text-sm uppercase">
+            <Link href="/" className="hover:text-primary py-2 border-b-2 border-secondary flex items-center gap-2">
+              <Home size={16} />
+              <span>Home</span>
+            </Link>
             <Link href="#features" className="hover:text-primary py-2 border-b-2 border-secondary">
               Features
             </Link>

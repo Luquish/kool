@@ -8,6 +8,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
 
 export default function DashboardPage() {
   const [currentUser, setCurrentUser] = useState<string | null>(null);
@@ -15,6 +19,7 @@ export default function DashboardPage() {
   const [strategy, setStrategy] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const { toast } = useToast();
+  const router = useRouter();
 
   // Obtener el usuario actual y su perfil
   useEffect(() => {
@@ -115,6 +120,51 @@ export default function DashboardPage() {
     return (completedTasks / totalTasks) * 100;
   };
 
+  // Cambiar estado de tarea
+  const handleTaskStatusChange = async (taskId: string, newStatus: string) => {
+    if (!strategy || !currentUser) return;
+
+    // Crear una copia profunda del objeto strategy
+    const updatedStrategy = JSON.parse(JSON.stringify(strategy));
+    
+    // Actualizar el estado de la tarea en el task_tracker
+    const taskIndex = updatedStrategy.task_tracker.findIndex((task: any) => task.id === taskId);
+    
+    if (taskIndex !== -1) {
+      updatedStrategy.task_tracker[taskIndex].status = newStatus;
+      
+      // Actualizar el estado local
+      setStrategy(updatedStrategy);
+      
+      // Guardar en el servidor
+      try {
+        await fetch('/api/storage', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            path: `storage/${currentUser}/strategy.json`,
+            data: updatedStrategy
+          }),
+        });
+        
+        toast({
+          title: 'Actualizado',
+          description: 'Estado de la tarea actualizado correctamente',
+          variant: 'default'
+        });
+      } catch (error) {
+        console.error('Error al guardar estado de tarea:', error);
+        toast({
+          title: 'Error',
+          description: 'No se pudo actualizar el estado de la tarea',
+          variant: 'destructive'
+        });
+      }
+    }
+  };
+
   // Si no hay usuario, mostrar mensaje
   if (!currentUser) {
     return (
@@ -133,6 +183,11 @@ export default function DashboardPage() {
 
   return (
     <div className="container mx-auto py-8">
+      <Breadcrumb 
+        items={[{ href: '/dashboard', label: 'Dashboard' }]}
+        className="mb-4" 
+      />
+      
       <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
       
       {/* Mostrar botón si no hay estrategia */}
@@ -232,15 +287,31 @@ export default function DashboardPage() {
                       <TableRow key={task.id}>
                         <TableCell className="font-medium">{task.title}</TableCell>
                         <TableCell>
-                          <span className={`px-2 py-1 rounded text-xs ${
-                            task.status === 'done' 
-                              ? 'bg-green-100 text-green-800' 
-                              : task.status === 'in-progress' 
-                                ? 'bg-blue-100 text-blue-800' 
-                                : 'bg-gray-100 text-gray-800'
-                          }`}>
-                            {task.status === 'done' ? 'Completado' : task.status === 'in-progress' ? 'En progreso' : 'Pendiente'}
-                          </span>
+                          <Select
+                            defaultValue={task.status}
+                            onValueChange={(value) => handleTaskStatusChange(task.id, value)}
+                          >
+                            <SelectTrigger className="w-[180px]">
+                              <SelectValue placeholder="Estado" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="pending">
+                                <span className="px-2 py-1 rounded text-xs bg-gray-100 text-gray-800">
+                                  Pendiente
+                                </span>
+                              </SelectItem>
+                              <SelectItem value="in-progress">
+                                <span className="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
+                                  En progreso
+                                </span>
+                              </SelectItem>
+                              <SelectItem value="done">
+                                <span className="px-2 py-1 rounded text-xs bg-green-100 text-green-800">
+                                  Completado
+                                </span>
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
                         </TableCell>
                         <TableCell>{task.owner}</TableCell>
                         <TableCell>{task.dependencies?.join(', ') || 'Ninguna'}</TableCell>
