@@ -32,7 +32,7 @@
   },
   "financials": {
     "annual_expenses_ars": 0,
-    "budget_per_launch_ars": 0
+    "budget_per_launch_ars": 10
   },
   "is_onboarding_in_progress": false
 }

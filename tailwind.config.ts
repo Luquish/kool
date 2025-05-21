@@ -22,6 +22,7 @@ const config = {
       fontFamily: {
         sans: ['Poppins', 'sans-serif'],
         display: ['Bebas Neue', 'sans-serif'],
+        logo: ['Shrikhand', 'cursive'],
       },
       colors: {
         border: "hsl(var(--border))",

@@ -18,13 +18,14 @@ export default function HeroArticle() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
             <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
               <h2 className="text-4xl md:text-6xl font-black leading-tight mb-4">
-                THE FUTURE OF MUSIC MANAGEMENT
+                STRATEGY NEVER LOOKED THIS <span className="font-logo text-primary">KOOL</span>
               </h2>
               <p className="text-xl md:text-2xl font-medium mb-6 max-w-3xl">
-                Kool is the AI-powered music management platform that helps independent artists compete with major labels and transform their careers.
+              Kool is your AI-powered strategist — built to grow your project. We give you the insights and tools a pro manager would — without the middleman. Your music. Your vision. Your strategy.
+
               </p>
               <div className="flex items-center text-white/80 text-sm mb-4">
-                <span className="font-bold mr-2">By ALEX MARTINEZ</span>
+                <span className="font-bold mr-2">By Juan Obstrovsky</span>
                 <span>May 19, 2025</span>
               </div>
               <Button className="bg-primary hover:bg-primary/90 text-white">Read More</Button>
@@ -41,7 +42,7 @@ export default function HeroArticle() {
               KOOL's AI tools are helping independent musicians produce studio-quality tracks without the big budget
             </p>
             <div className="text-xs text-secondary/60">
-              <span className="font-bold">By MARIA JOHNSON</span> • May 15, 2025
+              <span className="font-bold">By Guadalupe Cardiello</span> • May 15, 2025
             </div>
           </div>
 
@@ -52,7 +53,7 @@ export default function HeroArticle() {
               Indie artist Jamie Taylor shares how KOOL's AI manager transformed his career in just 6 months
             </p>
             <div className="text-xs text-secondary/60">
-              <span className="font-bold">By CHRIS WONG</span> • May 12, 2025
+              <span className="font-bold">By Francisco Morchio</span> • May 12, 2025
             </div>
           </div>
 
@@ -63,7 +64,7 @@ export default function HeroArticle() {
               New AI-powered tool helps artists track and maximize their streaming across all platforms
             </p>
             <div className="text-xs text-secondary/60">
-              <span className="font-bold">By SARAH MILLER</span> • May 10, 2025
+              <span className="font-bold">By Faustina Bagnat</span> • May 10, 2025
             </div>
           </div>
         </div>

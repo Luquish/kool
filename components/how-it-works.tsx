@@ -18,10 +18,10 @@ export default function HowItWorks() {
             Discover how KOOL's AI-powered platform transforms your music career with automated management and strategic growth.
           </p>
           <div className="text-xs text-secondary/60 mb-4">
-            <span className="font-bold">By KOOL EDITORIAL TEAM</span> • May 8, 2025
+            <span className="font-bold">By KOOL TEAM</span> • May 8, 2025
           </div>
           <Button variant="outline" className="border-secondary text-secondary hover:bg-secondary/5">
-            Read Full Article
+            See KOOL in Action
           </Button>
         </div>
 
@@ -34,9 +34,9 @@ export default function HowItWorks() {
                 <div className="flex items-start">
                   <span className="text-5xl font-black text-primary mr-4">1</span>
                   <div>
-                    <h3 className="text-xl font-bold mb-2">Create your strategy</h3>
+                    <h3 className="text-xl font-bold mb-2">Define Your Goals</h3>
                     <p className="text-white/80">
-                      Define your goals, upload your content, and let KOOL analyze your career to generate a custom roadmap for your next steps.
+                      Define your goals, upload your content, and let KOOL analyze your career to generate a custom roadmap.
                     </p>
                   </div>
                 </div>

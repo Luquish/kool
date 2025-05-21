@@ -4,36 +4,42 @@ import { Check } from "lucide-react"
 export default function PricingSection() {
   const plans = [
     {
-      name: "Starter",
-      price: "$19",
-      description: "Perfect for emerging artists",
-      features: ["AI Career Strategy", "Basic Analytics", "Release Planning", "Social Media Tools", "Email Support"],
+      name: "INDIE PLAN",
+      price: "Free",
+      description: "Great for getting started: helps us build a user base, train the Kooler, and offer upgrades from within.",
+      features: [
+        "Create a basic artist profile",
+        "Basic Analytics",
+        "Access to a limited dashboard",
+        "Interact with the Kooler (no execution)",
+      ],
     },
     {
-      name: "Pro",
-      price: "$49",
-      description: "For serious independent artists",
+      name: "KOOL PLAN",
+      price: "$4.99",
+      description: "Ideal for independent artists looking for structure, strategy, and autonomy",
       features: [
         "Everything in Starter",
-        "Advanced Analytics",
-        "Revenue Optimization",
-        "Fan Engagement Tools",
-        "Priority Support",
+        "Full artist profile",
+        "Full dashboard access",
+        "Interact with the Kooler with action execution",
+        "Access to exclusive workshops",
         "Collaboration Matching",
       ],
       popular: true,
     },
     {
-      name: "Elite",
-      price: "$99",
-      description: "Complete career management",
+      name: "MANAGER PLAN",
+      price: "$59.99",
+      description: "Designed for managers, labels, and incubators with limited time — KOOL becomes part of your team",
       features: [
         "Everything in Pro",
-        "Custom AI Training",
-        "Industry Connections",
-        "Playlist Pitching",
-        "24/7 Support",
-        "Distribution Services",
+        "Manage up to 10 artist profiles",
+        "Monitoring tools & centralized dashboard",
+        "Action plans",
+        "Collaboration with labels & teams",
+        "Spotify reports",
+        "White-label option",
       ],
     },
   ]
@@ -65,7 +71,9 @@ export default function PricingSection() {
               <h3 className="text-2xl font-bold text-secondary mb-2">{plan.name}</h3>
               <div className="flex items-end mb-4">
                 <span className="text-4xl font-black text-secondary">{plan.price}</span>
-                <span className="text-secondary/70 ml-1">/month</span>
+                {plan.price !== "Free" && (
+                  <span className="text-secondary/70 ml-1">/month</span>
+                )}
               </div>
               <p className="text-secondary/70 mb-6">{plan.description}</p>
               <Button
@@ -88,16 +96,6 @@ export default function PricingSection() {
             </div>
           </div>
         ))}
-      </div>
-
-      <div className="mt-12 bg-background border-2 border-secondary p-8">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between">
-          <div className="mb-4 md:mb-0">
-            <div className="text-primary font-bold text-sm mb-2">SPECIAL OFFER</div>
-            <h3 className="text-2xl font-bold">Get 2 Months Free With Annual Billing</h3>
-          </div>
-          <Button className="bg-primary hover:bg-primary/90 text-white">View Annual Plans</Button>
-        </div>
       </div>
     </section>
   )

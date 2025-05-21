@@ -146,6 +146,14 @@ html {
   font-style: normal;
 }
 
+/* Shrikhand Font */
+@font-face {
+  font-family: 'Shrikhand';
+  src: url('/font/Shrikhand-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 @layer base {
   :root {
     --background: 0 0% 96%;

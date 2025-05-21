@@ -10,14 +10,9 @@ export default function MagazineFooter() {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           <div className="md:col-span-2">
-            <div className="font-serif italic font-bold text-white tracking-tighter transform -rotate-2 mb-4">
-              <Image
-                src="/kool_logo.svg"
-                alt="KOOL Logo"
-                width={120}
-                height={40}
-                className="text-white"
-              />
+            <div className="font-logo text-5xl text-primary transform -rotate-2 relative mb-4">
+              <span className="relative">KOOL</span>
+              <div className="absolute inset-0 transform translate-x-0.5 translate-y-0.5 text-background -z-10">KOOL</div>
             </div>
             <p className="text-white/70 mb-6 max-w-md">
               The AI-powered platform that helps independent musicians create, promote, and monetize their music like

@@ -71,7 +71,7 @@ export default function AboutUs() {
               "KOOL represents the future of music management, where technology and creativity unite to create unprecedented opportunities for independent artists."
             </p>
             <p className="text-sm">
-              <span className="font-bold">Sarah Anderson</span> • CEO & Founder
+              <span className="font-bold">Faustina Bagnat</span> • CEO & Founder
             </p>
           </div>
         </div>
