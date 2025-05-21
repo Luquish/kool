@@ -11,7 +11,7 @@ export default function MagazineFooter() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           <div className="md:col-span-2">
             <div className="font-logo text-5xl text-primary transform -rotate-2 relative mb-4">
-              <span className="relative">KOOL</span>
+              <span className="relative text-stroke-1 text-stroke-black">KOOL</span>
               <div className="absolute inset-0 transform translate-x-0.5 translate-y-0.5 text-background -z-10">KOOL</div>
             </div>
             <p className="text-white/70 mb-6 max-w-md">

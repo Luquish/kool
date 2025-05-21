@@ -19,9 +19,9 @@ export default function AboutUs() {
             />
           </div>
           <div className="bg-primary text-white inline-block px-3 py-1 text-xs font-bold mb-2">OUR MISSION</div>
-          <h3 className="text-xl font-bold mb-2">Democratizing Musical Success</h3>
+          <h3 className="text-xl font-bold mb-2">Accessibility</h3>
           <p className="text-secondary/70 text-sm mb-4">
-            Our mission is to provide independent artists with the tools and resources traditionally only available to artists signed with major record labels.
+            Like having a professional team within reach of any independent artist. No friction, no filters.
           </p>
         </div>
 
@@ -34,9 +34,9 @@ export default function AboutUs() {
             />
           </div>
           <div className="bg-secondary text-white inline-block px-3 py-1 text-xs font-bold mb-2">TECHNOLOGY</div>
-          <h3 className="text-xl font-bold mb-2">Powered by Advanced AI</h3>
+          <h3 className="text-xl font-bold mb-2">Sustainability and Autonomy</h3>
           <p className="text-secondary/70 text-sm mb-4">
-            We utilize cutting-edge AI technology to analyze music trends, optimize promotion strategies, and maximize artist reach.
+            Build a real career with concrete tools that support long-term growth — not just viral moments. KOOL works for you. No intermediaries, no dependencies. 100% self-driven, 100% scalable.
           </p>
         </div>
 
@@ -68,7 +68,7 @@ export default function AboutUs() {
           </div>
           <div className="mt-4 md:mt-0 md:ml-8 text-white/80">
             <p className="italic mb-2">
-              "KOOL represents the future of music management, where technology and creativity unite to create unprecedented opportunities for independent artists."
+              "Based on our survey, 9 out of 10 artists believe a clear strategy could change the course of their careers. KOOL helps them build one — and sustain it."
             </p>
             <p className="text-sm">
               <span className="font-bold">Faustina Bagnat</span> • CEO & Founder

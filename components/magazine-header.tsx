@@ -79,8 +79,8 @@ export default function MagazineHeader() {
         </div>
         <div className="flex-1 flex justify-center">
           <Link href="/" className="block">
-            <div className="font-logo text-6xl text-primary transform -rotate-2 relative">
-              <span className="relative">KOOL</span>
+            <div className="font-logo text-6xl text-primary transform relative">
+              <span className="relative text-stroke-1 text-stroke-white">KOOL</span>
               <div className="absolute inset-0 transform translate-x-0.5 translate-y-0.5 text-black -z-10">KOOL</div>
             </div>
           </Link>
