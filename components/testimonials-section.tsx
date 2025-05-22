@@ -8,21 +8,21 @@ export default function TestimonialsSection() {
       role: "Indie Pop Artist",
       image: "/placeholder.svg?height=100&width=100",
       quote:
-        "Since using KOOL, my streaming numbers have increased by 300% and I've booked twice as many shows. The AI recommendations are spot-on.",
+        "Desde que uso KOOL, mis números de streaming han aumentado un 300% y he reservado el doble de shows. Las recomendaciones de IA son perfectas.",
     },
     {
       name: "Sophia Chen",
       role: "Electronic Producer",
       image: "/placeholder.svg?height=100&width=100",
       quote:
-        "KOOL helped me identify my core audience and create a marketing strategy that actually works. It's like having a manager who knows the industry inside out.",
+        "KOOL me ayudó a identificar mi audiencia principal y crear una estrategia de marketing que realmente funciona. Es como tener un manager que conoce la industria a la perfección.",
     },
     {
       name: "Marcus Johnson",
       role: "Hip-Hop Artist",
       image: "/placeholder.svg?height=100&width=100",
       quote:
-        "The revenue optimization feature alone paid for my subscription in the first month. KOOL found licensing opportunities I never would have discovered.",
+        "Los créditos de KOOL valen cada centavo. La plataforma encontró oportunidades de licenciamiento que nunca hubiera descubierto por mi cuenta.",
     },
   ]
 
@@ -31,9 +31,9 @@ export default function TestimonialsSection() {
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12">
           <div>
-            <h2 className="text-3xl md:text-5xl font-black text-secondary mb-4 font-display">Artist Success Stories</h2>
+            <h2 className="text-3xl md:text-5xl font-black text-secondary mb-4 font-display">Historias de Éxito</h2>
             <p className="text-lg text-secondary/70 max-w-2xl">
-              See how independent musicians are transforming their careers with KOOL's AI-powered management.
+              Descubre cómo los músicos independientes están transformando sus carreras con la gestión impulsada por IA de KOOL.
             </p>
           </div>
           <div className="flex space-x-2 mt-4 md:mt-0">
@@ -76,12 +76,11 @@ export default function TestimonialsSection() {
         <div className="mt-16 bg-secondary text-white rounded-lg overflow-hidden">
           <div className="grid grid-cols-1 md:grid-cols-2">
             <div className="p-8 md:p-12">
-              <div className="text-sm font-bold text-primary mb-2 font-display">FEATURED ARTIST</div>
-              <h3 className="text-2xl md:text-3xl font-bold mb-4 font-display">From Bedroom Producer to Festival Headliner</h3>
+              <div className="text-sm font-bold text-primary mb-2 font-display">ARTISTA DESTACADO</div>
+              <h3 className="text-2xl md:text-3xl font-bold mb-4 font-display">De Productor de Dormitorio a Headliner de Festival</h3>
               <p className="text-white/80 mb-6">
-                "KOOL's AI manager helped me navigate the industry, connect with the right people, and build a
-                sustainable career. Within 18 months, I went from releasing tracks on SoundCloud to performing at major
-                festivals."
+                "El asistente de IA de KOOL me ayudó a navegar por la industria, conectar con las personas correctas y construir una
+                carrera sostenible. En 18 meses, pasé de lanzar tracks en SoundCloud a tocar en festivales importantes."
               </p>
               <div className="flex items-center">
                 <img

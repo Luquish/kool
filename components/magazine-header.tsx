@@ -15,7 +15,6 @@ export default function MagazineHeader() {
   const [showJoke, setShowJoke] = useState(false)
   const [hasScrolled, setHasScrolled] = useState(false)
   const [currentUser, setCurrentUser] = useState<string | null>(null)
-  const [userSubscription, setUserSubscription] = useState<string | null>(null)
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
   const [isCreditModalOpen, setIsCreditModalOpen] = useState(false)
   const [userCredits, setUserCredits] = useState<number | null>(null)
@@ -69,13 +68,6 @@ export default function MagazineHeader() {
         
         if (userEmail) {
           setCurrentUser(userEmail);
-          
-          const userProfile = await storage.getUserProfile(userEmail);
-          if (userProfile) {
-            setUserSubscription(userProfile.subscription_plan);
-          }
-
-          // Obtener créditos actuales
           await fetchCurrentCredits(userEmail);
         }
       } catch (error) {
@@ -116,7 +108,6 @@ export default function MagazineHeader() {
       if (success) {
         setCurrentUser(null);
         setUserCredits(null);
-        setUserSubscription(null);
         setIsProfileMenuOpen(false);
         window.location.href = "/";
       } else {
