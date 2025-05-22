@@ -9,10 +9,20 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
-import { Send } from 'lucide-react';
+import { 
+  Send, 
+  Lock,
+  Share2, // Social
+  Music2, // Spotify
+  Target, // Marketing
+  Copyright, // Publishing
+  Mic2, // Live
+  FileText // Contracts
+} from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { AGENTS, AgentType } from '@/lib/agent-prompts';
+import { useOnboardingStore } from '@/lib/store/onboarding-store';
 import {
   Select,
   SelectContent,
@@ -20,6 +30,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+// Mapa de iconos para cada agente
+const AGENT_ICONS: Record<AgentType, React.ReactNode> = {
+  social: <Share2 className="h-4 w-4" />,
+  spotify: <Music2 className="h-4 w-4" />,
+  marketing: <Target className="h-4 w-4" />,
+  publishing: <Copyright className="h-4 w-4" />,
+  live: <Mic2 className="h-4 w-4" />,
+  contracts: <FileText className="h-4 w-4" />
+};
 
 // Interfaz para mensaje
 interface Message {
@@ -38,9 +64,10 @@ export default function ChatPage() {
   const [message, setMessage] = useState<string>('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [currentAgent, setCurrentAgent] = useState<AgentType>('spotify');
+  const [currentAgent, setCurrentAgent] = useState<AgentType>('social');
   const { toast } = useToast();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const [isOnboardingCompleted, setIsOnboardingCompleted] = useState<boolean>(false);
 
   // Obtener el usuario actual y su perfil
   useEffect(() => {
@@ -52,13 +79,13 @@ export default function ChatPage() {
         if (user) {
           const profile = await storage.getUserProfile(user);
           setUserProfile(profile);
+          setIsOnboardingCompleted(!profile?.is_onboarding_in_progress);
           
           // Recuperar historial de chat si existe
           try {
             const chatData = await fetch(`/api/storage?path=storage/${user}/chat.json`);
             if (chatData.ok) {
               const data = await chatData.json();
-              // Convertir las cadenas de fecha en objetos Date
               const formattedMessages = data.data.map((msg: any) => ({
                 ...msg, 
                 timestamp: new Date(msg.timestamp)
@@ -116,6 +143,34 @@ export default function ChatPage() {
     }
   };
 
+  // Función para verificar si un agente está bloqueado
+  const isAgentLocked = (agentType: AgentType): boolean => {
+    if (agentType === 'social') return false; // El agente social siempre está disponible
+    if (!currentUser) return true; // Si no hay usuario, todos los demás agentes están bloqueados
+    return !isOnboardingCompleted; // Si hay usuario pero no completó onboarding, están bloqueados
+  };
+
+  // Función para manejar el cambio de agente
+  const handleAgentChange = (value: AgentType) => {
+    if (isAgentLocked(value)) {
+      if (!currentUser) {
+        toast({
+          title: 'Agente bloqueado',
+          description: 'Inicia sesión para acceder a todos los agentes personalizados.',
+          variant: 'destructive'
+        });
+      } else {
+        toast({
+          title: 'Agente bloqueado',
+          description: 'Completa el onboarding para acceder a los agentes personalizados.',
+          variant: 'destructive'
+        });
+      }
+      return;
+    }
+    setCurrentAgent(value);
+  };
+
   // Enviar mensaje
   const handleSendMessage = async () => {
     if (!message.trim() || isLoading) return;
@@ -137,8 +192,10 @@ export default function ChatPage() {
     setMessages(updatedMessages);
     
     try {
-      // Guardar mensajes
-      await saveMessages(updatedMessages);
+      // Solo guardar mensajes si el usuario está autenticado y no es el agente social
+      if (currentUser && currentAgent !== 'social') {
+        await saveMessages(updatedMessages);
+      }
       
       // Enviar mensaje a la API
       const response = await fetch('/api/chat', {
@@ -148,7 +205,8 @@ export default function ChatPage() {
         },
         body: JSON.stringify({
           message: userMessage.content,
-          agentType: currentAgent
+          agentType: currentAgent,
+          userEmail: currentUser
         }),
       });
       
@@ -158,23 +216,35 @@ export default function ChatPage() {
       }
       
       const data = await response.json();
+
+      if (data.error) {
+        toast({
+          title: 'Error',
+          description: data.error,
+          variant: 'destructive'
+        });
+        return;
+      }
       
       // Añadir respuesta del asistente
       const assistantMessage: Message = {
         role: 'assistant',
         content: data.response,
         timestamp: new Date(),
-        agent: data.agent
+        agent: {
+          type: currentAgent,
+          name: AGENTS[currentAgent].name
+        }
       };
       
       const newMessages = [...updatedMessages, assistantMessage];
       setMessages(newMessages);
       
-      // Guardar mensajes actualizados
-      await saveMessages(newMessages);
-
-      // Actualizar los créditos en el header
-      await updateHeaderCredits();
+      // Solo guardar mensajes y actualizar créditos si el usuario está autenticado y no es el agente social
+      if (currentUser && currentAgent !== 'social') {
+        await saveMessages(newMessages);
+        await updateHeaderCredits();
+      }
     } catch (error: any) {
       console.error('Error en la conversación:', error);
       toast({
@@ -195,57 +265,16 @@ export default function ChatPage() {
     }).format(date);
   };
 
-  // Si no hay usuario, mostrar mensaje
-  if (!currentUser) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Card className="w-[400px]">
-          <CardHeader>
-            <CardTitle>No has iniciado sesión</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>Por favor, inicia sesión para acceder al chat.</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   return (
     <div className="container mx-auto py-8 flex flex-col h-[calc(100vh-200px)]">
       <Breadcrumb 
         items={[{ href: '/chat', label: 'Chat' }]}
-        className="mb-4" 
+        className="mb-4 mt-4" 
       />
-      
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-3xl font-bold">Chat con KoolAI</h1>
-        <Select
-          value={currentAgent}
-          onValueChange={(value: AgentType) => setCurrentAgent(value)}
-        >
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Select Agent" />
-          </SelectTrigger>
-          <SelectContent>
-            {Object.entries(AGENTS).map(([key, agent]) => (
-              <SelectItem key={key} value={key}>
-                {agent.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
       
       <Card className="flex-1 flex flex-col">
         <CardHeader className="pb-2">
           <div className="flex justify-between items-center">
-            <CardTitle className="text-lg">
-              {userProfile?.artist_name ? `Conversación con ${userProfile.artist_name}` : 'Tu conversación'}
-            </CardTitle>
-            <div className="text-sm text-muted-foreground">
-              Agente actual: {AGENTS[currentAgent].name}
-            </div>
           </div>
           <div className="text-sm text-muted-foreground mt-1">
             {AGENTS[currentAgent].description}
@@ -266,8 +295,11 @@ export default function ChatPage() {
           <ScrollArea className="h-[calc(100vh-450px)] px-4" ref={scrollAreaRef}>
             {messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center p-4">
-                <p className="text-muted-foreground mb-2">No hay mensajes aún</p>
-                <p className="text-muted-foreground">Comienza la conversación con el agente de {AGENTS[currentAgent].name}</p>
+                <p className="text-muted-foreground">
+                  {!currentUser 
+                    ? 'You are now talking to the free social media chat' 
+                    : `You are now talking to the agent of ${AGENTS[currentAgent].name}`}
+                </p>
               </div>
             ) : (
               <div className="space-y-4 py-4">
@@ -315,7 +347,7 @@ export default function ChatPage() {
             )}
           </ScrollArea>
         </CardContent>
-        <CardFooter className="pt-0">
+        <CardFooter className="pt-4">
           <form 
             onSubmit={(e) => {
               e.preventDefault();
@@ -324,12 +356,46 @@ export default function ChatPage() {
             className="flex w-full gap-2 items-center"
           >
             <Input
-              placeholder="Escribe tu mensaje..."
+              placeholder="Start your conversation..."
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               className="flex-1"
               disabled={isLoading}
             />
+            <div className="relative group">
+              <Select
+                value={currentAgent}
+                onValueChange={handleAgentChange}
+              >
+                <SelectTrigger className="w-[42px] px-2">
+                  {AGENT_ICONS[currentAgent]}
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(AGENTS).map(([key, agent]) => {
+                    const isLocked = key !== 'social' && (!currentUser || (currentUser && !isOnboardingCompleted));
+                    return (
+                      <SelectItem 
+                        key={key} 
+                        value={key}
+                        className={`flex items-center justify-between ${isLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        disabled={isLocked || false}
+                      >
+                        <div className="flex items-center gap-2">
+                          {AGENT_ICONS[key as AgentType]}
+                          <span>{agent.name}</span>
+                          {isLocked && <Lock size={16} className="ml-2" />}
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+              {!currentUser && (
+                <div className="absolute hidden group-hover:block bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 text-sm bg-popover text-popover-foreground rounded-md shadow-md whitespace-nowrap">
+                  Sign in to access all personalized agents and save your chat history.
+                </div>
+              )}
+            </div>
             <Button 
               type="submit" 
               size="icon"

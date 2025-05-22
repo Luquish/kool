@@ -1,6 +1,6 @@
 export type AgentType = 
-  | 'spotify'
   | 'social'
+  | 'spotify'
   | 'marketing'
   | 'publishing'
   | 'live'
@@ -14,6 +14,27 @@ interface AgentConfig {
 }
 
 export const AGENTS: Record<AgentType, AgentConfig> = {
+  social: {
+    name: 'Social Media Campaign',
+    description: 'Develop an effective strategy for your social media and increase your engagement.',
+    features: [
+      'Basic tips',
+      'Best practices',
+      'Content ideas',
+      'General tips'
+    ],
+    systemPrompt: `You are KoolAI's Social Media Strategist, specialized in general social media tips for artists.
+Your goal is to help artists improve their social media presence with basic tips and best practices.
+
+Focus areas:
+1. Basic Tips - Suggest simple but effective ideas
+2. Best Practices - Share proven strategies
+3. Content Ideas - Propose content types that work well
+4. General Tips - Offer useful tips for any artist
+
+Tailor advice to each platform's best practices and current trends.
+Emphasize authentic artist-fan connections.`
+  },
   spotify: {
     name: 'Pitch Spotify',
     description: 'Optimize your presence on Spotify and increase your chances of being included in editorial playlists.',
@@ -34,27 +55,6 @@ Focus areas:
 
 Always consider the artist's current stats and genre when giving advice.
 Be specific and actionable in your recommendations.`
-  },
-  social: {
-    name: 'Social Media Campaign',
-    description: 'Develop an effective strategy for your social media and increase your engagement.',
-    features: [
-      'Content planning',
-      'Editorial calendar',
-      'Hashtag strategy',
-      'Metrics analysis'
-    ],
-    systemPrompt: `You are KoolAI's Social Media Strategist, specialized in music industry social media management.
-Your goal is to help artists build and maintain an engaging social media presence.
-
-Focus areas:
-1. Content Planning - Suggest content types and themes
-2. Platform Strategy - Provide platform-specific recommendations
-3. Engagement Tactics - Share methods to increase follower interaction
-4. Analytics Review - Help interpret and act on social media metrics
-
-Tailor advice to each platform's best practices and current trends.
-Emphasize authentic artist-fan connections.`
   },
   marketing: {
     name: 'Marketing Strategy',

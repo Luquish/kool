@@ -229,6 +229,9 @@ export default function MagazineHeader() {
               <Link href="#artists" className="hover:text-primary">
                 Artists
               </Link>
+              <Link href="/chat" className="hover:text-primary">
+                Chat
+              </Link>
             </>
           )}
           {currentUser && (
