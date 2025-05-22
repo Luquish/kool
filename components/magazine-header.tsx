@@ -130,8 +130,8 @@ export default function MagazineHeader() {
       </div>
 
       {/* Main navigation */}
-      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-        <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+      <div className="container mx-auto px-4 py-3 flex items-center justify-center relative">
+        <button className="md:hidden absolute left-4" onClick={() => setIsMenuOpen(!isMenuOpen)}>
           {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
 
@@ -177,22 +177,12 @@ export default function MagazineHeader() {
             </Link>
           )}
         </nav>
-
-        <div className="flex items-center">
-          {!userSubscription && (
-            <Link href="#pricing">
-              <Button className="bg-primary hover:bg-primary/90 text-white rounded-none">
-                Subscribe
-              </Button>
-            </Link>
-          )}
-        </div>
       </div>
 
       {/* Mobile menu */}
       {isMenuOpen && (
         <div className="md:hidden border-t-2 border-secondary">
-          <nav className="container mx-auto px-4 py-4 flex flex-col space-y-4 font-bold text-sm uppercase">
+          <nav className="container mx-auto px-4 py-4 flex flex-col items-center space-y-4 font-bold text-sm uppercase">
             {!isHomePage && (
               <Link href="/" className="hover:text-primary py-2 border-b-2 border-secondary flex items-center gap-2">
                 <Home size={16} />

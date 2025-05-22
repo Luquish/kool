@@ -5,7 +5,7 @@ export default function AboutUs() {
         <div className="bg-secondary text-white inline-block px-3 py-1 text-xs font-bold mb-3">ABOUT US</div>
         <h2 className="text-3xl md:text-4xl font-black mb-2">REVOLUTIONIZING THE MUSIC INDUSTRY</h2>
         <p className="text-lg text-secondary/70">
-          KOOL is an innovative platform combining AI and music industry expertise to empower independent artists.
+          We believe that every artist deserves the chance to grow, connect and monetize — regardless of time, money or access. KOOL was built to remove the friction that stops most emerging talents from going pro.
         </p>
       </div>
 

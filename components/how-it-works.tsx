@@ -21,7 +21,7 @@ export default function HowItWorks() {
             <span className="font-bold">By KOOL TEAM</span> • May 8, 2025
           </div>
           <Button variant="outline" className="border-secondary text-secondary hover:bg-secondary/5">
-            See KOOL in Action
+            See it in Action
           </Button>
         </div>
 
