@@ -11,9 +11,9 @@ export default function AboutUs() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div>
-          <div className="aspect-video bg-background mb-4">
+          <div className="aspect-square bg-background mb-4">
             <img
-              src="/placeholder.svg?height=300&width=500"
+              src="/images/accessibility.png"
               alt="Our Mission"
               className="w-full h-full object-cover"
             />
@@ -26,9 +26,9 @@ export default function AboutUs() {
         </div>
 
         <div>
-          <div className="aspect-video bg-background mb-4">
+          <div className="aspect-square bg-background mb-4">
             <img
-              src="/placeholder.svg?height=300&width=500"
+              src="/images/sustainability_and_autonomy.png"
               alt="Our Technology"
               className="w-full h-full object-cover"
             />
@@ -41,19 +41,19 @@ export default function AboutUs() {
         </div>
 
         <div>
-          <div className="aspect-video bg-background mb-4">
+          <div className="aspect-square bg-background mb-4">
             <img
-              src="/placeholder.svg?height=300&width=500"
+              src="/images/team.png"
               alt="Our Team"
               className="w-full h-full object-cover"
             />
           </div>
           <div className="bg-primary text-white inline-block px-3 py-1 text-xs font-bold mb-2">OUR TEAM</div>
           <h3 className="text-xl font-bold mb-2">
-            Music and Innovation Experts
+            Multidisciplinary Business Experts
           </h3>
           <p className="text-secondary/70 text-sm mb-4">
-            Our team combines decades of music industry experience with deep expertise in technology and AI.
+            Our team combines expertise in social sciences, finance, marketing and management with an innovative vision to transform the music industry.
           </p>
         </div>
       </div>

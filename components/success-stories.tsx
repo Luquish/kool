@@ -27,9 +27,9 @@ export default function SuccessStories() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="bg-background overflow-hidden">
           <div className="grid grid-cols-1 md:grid-cols-2">
-            <div className="aspect-square">
+            <div className="aspect-full">
               <img
-                src="/placeholder.svg?height=400&width=400"
+                src="/images/jamie_taylor.png"
                 alt="Jamie Taylor"
                 className="w-full h-full object-cover"
               />
@@ -53,9 +53,9 @@ export default function SuccessStories() {
 
         <div className="bg-background overflow-hidden">
           <div className="grid grid-cols-1 md:grid-cols-2">
-            <div className="aspect-square">
+            <div className="aspect-full">
               <img
-                src="/placeholder.svg?height=400&width=400"
+                src="/images/sophia_chen.png"
                 alt="Sophia Chen"
                 className="w-full h-full object-cover"
               />

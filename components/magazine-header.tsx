@@ -69,18 +69,18 @@ export default function MagazineHeader() {
       hasScrolled ? 'shadow-lg' : ''
     }`}>
       {/* Top utility bar */}
-      <div className="border-b-2 border-secondary py-2 px-4 flex justify-between items-center text-sm">
-        <div className="relative w-[100px] flex items-center">
+      <div className="border-b-2 border-secondary py-8 px-8 flex justify-between items-center text-sm relative">
+        <div className="w-[100px] flex items-center">
           <Link 
             href="#" 
-            className="text-secondary/70 hover:text-primary transition-colors duration-200 absolute whitespace-nowrap"
+            className="text-secondary/70 hover:text-primary transition-colors duration-200 whitespace-nowrap"
             onMouseEnter={() => setShowJoke(true)}
             onMouseLeave={() => setShowJoke(false)}
           >
             {showJoke ? "Just kidding!" : "Got a tip?"}
           </Link>
         </div>
-        <div className="flex-1 flex justify-center">
+        <div className="absolute left-1/2 transform -translate-x-1/2">
           <Link href="/" className="block transition-transform hover:scale-105 duration-200">
             <div className="font-logo text-6xl text-primary transform relative">
               <span className="relative text-stroke-1 text-stroke-white">KOOL</span>
@@ -88,7 +88,7 @@ export default function MagazineHeader() {
             </div>
           </Link>
         </div>
-        <div className="relative w-[200px] flex items-center justify-end space-x-4">
+        <div className="w-[200px] flex items-center justify-end space-x-4">
           {currentUser ? (
             <div className="relative">
               <button

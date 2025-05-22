@@ -7,11 +7,11 @@ export default function HowItWorks() {
         <div className="lg:col-span-4">
           <div className="bg-primary text-white inline-block px-3 py-1 text-xs font-bold mb-3">THE KOOL WAY</div>
           <h2 className="text-3xl font-black mb-4">This is what being <span className="text-primary">Kool</span> looks like.</h2>
-          <div className="aspect-[4/3] bg-background mb-4">
+          <div className="bg-background mb-4">
             <img
-              src="/placeholder.svg?height=400&width=600"
+              src="/images/thekoolway.png"
               alt="KOOL Process"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
             />
           </div>
           <p className="text-secondary/70 mb-4">
@@ -20,7 +20,7 @@ export default function HowItWorks() {
           <div className="text-xs text-secondary/60 mb-4">
             <span className="font-bold">By KOOL TEAM</span> • May 8, 2025
           </div>
-          <Button variant="outline" className="border-secondary text-secondary hover:bg-secondary/5">
+          <Button variant="outline" className="border-secondary bg-primary text-white hover:bg-primary/5">
             See it in Action
           </Button>
         </div>
