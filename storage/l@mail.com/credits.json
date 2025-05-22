@@ -1,0 +1,47 @@
+{
+  "credits": 29,
+  "transactions": [
+    {
+      "date": "2025-05-22T20:05:33.806Z",
+      "amount": 3,
+      "type": "purchase",
+      "description": "Welcome credits"
+    },
+    {
+      "date": "2025-05-22T20:31:52.272Z",
+      "amount": 3,
+      "type": "purchase",
+      "description": "Compra de 3 créditos"
+    },
+    {
+      "date": "2025-05-22T20:31:57.370Z",
+      "amount": 9,
+      "type": "purchase",
+      "description": "Compra de 9 créditos"
+    },
+    {
+      "date": "2025-05-22T23:04:44.559Z",
+      "amount": 5,
+      "type": "purchase",
+      "description": "Compra de 5 créditos"
+    },
+    {
+      "date": "2025-05-22T23:05:55.504Z",
+      "amount": 7,
+      "type": "purchase",
+      "description": "Compra de 7 créditos"
+    },
+    {
+      "date": "2025-05-22T23:14:16.175Z",
+      "amount": 1,
+      "type": "purchase",
+      "description": "Compra de 1 crédito"
+    },
+    {
+      "date": "2025-05-22T23:15:52.842Z",
+      "amount": 1,
+      "type": "purchase",
+      "description": "Compra de 1 crédito"
+    }
+  ]
+}

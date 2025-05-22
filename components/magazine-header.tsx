@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import storage from "@/lib/storage"
 import { usePathname } from "next/navigation"
 import CreditModal from "@/components/credit-modal"
+import { toast } from "@/components/ui/use-toast"
 
 export default function MagazineHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -25,11 +26,11 @@ export default function MagazineHeader() {
   // Función para obtener los créditos actuales
   const fetchCurrentCredits = async (userEmail: string) => {
     try {
-      const response = await fetch(`/api/storage?path=storage/${userEmail}/credits.json`);
+      const response = await fetch('/api/credits');
       if (response.ok) {
         const data = await response.json();
-        if (data && data.data && typeof data.data.credits === 'number') {
-          setUserCredits(data.data.credits);
+        if (typeof data.credits === 'number') {
+          setUserCredits(data.credits);
         }
       }
     } catch (error) {
@@ -111,10 +112,23 @@ export default function MagazineHeader() {
 
   const handleLogout = async () => {
     try {
-      await storage.logout();
-      window.location.href = "/";
+      const success = await storage.logout();
+      if (success) {
+        setCurrentUser(null);
+        setUserCredits(null);
+        setUserSubscription(null);
+        setIsProfileMenuOpen(false);
+        window.location.href = "/";
+      } else {
+        throw new Error("Error al cerrar sesión");
+      }
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo cerrar sesión. Inténtalo de nuevo.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -127,7 +141,7 @@ export default function MagazineHeader() {
         <div className="w-[100px] flex items-center">
           <Link 
             href="#" 
-            className="text-secondary/70 hover:text-primary transition-colors duration-200 whitespace-nowrap"
+            className="text-secondary/70 hover:text-primary trsansition-colors duration-200 whitespace-nowrap"
             onMouseEnter={() => setShowJoke(true)}
             onMouseLeave={() => setShowJoke(false)}
           >

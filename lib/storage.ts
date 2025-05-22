@@ -143,10 +143,20 @@ const getCurrentUser = async () => {
 
 // Función para cerrar sesión
 const logout = async () => {
-  if (isClient) {
-    localStorage.removeItem('currentUser');
+  try {
+    if (isClient) {
+      // Limpiar almacenamiento local
+      localStorage.removeItem('currentUser');
+      sessionStorage.clear();
+    }
+    
+    // Actualizar el servidor
+    await saveItem('storage/session.json', { currentUser: null });
+    return true;
+  } catch (error) {
+    console.error('Error durante el cierre de sesión:', error);
+    return false;
   }
-  return await saveItem('storage/session.json', { currentUser: null });
 };
 
 // Comprueba si existe un usuario

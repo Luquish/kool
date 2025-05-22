@@ -29,7 +29,20 @@ export default function CreditModal({ isOpen, onClose, onSuccess }: CreditModalP
 
       // Obtener los créditos actuales
       const creditsPath = `storage/${currentUser}/credits.json`;
-      const currentCredits = await storage.getItem(creditsPath) || { credits: 0, transactions: [] };
+      let currentCredits = await storage.getItem(creditsPath);
+      
+      // Si no existen créditos, inicializar con créditos de bienvenida
+      if (!currentCredits) {
+        currentCredits = {
+          credits: 3,
+          transactions: [{
+            date: new Date().toISOString(),
+            amount: 3,
+            type: 'purchase',
+            description: 'Welcome credits'
+          }]
+        };
+      }
 
       // Crear la nueva transacción
       const newTransaction = {
