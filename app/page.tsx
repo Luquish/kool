@@ -42,11 +42,10 @@ export default function Home() {
       <MagazineHeader />
       <HeroArticle />
       <main className="container mx-auto px-4 pt-10 pb-16">
-        <FeaturedGrid />
         <HowItWorks />
-        <SuccessStories />
-        <AboutUs />
         {showPricing && <PricingSection />}
+        <AboutUs />
+        <SuccessStories />
       </main>
       <MagazineFooter />
     </div>

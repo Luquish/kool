@@ -7,6 +7,7 @@ import { Search, Menu, X, User, Home } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import storage from "@/lib/storage"
 import { usePathname } from "next/navigation"
+import CreditModal from "@/components/credit-modal"
 
 export default function MagazineHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -15,9 +16,27 @@ export default function MagazineHeader() {
   const [currentUser, setCurrentUser] = useState<string | null>(null)
   const [userSubscription, setUserSubscription] = useState<string | null>(null)
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
+  const [isCreditModalOpen, setIsCreditModalOpen] = useState(false)
+  const [userCredits, setUserCredits] = useState<number | null>(null)
   const pathname = usePathname()
   const isHomePage = pathname === "/"
 
+  // Función para obtener los créditos actuales
+  const fetchCurrentCredits = async (userEmail: string) => {
+    try {
+      const response = await fetch(`/api/storage?path=storage/${userEmail}/credits.json`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.data && typeof data.data.credits === 'number') {
+          setUserCredits(data.data.credits);
+        }
+      }
+    } catch (error) {
+      console.error("Error al obtener créditos:", error);
+    }
+  };
+
+  // Efecto para manejar el scroll
   useEffect(() => {
     const handleScroll = () => {
       setHasScrolled(window.scrollY > 0)
@@ -27,29 +46,63 @@ export default function MagazineHeader() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  // Efecto para escuchar actualizaciones de créditos
+  useEffect(() => {
+    const handleCreditsUpdate = (event: CustomEvent<{ credits: number }>) => {
+      setUserCredits(event.detail.credits);
+    };
+
+    window.addEventListener('updateCredits', handleCreditsUpdate as EventListener);
+
+    return () => {
+      window.removeEventListener('updateCredits', handleCreditsUpdate as EventListener);
+    };
+  }, []);
+
+  // Efecto para cargar datos del usuario y refrescar créditos periódicamente
   useEffect(() => {
     const checkUser = async () => {
       try {
-        // Obtener el usuario actual usando el nuevo método
         const userEmail = await storage.getCurrentUser();
         
         if (userEmail) {
           setCurrentUser(userEmail);
           
-          // Obtener el perfil del usuario para verificar su plan
           const userProfile = await storage.getUserProfile(userEmail);
-          
           if (userProfile) {
             setUserSubscription(userProfile.subscription_plan);
           }
+
+          // Obtener créditos actuales
+          await fetchCurrentCredits(userEmail);
         }
       } catch (error) {
-        console.error("Error al verificar el usuario:", error);
+        console.error("Error al cargar datos del usuario:", error);
       }
     };
     
     checkUser();
-  }, []);
+
+    // Refrescar créditos cada 30 segundos si hay un usuario activo
+    let interval: NodeJS.Timeout;
+    if (currentUser) {
+      interval = setInterval(() => {
+        fetchCurrentCredits(currentUser);
+      }, 30000);
+    }
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [currentUser]);
+
+  const refreshCredits = async () => {
+    if (currentUser) {
+      await fetchCurrentCredits(currentUser);
+    }
+  };
 
   const toggleProfileMenu = () => {
     setIsProfileMenuOpen(!isProfileMenuOpen);
@@ -103,9 +156,19 @@ export default function MagazineHeader() {
               {isProfileMenuOpen && (
                 <div className="absolute right-0 mt-2 w-48 rounded-lg bg-white shadow-lg border border-gray-200 overflow-hidden transform origin-top-right transition-transform duration-200 ease-out">
                   <div className="py-1">
+                    <div className="px-4 py-2 border-b border-gray-200">
+                      <p className="text-sm text-gray-600">Kool Credits</p>
+                      <p className="text-lg font-bold text-primary">{userCredits} credits</p>
+                    </div>
                     <Link href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                       My Profile
                     </Link>
+                    <button
+                      onClick={() => setIsCreditModalOpen(true)}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Add Kool Credits
+                    </button>
                     <button
                       onClick={handleLogout}
                       className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -115,6 +178,11 @@ export default function MagazineHeader() {
                   </div>
                 </div>
               )}
+              <CreditModal
+                isOpen={isCreditModalOpen}
+                onClose={() => setIsCreditModalOpen(false)}
+                onSuccess={refreshCredits}
+              />
             </div>
           ) : (
             <>
@@ -148,9 +216,6 @@ export default function MagazineHeader() {
           
           {isHomePage && (
             <>
-              <Link href="#features" className="hover:text-primary">
-                Features
-              </Link>
               <Link href="#how-it-works" className="hover:text-primary">
                 How It Works
               </Link>
@@ -160,9 +225,12 @@ export default function MagazineHeader() {
               <Link href="#about" className="hover:text-primary">
                 About
               </Link>
+              <Link href="#pricing" className="hover:text-primary">
+                Pricing
+              </Link>
             </>
           )}
-          {currentUser ? (
+          {currentUser && (
             <>
               <Link href="/dashboard" className="hover:text-primary">
                 Dashboard
@@ -171,10 +239,6 @@ export default function MagazineHeader() {
                 Chat
               </Link>
             </>
-          ) : (
-            <Link href="#pricing" className="hover:text-primary">
-              Pricing
-            </Link>
           )}
         </nav>
       </div>

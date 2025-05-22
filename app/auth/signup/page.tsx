@@ -28,7 +28,7 @@ export default function SignupPage() {
     }
 
     try {
-      // Verificar si el usuario ya existe
+      // 1. Verificar si el usuario ya existe
       const userExists = await storage.checkUserExists(email);
       
       if (userExists) {
@@ -36,11 +36,11 @@ export default function SignupPage() {
         return;
       }
 
-      // Hash de la contraseña
+      // 2. Hash de la contraseña
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
 
-      // Crear el perfil inicial del usuario
+      // 3. Crear el perfil inicial del usuario
       const initialProfile = {
         name,
         email,
@@ -62,7 +62,6 @@ export default function SignupPage() {
           youtube_subscribers: 0,
           mailing_list_size: 0
         },
-        
         discography: {
           eps: [],
           singles_released: [],
@@ -81,20 +80,27 @@ export default function SignupPage() {
       };
 
       try {
-        // Guardar el perfil del usuario
-        const saved = await storage.saveUserProfile(email, initialProfile);
+        // 4. Guardar el perfil del usuario
+        await storage.saveUserProfile(email, initialProfile);
         
-        if (!saved) {
-          throw new Error('Error al guardar el perfil');
-        }
+        // 5. Crear los créditos iniciales
+        await storage.saveItem(`storage/${email}/credits.json`, {
+          credits: 3,
+          transactions: [{
+            date: new Date().toISOString(),
+            amount: 3,
+            type: 'purchase',
+            description: 'Welcome credits'
+          }]
+        });
         
-        // Establecer el usuario actual
+        // 6. Establecer el usuario actual
         await storage.setCurrentUser(email);
         
-        // Redirigir al usuario al onboarding
+        // 7. Redirigir al usuario al onboarding
         router.push('/');
       } catch (error) {
-        console.error('Error al guardar el perfil:', error);
+        console.error('Error al guardar datos:', error);
         setError('Hubo un error al crear tu cuenta. Por favor, intenta de nuevo.');
       }
     } catch (err) {

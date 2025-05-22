@@ -1,0 +1,54 @@
+[
+  {
+    "role": "user",
+    "content": "Hola",
+    "timestamp": "2025-05-22T20:08:24.761Z"
+  },
+  {
+    "role": "user",
+    "content": "Hola",
+    "timestamp": "2025-05-22T20:10:17.439Z"
+  },
+  {
+    "role": "user",
+    "content": "hola",
+    "timestamp": "2025-05-22T20:10:58.544Z"
+  },
+  {
+    "role": "user",
+    "content": "Hola",
+    "timestamp": "2025-05-22T20:15:28.799Z"
+  },
+  {
+    "role": "user",
+    "content": "Hola",
+    "timestamp": "2025-05-22T20:17:25.374Z"
+  },
+  {
+    "role": "assistant",
+    "content": "¡Hola! ¿En qué puedo ayudarte hoy?",
+    "timestamp": "2025-05-22T20:17:27.529Z",
+    "agent": {
+      "type": "spotify",
+      "name": "Pitch Spotify"
+    }
+  },
+  {
+    "role": "user",
+    "content": "hola",
+    "timestamp": "2025-05-22T20:20:16.179Z",
+    "agent": {
+      "type": "spotify",
+      "name": "Pitch Spotify"
+    }
+  },
+  {
+    "role": "assistant",
+    "content": "¡Hola! ¿Cómo puedo ayudarte hoy?",
+    "timestamp": "2025-05-22T20:20:19.936Z",
+    "agent": {
+      "type": "spotify",
+      "name": "Pitch Spotify"
+    }
+  }
+]

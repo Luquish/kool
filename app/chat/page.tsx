@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import storage from '@/lib/storage';
+import { getUserCredits } from '@/lib/credits';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -11,12 +12,24 @@ import { Separator } from '@/components/ui/separator';
 import { Send } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
+import { AGENTS, AgentType } from '@/lib/agent-prompts';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // Interfaz para mensaje
 interface Message {
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
+  agent?: {
+    type: AgentType;
+    name: string;
+  };
 }
 
 export default function ChatPage() {
@@ -25,6 +38,7 @@ export default function ChatPage() {
   const [message, setMessage] = useState<string>('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [currentAgent, setCurrentAgent] = useState<AgentType>('spotify');
   const { toast } = useToast();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
@@ -90,21 +104,37 @@ export default function ChatPage() {
     }
   };
 
+  // Función para actualizar los créditos en el header
+  const updateHeaderCredits = async () => {
+    if (currentUser) {
+      const userCredits = await getUserCredits(currentUser);
+      // Emitir un evento personalizado para actualizar los créditos
+      const event = new CustomEvent('updateCredits', { 
+        detail: { credits: userCredits.credits }
+      });
+      window.dispatchEvent(event);
+    }
+  };
+
   // Enviar mensaje
   const handleSendMessage = async () => {
-    if (!message.trim() || !currentUser) return;
-    
-    // Añadir mensaje del usuario
+    if (!message.trim() || isLoading) return;
+    setIsLoading(true);
+
     const userMessage: Message = {
       role: 'user',
-      content: message,
-      timestamp: new Date()
+      content: message.trim(),
+      timestamp: new Date(),
+      agent: {
+        type: currentAgent,
+        name: AGENTS[currentAgent].name
+      }
     };
-    
+
+    // Limpiar el input y actualizar mensajes localmente
+    setMessage('');
     const updatedMessages = [...messages, userMessage];
     setMessages(updatedMessages);
-    setMessage('');
-    setIsLoading(true);
     
     try {
       // Guardar mensajes
@@ -118,12 +148,13 @@ export default function ChatPage() {
         },
         body: JSON.stringify({
           message: userMessage.content,
-          email: currentUser
+          agentType: currentAgent
         }),
       });
       
       if (!response.ok) {
-        throw new Error('Error al enviar mensaje');
+        const error = await response.json();
+        throw new Error(error.error || 'Error al enviar mensaje');
       }
       
       const data = await response.json();
@@ -132,7 +163,8 @@ export default function ChatPage() {
       const assistantMessage: Message = {
         role: 'assistant',
         content: data.response,
-        timestamp: new Date()
+        timestamp: new Date(),
+        agent: data.agent
       };
       
       const newMessages = [...updatedMessages, assistantMessage];
@@ -140,11 +172,14 @@ export default function ChatPage() {
       
       // Guardar mensajes actualizados
       await saveMessages(newMessages);
-    } catch (error) {
+
+      // Actualizar los créditos en el header
+      await updateHeaderCredits();
+    } catch (error: any) {
       console.error('Error en la conversación:', error);
       toast({
         title: 'Error',
-        description: 'No se pudo procesar tu mensaje. Inténtalo de nuevo.',
+        description: error.message || 'No se pudo procesar tu mensaje. Inténtalo de nuevo.',
         variant: 'destructive'
       });
     } finally {
@@ -183,24 +218,56 @@ export default function ChatPage() {
         className="mb-4" 
       />
       
-      <h1 className="text-3xl font-bold mb-4">Chat con KoolAI</h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-3xl font-bold">Chat con KoolAI</h1>
+        <Select
+          value={currentAgent}
+          onValueChange={(value: AgentType) => setCurrentAgent(value)}
+        >
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Select Agent" />
+          </SelectTrigger>
+          <SelectContent>
+            {Object.entries(AGENTS).map(([key, agent]) => (
+              <SelectItem key={key} value={key}>
+                {agent.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
       
       <Card className="flex-1 flex flex-col">
         <CardHeader className="pb-2">
-          <CardTitle className="text-lg">
-            {userProfile?.artist_name ? `Conversación con ${userProfile.artist_name}` : 'Tu conversación'}
-          </CardTitle>
-          <p className="text-sm text-muted-foreground">
-            Consulta cualquier duda sobre tu estrategia musical
-          </p>
+          <div className="flex justify-between items-center">
+            <CardTitle className="text-lg">
+              {userProfile?.artist_name ? `Conversación con ${userProfile.artist_name}` : 'Tu conversación'}
+            </CardTitle>
+            <div className="text-sm text-muted-foreground">
+              Agente actual: {AGENTS[currentAgent].name}
+            </div>
+          </div>
+          <div className="text-sm text-muted-foreground mt-1">
+            {AGENTS[currentAgent].description}
+          </div>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {AGENTS[currentAgent].features.map((feature, index) => (
+              <span 
+                key={index}
+                className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full"
+              >
+                {feature}
+              </span>
+            ))}
+          </div>
           <Separator className="mt-2" />
         </CardHeader>
         <CardContent className="flex-1 p-0 relative">
-          <ScrollArea className="h-[calc(100vh-350px)] px-4" ref={scrollAreaRef}>
+          <ScrollArea className="h-[calc(100vh-450px)] px-4" ref={scrollAreaRef}>
             {messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center p-4">
                 <p className="text-muted-foreground mb-2">No hay mensajes aún</p>
-                <p className="text-muted-foreground">Comienza la conversación con KoolAI</p>
+                <p className="text-muted-foreground">Comienza la conversación con el agente de {AGENTS[currentAgent].name}</p>
               </div>
             ) : (
               <div className="space-y-4 py-4">
@@ -212,7 +279,7 @@ export default function ChatPage() {
                     {msg.role === 'assistant' && (
                       <Avatar className="h-8 w-8">
                         <div className="bg-primary text-white rounded-full h-8 w-8 flex items-center justify-center">
-                          K
+                          {msg.agent?.name[0] || 'K'}
                         </div>
                       </Avatar>
                     )}
@@ -221,6 +288,11 @@ export default function ChatPage() {
                         ? 'bg-primary text-primary-foreground' 
                         : 'bg-muted'
                     }`}>
+                      {msg.role === 'assistant' && msg.agent && (
+                        <div className="text-xs text-primary mb-1">
+                          {msg.agent.name}
+                        </div>
+                      )}
                       <div className="text-sm whitespace-pre-wrap">{msg.content}</div>
                       <div className={`text-xs mt-1 ${
                         msg.role === 'user' 

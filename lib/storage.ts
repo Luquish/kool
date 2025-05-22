@@ -1,7 +1,18 @@
 // Comprobar si estamos en el cliente (navegador)
 const isClient = typeof window !== 'undefined';
 
-// Función genérica para guardar datos en localStorage
+// Obtener la URL base para las peticiones
+const getBaseUrl = () => {
+  if (isClient) {
+    return '';
+  }
+  // En el servidor, usar la URL completa
+  const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+  const host = process.env.VERCEL_URL || 'localhost:3000';
+  return `${protocol}://${host}`;
+};
+
+// Función genérica para guardar datos en localStorage y servidor
 const saveItem = async (storagePath: string, data: any) => {
   try {
     // Guardar en localStorage (sólo en el cliente)
@@ -10,7 +21,8 @@ const saveItem = async (storagePath: string, data: any) => {
     }
     
     // Guardar en el servidor a través de la API
-    const response = await fetch('/api/storage', {
+    const baseUrl = getBaseUrl();
+    const response = await fetch(`${baseUrl}/api/storage`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -28,15 +40,6 @@ const saveItem = async (storagePath: string, data: any) => {
     return true;
   } catch (error) {
     console.error('Error guardando datos:', error);
-    // Si estamos en el cliente, al menos intentamos guardar en localStorage
-    if (isClient) {
-      try {
-        localStorage.setItem(storagePath, JSON.stringify(data));
-        return true;
-      } catch (e) {
-        console.error('Error guardando en localStorage:', e);
-      }
-    }
     return false;
   }
 };
@@ -44,24 +47,27 @@ const saveItem = async (storagePath: string, data: any) => {
 // Función genérica para obtener datos
 const getItem = async (storagePath: string) => {
   try {
-    // Intentar obtener desde el servidor primero
-    try {
-      const response = await fetch(`/api/storage?path=${encodeURIComponent(storagePath)}`);
-      if (response.ok) {
-        const result = await response.json();
-        return result.data;
-      }
-    } catch (error) {
-      console.warn('Error obteniendo datos del servidor:', error);
-      // Continuar e intentar obtener desde localStorage
-    }
-    
-    // Si estamos en el cliente, intentar obtener desde localStorage
     if (isClient) {
-      const data = localStorage.getItem(storagePath);
-      if (data) {
-        return JSON.parse(data);
+      // En el cliente, intentar obtener desde localStorage primero
+      const localData = localStorage.getItem(storagePath);
+      if (localData) {
+        return JSON.parse(localData);
       }
+    }
+
+    // Si no hay datos locales o estamos en el servidor, obtener del servidor
+    const baseUrl = getBaseUrl();
+    const response = await fetch(`${baseUrl}/api/storage?path=${encodeURIComponent(storagePath)}`);
+    
+    if (response.ok) {
+      const result = await response.json();
+      
+      // Si estamos en el cliente, guardar en localStorage para futuras consultas
+      if (isClient && result.data) {
+        localStorage.setItem(storagePath, JSON.stringify(result.data));
+      }
+      
+      return result.data;
     }
     
     return null;
@@ -73,10 +79,7 @@ const getItem = async (storagePath: string) => {
 
 // Función específica para guardar el perfil de usuario
 const saveUserProfile = async (email: string, profileData: any) => {
-  // Usar la estructura solicitada: storage/${email}/profile.json
   const userProfilePath = `storage/${email}/profile.json`;
-  
-  // Guardar perfil de usuario
   return await saveItem(userProfilePath, profileData);
 };
 
@@ -88,36 +91,61 @@ const getUserProfile = async (email: string) => {
 
 // Función específica para guardar datos de onboarding
 const saveOnboardingData = async (email: string, onboardingData: any) => {
-  // Obtener el perfil actual
   const currentProfile = await getUserProfile(email);
   
   if (!currentProfile) {
     throw new Error('Perfil de usuario no encontrado');
   }
   
-  // Actualizar el perfil con los datos de onboarding
   const updatedProfile = {
     ...currentProfile,
     ...onboardingData
   };
   
-  // Guardar el perfil actualizado
   return await saveUserProfile(email, updatedProfile);
 };
 
 // Función para marcar un usuario como autenticado
 const setCurrentUser = async (email: string) => {
+  if (isClient) {
+    localStorage.setItem('currentUser', email);
+  }
   return await saveItem('storage/session.json', { currentUser: email });
 };
 
 // Función para obtener el usuario actual
 const getCurrentUser = async () => {
-  const session = await getItem('storage/session.json');
-  return session?.currentUser || null;
+  try {
+    if (isClient) {
+      // En el cliente, intentar obtener desde localStorage primero
+      const localUser = localStorage.getItem('currentUser');
+      if (localUser) {
+        return localUser;
+      }
+    }
+    
+    // Intentar obtener desde el servidor
+    const session = await getItem('storage/session.json');
+    const currentUser = session?.currentUser || null;
+    
+    // Si estamos en el cliente y obtuvimos el usuario del servidor, 
+    // actualizar localStorage
+    if (isClient && currentUser) {
+      localStorage.setItem('currentUser', currentUser);
+    }
+    
+    return currentUser;
+  } catch (error) {
+    console.error('Error al obtener usuario actual:', error);
+    return null;
+  }
 };
 
 // Función para cerrar sesión
 const logout = async () => {
+  if (isClient) {
+    localStorage.removeItem('currentUser');
+  }
   return await saveItem('storage/session.json', { currentUser: null });
 };
 

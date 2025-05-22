@@ -1,55 +1,37 @@
 {
   "name": "luca",
   "email": "l@mail.com",
-  "password": "$2b$10$dGwl27PoXTtG.TyFc2mrcOK4RmNlk4tZbH0xo7Yj8Rn81kRQ1gmCa",
+  "password": "$2b$10$ZK5lRfu.x8AONpCcPtmYOOICEg532Awg5o01qjT646Yekhk87COHC",
   "subscription_plan": null,
   "language": "es",
   "project_type": "",
-  "artist_name": "s",
-  "members": [
-    "s"
-  ],
-  "guest_members": [
-    "s"
-  ],
-  "creative_team": [
-    "s"
-  ],
-  "distributor": "s",
+  "artist_name": "",
+  "members": [],
+  "guest_members": [],
+  "creative_team": [],
+  "distributor": "",
   "label_status": "independent",
   "label_name": "",
   "socials": {
-    "instagram_followers": 1,
-    "spotify_monthly_listeners": 1,
-    "tiktok_followers": 1,
-    "youtube_subscribers": 1,
-    "mailing_list_size": 1
+    "instagram_followers": 0,
+    "spotify_monthly_listeners": 0,
+    "tiktok_followers": 0,
+    "youtube_subscribers": 0,
+    "mailing_list_size": 0
   },
   "discography": {
-    "eps": [
-      {
-        "title": "1",
-        "tracks": 1,
-        "year": 1
-      }
-    ],
-    "singles_released": [
-      {
-        "title": "1",
-        "year": 1
-      }
-    ],
+    "eps": [],
+    "singles_released": [],
     "upcoming_releases": [],
-    "visual_concept": "1"
+    "visual_concept": ""
   },
   "live_history": {
     "highlights": [],
-    "avg_capacity": 1,
-    "avg_ticket_price_ars": 2
+    "avg_capacity": 0,
+    "avg_ticket_price_ars": 0
   },
   "financials": {
-    "annual_expenses_ars": 2,
-    "budget_per_launch_ars": 2
-  },
-  "is_onboarding_in_progress": false
+    "annual_expenses_ars": 0,
+    "budget_per_launch_ars": 0
+  }
 }

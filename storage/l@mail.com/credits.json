@@ -1,0 +1,23 @@
+{
+  "credits": 1,
+  "transactions": [
+    {
+      "date": "2025-05-22T20:05:33.806Z",
+      "amount": 3,
+      "type": "purchase",
+      "description": "Welcome credits"
+    },
+    {
+      "date": "2025-05-22T20:17:27.505Z",
+      "amount": 1,
+      "type": "use",
+      "description": "Chat con agente spotify"
+    },
+    {
+      "date": "2025-05-22T20:20:19.927Z",
+      "amount": 1,
+      "type": "use",
+      "description": "Chat con agente spotify"
+    }
+  ]
+}
