@@ -20,6 +20,7 @@ export default function MagazineHeader() {
   const [userCredits, setUserCredits] = useState<number | null>(null)
   const pathname = usePathname()
   const isHomePage = pathname === "/"
+  const shouldHideNavigation = ['/chat', '/dashboard', '/profile'].includes(pathname)
 
   // Función para obtener los créditos actuales
   const fetchCurrentCredits = async (userEmail: string) => {
@@ -118,9 +119,9 @@ export default function MagazineHeader() {
   };
 
   return (
-    <header className={`fixed top-0 left-0 right-0 bg-white z-50 transition-shadow duration-200 border-b-2 border-secondary ${
+    <header className={`fixed top-0 left-0 right-0 bg-white z-50 transition-all duration-300 ease-in-out border-b-2 border-secondary ${
       hasScrolled ? 'shadow-lg' : ''
-    }`}>
+    } ${shouldHideNavigation ? 'shadow-[0_20px_40px_-2px_hsl(0_73%_37%_/_0.5)] pb-0' : 'pb-0'}`}>
       {/* Top utility bar */}
       <div className="border-b-2 border-secondary py-8 px-8 flex justify-between items-center text-sm relative">
         <div className="w-[100px] flex items-center">
@@ -163,6 +164,9 @@ export default function MagazineHeader() {
                     <Link href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                       My Profile
                     </Link>
+                    <Link href="/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                      Dashboard
+                    </Link>
                     <button
                       onClick={() => setIsCreditModalOpen(true)}
                       className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -198,54 +202,46 @@ export default function MagazineHeader() {
       </div>
 
       {/* Main navigation */}
-      <div className="container mx-auto px-4 py-3 flex items-center justify-center relative">
-        <button className="md:hidden absolute left-4" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+      {!shouldHideNavigation && (
+        <div className="container mx-auto px-4 py-3 flex items-center justify-center relative">
+          <button className="md:hidden absolute left-4" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
 
-        <nav className="hidden md:flex items-center space-x-8 font-bold text-sm uppercase">
-          {!isHomePage && (
-            <Link 
-              href="/" 
-              className="flex items-center gap-1 text-primary hover:text-primary/80 transition-colors"
-            >
-              <Home size={16} />
-              <span>Home</span>
-            </Link>
-          )}
-          
-          {isHomePage && (
-            <>
-              <Link href="#how-it-works" className="hover:text-primary">
-                How It Works
+          <nav className="hidden md:flex items-center space-x-8 font-bold text-sm uppercase">
+            {!isHomePage && (
+              <Link 
+                href="/" 
+                className="flex items-center gap-1 text-primary hover:text-primary/80 transition-colors"
+              >
+                <Home size={16} />
+                <span>Home</span>
               </Link>
-              
-              <Link href="#services" className="hover:text-primary">
-                Services
-              </Link>
-              <Link href="#about" className="hover:text-primary">
-                About
-              </Link>
-              <Link href="#artists" className="hover:text-primary">
-                Artists
-              </Link>
-              <Link href="/chat" className="hover:text-primary">
-                Chat
-              </Link>
-            </>
-          )}
-          {currentUser && (
-            <>
-              <Link href="/dashboard" className="hover:text-primary">
-                Dashboard
-              </Link>
-              <Link href="/chat" className="hover:text-primary">
-                Chat
-              </Link>
-            </>
-          )}
-        </nav>
-      </div>
+            )}
+            
+            {isHomePage && (
+              <>
+                <Link href="#how-it-works" className="hover:text-primary">
+                  How It Works
+                </Link>
+                
+                <Link href="#services" className="hover:text-primary">
+                  Services
+                </Link>
+                <Link href="#about" className="hover:text-primary">
+                  About
+                </Link>
+                <Link href="#artists" className="hover:text-primary">
+                  Artists
+                </Link>
+                <Link href="/chat" className="hover:text-primary">
+                  Chat
+                </Link>
+              </>
+            )}
+          </nav>
+        </div>
+      )}
 
       {/* Mobile menu */}
       {isMenuOpen && (
@@ -272,25 +268,8 @@ export default function MagazineHeader() {
                 <Link href="#about" className="hover:text-primary py-2 border-b-2 border-secondary">
                   About
                 </Link>
-              </>
-            )}
-            
-            {currentUser ? (
-              <>
-                <Link href="/dashboard" className="hover:text-primary py-2 border-b-2 border-secondary">
-                  Dashboard
-                </Link>
                 <Link href="/chat" className="hover:text-primary py-2 border-b-2 border-secondary">
                   Chat
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link href="#pricing" className="hover:text-primary py-2 border-b-2 border-secondary">
-                  Pricing
-                </Link>
-                <Link href="#news" className="hover:text-primary py-2 border-b-2 border-secondary">
-                  News
                 </Link>
               </>
             )}

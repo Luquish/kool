@@ -171,10 +171,10 @@ export default function DashboardPage() {
       <div className="flex items-center justify-center h-screen">
         <Card className="w-[400px]">
           <CardHeader>
-            <CardTitle>No has iniciado sesión</CardTitle>
+            <CardTitle>You are not logged in</CardTitle>
           </CardHeader>
           <CardContent>
-            <p>Por favor, inicia sesión para acceder al dashboard.</p>
+            <p>Please log in to access the dashboard.</p>
           </CardContent>
         </Card>
       </div>
@@ -194,20 +194,20 @@ export default function DashboardPage() {
       {!strategy && (
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle>Crea tu estrategia personalizada</CardTitle>
+            <CardTitle>Create your personalized strategy</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="mb-4">Genera un plan de crecimiento personalizado basado en tu perfil de artista.</p>
+            <p className="mb-4">Generate a personalized growth plan based on your artist profile.</p>
             <Button 
               onClick={handleGenerateStrategy} 
               disabled={loading}
             >
-              {loading ? 'Generando...' : 'Build Strategy'}
+              {loading ? 'Generating...' : 'Build Strategy'}
             </Button>
             
             {loading && (
               <div className="mt-4">
-                <p className="mb-2">Generando tu estrategia personalizada. Esto puede tardar un minuto...</p>
+                <p className="mb-2">Generating your personalized strategy. This may take a minute...</p>
                 <Progress value={undefined} className="h-2" />
               </div>
             )}
@@ -219,7 +219,7 @@ export default function DashboardPage() {
       {strategy && (
         <Tabs defaultValue="calendar" className="w-full">
           <TabsList className="mb-4">
-            <TabsTrigger value="calendar">Calendario</TabsTrigger>
+            <TabsTrigger value="calendar">Calendar</TabsTrigger>
             <TabsTrigger value="tasks">Task Tracker</TabsTrigger>
           </TabsList>
           
@@ -227,19 +227,19 @@ export default function DashboardPage() {
           <TabsContent value="calendar">
             <Card>
               <CardHeader>
-                <CardTitle>Calendario de acciones</CardTitle>
+                <CardTitle>Action Calendar</CardTitle>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Fecha</TableHead>
-                      <TableHead>Título</TableHead>
-                      <TableHead>Descripción</TableHead>
-                      <TableHead>Canal</TableHead>
-                      <TableHead>Horas</TableHead>
-                      <TableHead>Objetivo</TableHead>
-                      <TableHead>Presupuesto (ARS)</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Title</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead>Channel</TableHead>
+                      <TableHead>Hours</TableHead>
+                      <TableHead>Goal</TableHead>
+                      <TableHead>Budget</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -267,7 +267,7 @@ export default function DashboardPage() {
                 <CardTitle className="flex justify-between items-center">
                   <span>Task Tracker</span>
                   <div className="flex items-center gap-4">
-                    <span className="text-sm">{calculateProgress().toFixed(0)}% completado</span>
+                    <span className="text-sm">{calculateProgress().toFixed(0)}% completed</span>
                     <Progress value={calculateProgress()} className="w-[200px] h-2" />
                   </div>
                 </CardTitle>
@@ -276,10 +276,10 @@ export default function DashboardPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Título</TableHead>
-                      <TableHead>Estado</TableHead>
-                      <TableHead>Responsable</TableHead>
-                      <TableHead>Dependencias</TableHead>
+                      <TableHead>Title</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Responsible</TableHead>
+                      <TableHead>Dependencies</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -292,29 +292,29 @@ export default function DashboardPage() {
                             onValueChange={(value) => handleTaskStatusChange(task.id, value)}
                           >
                             <SelectTrigger className="w-[180px]">
-                              <SelectValue placeholder="Estado" />
+                              <SelectValue placeholder="Status" />
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="pending">
                                 <span className="px-2 py-1 rounded text-xs bg-gray-100 text-gray-800">
-                                  Pendiente
+                                  Pending
                                 </span>
                               </SelectItem>
                               <SelectItem value="in-progress">
                                 <span className="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
-                                  En progreso
+                                  In progress
                                 </span>
                               </SelectItem>
                               <SelectItem value="done">
                                 <span className="px-2 py-1 rounded text-xs bg-green-100 text-green-800">
-                                  Completado
+                                  Completed
                                 </span>
                               </SelectItem>
                             </SelectContent>
                           </Select>
                         </TableCell>
                         <TableCell>{task.owner}</TableCell>
-                        <TableCell>{task.dependencies?.join(', ') || 'Ninguna'}</TableCell>
+                        <TableCell>{task.dependencies?.join(', ') || 'None'}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

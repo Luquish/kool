@@ -269,7 +269,7 @@ export default function ChatPage() {
     <div className="container mx-auto py-8 flex flex-col h-[calc(100vh-200px)]">
       <Breadcrumb 
         items={[{ href: '/chat', label: 'Chat' }]}
-        className="mb-4 mt-4" 
+        className="mb-4" 
       />
       
       <Card className="flex-1 flex flex-col">
