@@ -6,6 +6,7 @@ import Image from "next/image"
 import { Search, Menu, X, User, Home } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import storage from "@/lib/storage"
+import { usePathname } from "next/navigation"
 
 export default function MagazineHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -14,6 +15,8 @@ export default function MagazineHeader() {
   const [currentUser, setCurrentUser] = useState<string | null>(null)
   const [userSubscription, setUserSubscription] = useState<string | null>(null)
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
+  const pathname = usePathname()
+  const isHomePage = pathname === "/"
 
   useEffect(() => {
     const handleScroll = () => {
@@ -133,26 +136,32 @@ export default function MagazineHeader() {
         </button>
 
         <nav className="hidden md:flex items-center space-x-8 font-bold text-sm uppercase">
-          <Link 
-            href="/" 
-            className="flex items-center gap-1 text-primary hover:text-primary/80 transition-colors"
-          >
-            <Home size={16} />
-            <span>Home</span>
-          </Link>
+          {!isHomePage && (
+            <Link 
+              href="/" 
+              className="flex items-center gap-1 text-primary hover:text-primary/80 transition-colors"
+            >
+              <Home size={16} />
+              <span>Home</span>
+            </Link>
+          )}
           
-          <Link href="#features" className="hover:text-primary">
-            Features
-          </Link>
-          <Link href="#how-it-works" className="hover:text-primary">
-            How It Works
-          </Link>
-          <Link href="#artists" className="hover:text-primary">
-            Artists
-          </Link>
-          <Link href="#about" className="hover:text-primary">
-            About
-          </Link>
+          {isHomePage && (
+            <>
+              <Link href="#features" className="hover:text-primary">
+                Features
+              </Link>
+              <Link href="#how-it-works" className="hover:text-primary">
+                How It Works
+              </Link>
+              <Link href="#artists" className="hover:text-primary">
+                Artists
+              </Link>
+              <Link href="#about" className="hover:text-primary">
+                About
+              </Link>
+            </>
+          )}
           {currentUser ? (
             <>
               <Link href="/dashboard" className="hover:text-primary">
@@ -184,16 +193,30 @@ export default function MagazineHeader() {
       {isMenuOpen && (
         <div className="md:hidden border-t-2 border-secondary">
           <nav className="container mx-auto px-4 py-4 flex flex-col space-y-4 font-bold text-sm uppercase">
-            <Link href="/" className="hover:text-primary py-2 border-b-2 border-secondary flex items-center gap-2">
-              <Home size={16} />
-              <span>Home</span>
-            </Link>
-            <Link href="#features" className="hover:text-primary py-2 border-b-2 border-secondary">
-              Features
-            </Link>
-            <Link href="#artists" className="hover:text-primary py-2 border-b-2 border-secondary">
-              Artists
-            </Link>
+            {!isHomePage && (
+              <Link href="/" className="hover:text-primary py-2 border-b-2 border-secondary flex items-center gap-2">
+                <Home size={16} />
+                <span>Home</span>
+              </Link>
+            )}
+            
+            {isHomePage && (
+              <>
+                <Link href="#features" className="hover:text-primary py-2 border-b-2 border-secondary">
+                  Features
+                </Link>
+                <Link href="#how-it-works" className="hover:text-primary py-2 border-b-2 border-secondary">
+                  How It Works
+                </Link>
+                <Link href="#artists" className="hover:text-primary py-2 border-b-2 border-secondary">
+                  Artists
+                </Link>
+                <Link href="#about" className="hover:text-primary py-2 border-b-2 border-secondary">
+                  About
+                </Link>
+              </>
+            )}
+            
             {currentUser ? (
               <>
                 <Link href="/dashboard" className="hover:text-primary py-2 border-b-2 border-secondary">
