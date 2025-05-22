@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import storage from '@/lib/storage';
 
 interface CreditModalProps {
   isOpen: boolean;
@@ -19,27 +20,43 @@ export default function CreditModal({ isOpen, onClose, onSuccess }: CreditModalP
   const handlePurchase = async () => {
     try {
       setIsLoading(true);
-      
-      const response = await fetch('/api/credits', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ amount }),
-      });
 
-      if (!response.ok) {
-        throw new Error('Error al procesar la compra');
+      // Obtener el usuario actual
+      const currentUser = await storage.getCurrentUser();
+      if (!currentUser) {
+        throw new Error('Usuario no autenticado');
       }
 
+      // Obtener los créditos actuales
+      const creditsPath = `storage/${currentUser}/credits.json`;
+      const currentCredits = await storage.getItem(creditsPath) || { credits: 0, transactions: [] };
+
+      // Crear la nueva transacción
+      const newTransaction = {
+        date: new Date().toISOString(),
+        amount: amount,
+        type: 'purchase',
+        description: `Compra de ${amount} crédito${amount !== 1 ? 's' : ''}`
+      };
+
+      // Actualizar los créditos
+      const updatedCredits = {
+        credits: currentCredits.credits + amount,
+        transactions: [...currentCredits.transactions, newTransaction]
+      };
+
+      // Guardar los créditos actualizados
+      await storage.saveItem(creditsPath, updatedCredits);
+      
       toast({
         title: "¡Compra exitosa!",
-        description: `Has comprado ${amount} créditos por $${amount * 3} USD`,
+        description: `Has comprado ${amount} crédito${amount !== 1 ? 's' : ''} por $${amount * 3} USD`,
       });
 
       onSuccess();
       onClose();
     } catch (error) {
+      console.error('Error en la compra:', error);
       toast({
         title: "Error",
         description: "No se pudo procesar la compra. Inténtalo de nuevo.",
@@ -73,7 +90,7 @@ export default function CreditModal({ isOpen, onClose, onSuccess }: CreditModalP
             >
               -
             </button>
-            <span className="text-xl font-semibold">{amount} credits</span>
+            <span className="text-xl font-semibold">{amount} credit{amount !== 1 ? 's' : ''}</span>
             <button
               onClick={() => setAmount(amount + 1)}
               className="px-3 py-1 border rounded-md"

@@ -1,5 +1,5 @@
 {
-  "credits": 1,
+  "credits": 15,
   "transactions": [
     {
       "date": "2025-05-22T20:05:33.806Z",
@@ -8,16 +8,16 @@
       "description": "Welcome credits"
     },
     {
-      "date": "2025-05-22T20:17:27.505Z",
-      "amount": 1,
-      "type": "use",
-      "description": "Chat con agente spotify"
+      "date": "2025-05-22T20:31:52.272Z",
+      "amount": 3,
+      "type": "purchase",
+      "description": "Compra de 3 créditos"
     },
     {
-      "date": "2025-05-22T20:20:19.927Z",
-      "amount": 1,
-      "type": "use",
-      "description": "Chat con agente spotify"
+      "date": "2025-05-22T20:31:57.370Z",
+      "amount": 9,
+      "type": "purchase",
+      "description": "Compra de 9 créditos"
     }
   ]
 }
