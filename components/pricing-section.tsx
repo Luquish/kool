@@ -8,10 +8,10 @@ export default function PricingSection() {
       credits: 1,
       description: "Optimize your presence on Spotify and increase your chances of being included in editorial playlists.",
       features: [
-        "Análisis de tu perfil actual",
-        "Optimización de metadata",
-        "Estrategia de pitch",
-        "Seguimiento personalizado"
+        "Analyze your current profile",
+        "Optimize metadata",
+        "Pitch strategy",
+        "Customized tracking"
       ]
     },
     {
@@ -39,12 +39,12 @@ export default function PricingSection() {
     {
       name: "Publishing",
       credits: 1,
-      description: "Gestiona tus derechos de autor y maximiza tus ingresos por publishing.",
+      description: "Manage your copyright and maximize your publishing income.",
       features: [
-        "Registro de obras",
-        "Gestión de derechos",
-        "Estrategia de monetización",
-        "Reporte de regalías"
+        "Register your works",
+        "Rights management",
+        "Monetization strategy",
+        "Royalty report"
       ]
     },
     {
@@ -88,16 +88,11 @@ export default function PricingSection() {
             className="border-2 border-secondary hover:border-primary transition-colors duration-300"
           >
             <div className="p-6 flex flex-col h-full">
-              <h3 className="text-2xl font-bold text-secondary mb-2">{service.name}</h3>
+              <h3 className="text-3xl font-bold text-secondary mb-2">{service.name}</h3>
               <div className="flex items-center mb-4">
-                <span className="text-2xl font-black text-primary">{service.credits} crédito</span>
+                <span className="text-2xl font-black text-primary">{service.credits} credit</span>
               </div>
-              <p className="text-secondary/70 mb-6">{service.description}</p>
-              <Button
-                className="w-full bg-primary hover:bg-primary/90 text-white"
-              >
-                Usar Crédito
-              </Button>
+              <p className="text-secondary/70">{service.description}</p>
               <ul className="mt-6 space-y-3 flex-grow">
                 {service.features.map((feature, i) => (
                   <li key={i} className="flex items-center">

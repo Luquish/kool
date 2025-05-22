@@ -2,7 +2,7 @@ export default function AboutUs() {
   return (
     <section id="about" className="my-12 border-t-2 border-secondary pt-12">
       <div className="mb-8">
-        <div className="bg-secondary text-white inline-block px-3 py-1 text-xs font-bold mb-3">ABOUT US</div>
+        <div className="bg-secondary text-white inline-block px-3 py-1 text-xs font-bold mb-3">OUR VISION</div>
         <h2 className="text-3xl md:text-4xl font-black mb-2">REVOLUTIONIZING THE MUSIC INDUSTRY</h2>
         <p className="text-lg text-secondary/70">
           We believe that every artist deserves the chance to grow, connect and monetize — regardless of time, money or access. KOOL was built to remove the friction that stops most emerging talents from going pro.
@@ -11,7 +11,7 @@ export default function AboutUs() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div>
-          <div className="aspect-square bg-background mb-4">
+          <div className="aspect-[4/3] bg-background mb-4">
             <img
               src="/images/accessibility.png"
               alt="Our Mission"
@@ -20,13 +20,10 @@ export default function AboutUs() {
           </div>
           <div className="bg-primary text-white inline-block px-3 py-1 text-xs font-bold mb-2">OUR MISSION</div>
           <h3 className="text-xl font-bold mb-2">Accessibility</h3>
-          <p className="text-secondary/70 text-sm mb-4">
-            Like having a professional team within reach of any independent artist. No friction, no filters.
-          </p>
         </div>
 
         <div>
-          <div className="aspect-square bg-background mb-4">
+          <div className="aspect-[4/3] bg-background mb-4">
             <img
               src="/images/sustainability_and_autonomy.png"
               alt="Our Technology"
@@ -35,13 +32,10 @@ export default function AboutUs() {
           </div>
           <div className="bg-secondary text-white inline-block px-3 py-1 text-xs font-bold mb-2">TECHNOLOGY</div>
           <h3 className="text-xl font-bold mb-2">Sustainability and Autonomy</h3>
-          <p className="text-secondary/70 text-sm mb-4">
-            Build a real career with concrete tools that support long-term growth — not just viral moments. KOOL works for you. No intermediaries, no dependencies. 100% self-driven, 100% scalable.
-          </p>
         </div>
 
         <div>
-          <div className="aspect-square bg-background mb-4">
+          <div className="aspect-[4/3] bg-background mb-4">
             <img
               src="/images/team.png"
               alt="Our Team"
@@ -52,9 +46,6 @@ export default function AboutUs() {
           <h3 className="text-xl font-bold mb-2">
             Multidisciplinary Business Experts
           </h3>
-          <p className="text-secondary/70 text-sm mb-4">
-            Our team combines expertise in social sciences, finance, marketing and management with an innovative vision to transform the music industry.
-          </p>
         </div>
       </div>
 

@@ -219,14 +219,15 @@ export default function MagazineHeader() {
               <Link href="#how-it-works" className="hover:text-primary">
                 How It Works
               </Link>
-              <Link href="#artists" className="hover:text-primary">
-                Artists
+              
+              <Link href="#services" className="hover:text-primary">
+                Services
               </Link>
               <Link href="#about" className="hover:text-primary">
                 About
               </Link>
-              <Link href="#pricing" className="hover:text-primary">
-                Pricing
+              <Link href="#artists" className="hover:text-primary">
+                Artists
               </Link>
             </>
           )}

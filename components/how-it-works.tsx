@@ -58,33 +58,9 @@ export default function HowItWorks() {
                 <div className="flex items-start">
                   <span className="text-5xl font-black text-primary mr-4">3</span>
                   <div>
-                    <h3 className="text-xl font-bold mb-2">Optimize Your Content</h3>
-                    <p className="text-white/80">
-                      Let KOOL's AI analyze your music and content to suggest improvements, optimal release times, and platform-specific strategies for maximum impact.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="border-b border-white/20 pb-4">
-                <div className="flex items-start">
-                  <span className="text-5xl font-black text-primary mr-4">4</span>
-                  <div>
                     <h3 className="text-xl font-bold mb-2">Track your results</h3>
                     <p className="text-white/80">
-                      Visualize your growth with real-time reports and strategic feedback loops in your personalized dashboard. Adjust your path as you grow.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <div className="flex items-start">
-                  <span className="text-5xl font-black text-primary mr-4">5</span>
-                  <div>
-                    <h3 className="text-xl font-bold mb-2">Scale Your Success</h3>
-                    <p className="text-white/80">
-                      As your audience grows, KOOL's AI automatically adapts your strategy, scaling your reach while maintaining authentic connections with your fanbase.
+                    Visualize your growth with real-time reports and strategic feedback loops in your personalized dashboard. Adjust your path as you grow.
                     </p>
                   </div>
                 </div>
