@@ -32,7 +32,14 @@ export async function POST(request: NextRequest) {
       }, { status: 500 });
     }
 
-    // Construir el prompt con los datos del perfil de usuario
+    // Obtener la fecha actual y calcular las fechas para el calendario
+    const currentDate = new Date();
+    const startDate = new Date(currentDate);
+    startDate.setDate(1); // Comenzar desde el primer día del mes actual
+    const endDate = new Date(startDate);
+    endDate.setMonth(endDate.getMonth() + 3); // 3 meses de calendario
+
+    // Construir el prompt con los datos del perfil de usuario y las fechas
     const systemPrompt = `##########################
 ##  SYSTEM INSTRUCTIONS ##
 ##########################
@@ -47,10 +54,17 @@ Always reply in the language indicated by \`language\`.
    - "date"         : ISO-8601 string (YYYY-MM-DD)  
    - "title"        : short action name  
    - "description"  : what to do, written for a human artist/manager  
-   - "channel"      : IG / TikTok / YT / Live / Email / PR / Other  
+   - "channel"      : IG/TikTok / YT / Live / Email / PR / Other  
    - "effort_hours" : integer estimate  
-   - "goal"         : reach / engagement / conversion / brand / other  
-   - "budget_ars"   : number (0 if organic)
+   - "goal"         : brand / engagement / conversion / data-driven  
+   - "budget"   : number (0 if organic)
+
+IMPORTANT TIMING INSTRUCTIONS:
+• Start date: ${startDate.toISOString().split('T')[0]}
+• End date: ${endDate.toISOString().split('T')[0]}
+• All dates in the calendar MUST be within this range
+• Distribute tasks evenly across these dates
+• DO NOT generate dates outside this range
 
 2. **"task_tracker"** - array **in the same order and length** as *calendar*; each object shares the same \`"id"\` and \`"title"\`, and adds:
    - "status"       : pending / in-progress / done  
@@ -80,7 +94,7 @@ ${JSON.stringify(profileData, null, 2)}
 ##  END OF PROFILE    ##
 ########################
 
-<<Now generate the personalised 12-week calendar and task tracker JSON>>`;
+<<Now generate the personalised calendar and task tracker JSON starting from ${startDate.toISOString().split('T')[0]} to ${endDate.toISOString().split('T')[0]}>>`;
 
     console.log("Enviando solicitud a OpenAI");
     

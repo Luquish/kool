@@ -62,7 +62,7 @@ export default function AboutUs() {
               "Based on our survey, 9 out of 10 artists believe a clear strategy could change the course of their careers. KOOL helps them build one — and sustain it."
             </p>
             <p className="text-sm">
-              <span className="font-bold">Faustina Bagnat</span> • CEO & Founder
+              <span className="font-bold">Faustina Bagnat</span> • COO & Co-Founder
             </p>
           </div>
         </div>

@@ -8,7 +8,7 @@
       "channel": "IG/TikTok",
       "effort_hours": 5,
       "goal": "brand",
-      "budget_ars": 0
+      "budget": 0
     },
     {
       "id": "task-2",
@@ -18,7 +18,7 @@
       "channel": "IG/TikTok",
       "effort_hours": 2,
       "goal": "engagement",
-      "budget_ars": 0
+      "budget": 0
     },
     {
       "id": "task-3",
@@ -28,7 +28,7 @@
       "channel": "Email",
       "effort_hours": 1,
       "goal": "engagement",
-      "budget_ars": 0
+      "budget": 0
     },
     {
       "id": "task-4",
@@ -38,7 +38,7 @@
       "channel": "Live",
       "effort_hours": 4,
       "goal": "engagement",
-      "budget_ars": 0
+      "budget": 0
     },
     {
       "id": "task-5",
@@ -48,7 +48,7 @@
       "channel": "Other",
       "effort_hours": 3,
       "goal": "conversion",
-      "budget_ars": 0
+      "budget": 0
     },
     {
       "id": "task-6",
@@ -58,7 +58,7 @@
       "channel": "IG/TikTok",
       "effort_hours": 3,
       "goal": "engagement",
-      "budget_ars": 0
+      "budget": 0
     },
     {
       "id": "task-7",
@@ -68,7 +68,7 @@
       "channel": "Other",
       "effort_hours": 2,
       "goal": "data-driven",
-      "budget_ars": 0
+      "budget": 0
     },
     {
       "id": "task-8",
@@ -78,7 +78,7 @@
       "channel": "YT",
       "effort_hours": 10,
       "goal": "brand",
-      "budget_ars": 500
+      "budget": 500
     },
     {
       "id": "task-9",
@@ -88,7 +88,7 @@
       "channel": "YT/IG",
       "effort_hours": 2,
       "goal": "engagement",
-      "budget_ars": 0
+      "budget": 0
     },
     {
       "id": "task-10",
@@ -98,7 +98,7 @@
       "channel": "IG/TikTok",
       "effort_hours": 3,
       "goal": "engagement",
-      "budget_ars": 0
+      "budget": 0
     },
     {
       "id": "task-11",
@@ -108,7 +108,7 @@
       "channel": "Other",
       "effort_hours": 2,
       "goal": "data-driven",
-      "budget_ars": 0
+      "budget": 0
     },
     {
       "id": "task-12",
@@ -118,7 +118,7 @@
       "channel": "Other",
       "effort_hours": 4,
       "goal": "brand",
-      "budget_ars": 0
+      "budget": 0
     }
   ],
   "task_tracker": [

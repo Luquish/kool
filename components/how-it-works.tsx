@@ -35,9 +35,6 @@ export default function HowItWorks() {
                   <span className="text-5xl font-black text-primary mr-4">1</span>
                   <div>
                     <h3 className="text-xl font-bold mb-2">Define Your Goals</h3>
-                    <p className="text-white/80">
-                      Define your goals, upload your content, and let KOOL analyze your career to generate a custom roadmap.
-                    </p>
                   </div>
                 </div>
               </div>
@@ -47,9 +44,6 @@ export default function HowItWorks() {
                   <span className="text-5xl font-black text-primary mr-4">2</span>
                   <div>
                     <h3 className="text-xl font-bold mb-2">Execute with AI</h3>
-                    <p className="text-white/80">
-                      KOOL doesn't just advise — it takes action. From pitching to scheduling and outreach, your AI agent works for you. Just like a manager, but 100% autonomous and scalable.
-                    </p>
                   </div>
                 </div>
               </div>
@@ -59,9 +53,6 @@ export default function HowItWorks() {
                   <span className="text-5xl font-black text-primary mr-4">3</span>
                   <div>
                     <h3 className="text-xl font-bold mb-2">Track your results</h3>
-                    <p className="text-white/80">
-                    Visualize your growth with real-time reports and strategic feedback loops in your personalized dashboard. Adjust your path as you grow.
-                    </p>
                   </div>
                 </div>
               </div>
