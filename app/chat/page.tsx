@@ -414,64 +414,52 @@ export default function ChatPage() {
             }}
             className="flex w-full gap-2 items-center"
           >
-            <Input
-              ref={inputRef}
-              placeholder="Start your conversation..."
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              className="flex-1"
-              disabled={isLoading || (AGENTS[currentAgent].isPaid && !userProfile?.onboarding_completed)}
-            />
-            <div className="relative group">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div>
-                      <Select
-                        value={currentAgent}
-                        onValueChange={handleAgentChange}
-                      >
-                        <SelectTrigger className="w-[42px] px-2">
-                          {AGENT_ICONS[currentAgent]}
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Object.entries(AGENTS).map(([key, agent]) => {
-                            const isLocked = AGENTS[key as AgentType].isPaid && (!currentUser || (currentUser && !userProfile?.onboarding_completed));
-                            return (
-                              <SelectItem 
-                                key={key} 
-                                value={key}
-                                className={`flex items-center justify-between ${isLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                disabled={isLocked ? true : undefined}
-                              >
-                                <div className="flex items-center gap-2">
-                                  {AGENT_ICONS[key as AgentType]}
-                                  <span>{agent.name}</span>
-                                  {agent.credits > 0 && (
-                                    <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full ml-2">
-                                      {agent.credits} credit{agent.credits !== 1 ? 's' : ''}
-                                    </span>
-                                  )}
-                                  {isLocked && <Lock size={16} className="ml-2" />}
-                                </div>
-                              </SelectItem>
-                            );
-                          })}
-                        </SelectContent>
-                      </Select>
+            <div className="relative flex-1 flex items-center">
+              <Input
+                ref={inputRef}
+                placeholder="Start your conversation..."
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                className="pr-[120px]"
+                disabled={isLoading || (AGENTS[currentAgent].isPaid && !userProfile?.onboarding_completed)}
+              />
+              <div className="absolute right-1">
+                <Select
+                  value={currentAgent}
+                  onValueChange={handleAgentChange}
+                >
+                  <SelectTrigger className="border-0 shadow-none bg-transparent hover:bg-transparent focus:ring-0 h-8">
+                    <div className="flex items-center gap-2">
+                      {AGENT_ICONS[currentAgent]}
+                      <span className="text-xs text-muted-foreground">{AGENTS[currentAgent].name}</span>
                     </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    {!currentUser ? (
-                      <p>Sign in to unlock all agents</p>
-                    ) : !userProfile?.onboarding_completed ? (
-                      <p>Complete onboarding to unlock all agents</p>
-                    ) : (
-                      <p>Select an agent to chat with</p>
-                    )}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(AGENTS).map(([key, agent]) => {
+                      const isLocked = AGENTS[key as AgentType].isPaid && (!currentUser || (currentUser && !userProfile?.onboarding_completed));
+                      return (
+                        <SelectItem 
+                          key={key} 
+                          value={key}
+                          className={`flex items-center justify-between ${isLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          disabled={isLocked ? true : undefined}
+                        >
+                          <div className="flex items-center gap-2">
+                            {AGENT_ICONS[key as AgentType]}
+                            <span>{agent.name}</span>
+                            {agent.credits > 0 && (
+                              <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full ml-2">
+                                {agent.credits} credit{agent.credits !== 1 ? 's' : ''}
+                              </span>
+                            )}
+                            {isLocked && <Lock size={16} className="ml-2" />}
+                          </div>
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <Button 
               type="submit" 
