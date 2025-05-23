@@ -139,63 +139,74 @@ ${JSON.stringify(userProfile, null, 2)}
 
 <<Now generate the personalised calendar and task tracker JSON starting from ${startDate.toISOString().split('T')[0]} to ${endDate.toISOString().split('T')[0]}>>`;
 
-    // Llamar a la API de OpenAI
-    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: 'gpt-4',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
-        ],
-        temperature: 0.7,
-        max_tokens: 4000
-      })
-    });
+    // Llamar a la API de OpenAI con un timeout más largo
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minutos de timeout
 
-    if (!openaiResponse.ok) {
-      const errorData = await openaiResponse.json();
-      console.error('Error de OpenAI:', errorData);
-      return NextResponse.json({ error: 'Error al generar la estrategia' }, { status: 500 });
-    }
-
-    const openaiData = await openaiResponse.json();
-    const content = openaiData.choices[0].message.content;
-    
-    // Extraer el JSON si viene en formato markdown
-    const cleanedContent = extractJsonFromMarkdown(content);
-    
-    let generatedStrategy;
     try {
-      generatedStrategy = JSON.parse(cleanedContent);
-    } catch (error) {
-      console.error("Error al parsear JSON:", error);
-      return NextResponse.json({ 
-        error: 'Error al parsear la respuesta JSON del modelo', 
-        rawContent: content.substring(0, 1000) 
-      }, { status: 500 });
-    }
-
-    // Guardar la estrategia en Supabase
-    const { error: strategyError } = await supabase
-      .from('strategies')
-      .upsert({
-        user_id: user.id,
-        calendar: generatedStrategy.calendar,
-        task_tracker: generatedStrategy.task_tracker,
-        updated_at: new Date().toISOString()
+      const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt }
+          ],
+          temperature: 0.7,
+          max_tokens: 4000
+        }),
+        signal: controller.signal
       });
 
-    if (strategyError) {
-      console.error('Error al guardar estrategia:', strategyError);
-      return NextResponse.json({ error: 'Error al guardar la estrategia' }, { status: 500 });
-    }
+      clearTimeout(timeoutId);
 
-    return NextResponse.json({ success: true, strategy: generatedStrategy });
+      if (!openaiResponse.ok) {
+        const errorData = await openaiResponse.json();
+        console.error('Error de OpenAI:', errorData);
+        return NextResponse.json({ error: 'Error al generar la estrategia' }, { status: 500 });
+      }
+
+      const openaiData = await openaiResponse.json();
+      const content = openaiData.choices[0].message.content;
+      
+      // Extraer el JSON si viene en formato markdown
+      const cleanedContent = extractJsonFromMarkdown(content);
+      
+      let generatedStrategy;
+      try {
+        generatedStrategy = JSON.parse(cleanedContent);
+      } catch (error) {
+        console.error("Error al parsear JSON:", error);
+        return NextResponse.json({ 
+          error: 'Error al parsear la respuesta JSON del modelo', 
+          rawContent: content.substring(0, 1000) 
+        }, { status: 500 });
+      }
+
+      // Guardar la estrategia en Supabase
+      const { error: strategyError } = await supabase
+        .from('strategies')
+        .upsert({
+          user_id: user.id,
+          calendar: generatedStrategy.calendar,
+          task_tracker: generatedStrategy.task_tracker,
+          updated_at: new Date().toISOString()
+        });
+
+      if (strategyError) {
+        console.error('Error al guardar estrategia:', strategyError);
+        return NextResponse.json({ error: 'Error al guardar la estrategia' }, { status: 500 });
+      }
+
+      return NextResponse.json({ success: true, strategy: generatedStrategy });
+    } catch (error) {
+      console.error('Error del servidor:', error);
+      return NextResponse.json({ error: 'Error del servidor', details: String(error) }, { status: 500 });
+    }
   } catch (error) {
     console.error('Error del servidor:', error);
     return NextResponse.json({ error: 'Error del servidor', details: String(error) }, { status: 500 });
