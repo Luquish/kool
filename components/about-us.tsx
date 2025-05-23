@@ -19,7 +19,7 @@ export default function AboutUs() {
               className="w-full h-full object-cover"
             />
           </div>
-          <h3 className="text-2xl font-bold mb-3">Accessibility</h3>
+          <h3 className="text-2xl font-bold">Accessibility</h3>
         </div>
 
         <div>
@@ -31,7 +31,7 @@ export default function AboutUs() {
               className="w-full h-full object-cover"
             />
           </div>
-          <h3 className="text-2xl font-bold mb-3">Sustainability and Autonomy</h3>
+          <h3 className="text-2xl font-bold">Sustainability and Autonomy</h3>
         </div>
 
         <div>
@@ -43,13 +43,13 @@ export default function AboutUs() {
               className="w-full h-full object-cover"
             />
           </div>
-          <h3 className="text-2xl font-bold mb-3">
+          <h3 className="text-2xl font-bold">
             Multidisciplinary Business Experts
           </h3>
         </div>
       </div>
 
-      <div className="mt-8 bg-secondary text-white p-8">
+      <div className="mt-4 bg-secondary text-white p-8">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between">
           <div>
             <div className="text-primary font-bold mb-2">OUR VISION</div>

@@ -416,15 +416,13 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="px-4 sm:px-6 md:px-8 lg:px-40 xl:px-60 2xl:px-96 pt-16 pb-16">
       <OnboardingModal isOpen={showOnboardingModal} onClose={() => setShowOnboardingModal(false)} />
       
       <Breadcrumb 
         items={[{ href: '/dashboard', label: 'Dashboard' }]}
         className="mb-4" 
       />
-      
-      <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
       
       {/* Mostrar botón si no hay estrategia */}
       {!strategy && (

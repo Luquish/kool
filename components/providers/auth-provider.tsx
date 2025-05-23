@@ -55,6 +55,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         ])
 
         console.log('Profile response:', profileResponse)
+        console.log('Profile data details:', {
+          id: profileResponse.data?.id,
+          onboarding_completed: profileResponse.data?.onboarding_completed,
+          full_profile: profileResponse.data
+        })
         console.log('Credits response:', creditsResponse)
 
         if (!profileResponse.error) {

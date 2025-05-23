@@ -12,10 +12,6 @@ import { Button } from "@/components/ui/button"
 import { OnboardingModal } from "@/components/ui/onboarding-modal"
 import { useAuth } from "@/components/providers/auth-provider"
 
-// Add this before the component
-interface UserProfile {
-  onboarding_completed: boolean;
-}
 
 export default function MagazineHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -27,7 +23,6 @@ export default function MagazineHeader() {
   const profileMenuRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
   const isHomePage = pathname === "/"
-  const shouldHideNavigation = ['/chat', '/dashboard', '/profile'].includes(pathname)
   const { user: currentUser, profile: userProfile, credits: userCredits, isLoading } = useAuth()
 
   // Add debug logs
@@ -83,10 +78,14 @@ export default function MagazineHeader() {
 
   const handleNavigation = (e: React.MouseEvent, path: string) => {
     e.preventDefault();
+    console.log('handleNavigation - userProfile:', userProfile);
+    console.log('handleNavigation - onboarding_completed:', userProfile?.onboarding_completed);
     if (!userProfile?.onboarding_completed) {
+      console.log('Showing onboarding modal because onboarding is not completed');
       setShowOnboardingAlert(true);
       return;
     }
+    console.log('Navigation proceeding to:', path);
     window.location.href = path;
   };
 
@@ -110,7 +109,7 @@ export default function MagazineHeader() {
       )}
       <header className={`fixed top-0 left-0 right-0 bg-white z-50 transition-all duration-300 ease-in-out border-b-2 border-secondary ${
         hasScrolled ? 'shadow-lg' : ''
-      } ${shouldHideNavigation ? 'shadow-[0_20px_40px_-2px_hsl(0_73%_37%_/_0.5)] pb-0' : 'pb-0'}`}>
+      } pb-0`}>
         {/* Top utility bar */}
         <div className="border-b-2 border-secondary py-4 md:py-8 px-4 md:px-8 flex justify-between items-center text-sm relative h-[72px] md:h-[100px]">
           <div className="w-[100px] hidden md:flex items-center">
@@ -187,71 +186,59 @@ export default function MagazineHeader() {
         </div>
 
         {/* Main navigation */}
-        {!shouldHideNavigation && (
-          <div className="container mx-auto px-4 py-3 flex items-center justify-center relative">
-            <nav className="hidden md:flex items-center space-x-8 font-bold text-sm uppercase">
-              {!isHomePage && (
-                <Link 
-                  href="/" 
-                  className="flex items-center gap-1 text-primary hover:text-primary/80 transition-colors"
-                >
-                  <Home size={16} />
-                  <span>Home</span>
+        <div className="container mx-auto px-4 py-3 flex items-center justify-center relative">
+          <nav className="hidden md:flex items-center space-x-8 font-bold text-sm uppercase">
+            {isHomePage && (
+              <>
+                <Link href="#how-it-works" className="hover:text-primary">
+                  How It Works
                 </Link>
-              )}
-              
-              {isHomePage && (
-                <>
-                  <Link href="#how-it-works" className="hover:text-primary">
-                    How It Works
-                  </Link>
-                  
-                  <Link href="#services" className="hover:text-primary">
-                    Services
-                  </Link>
-                  <Link href="#about" className="hover:text-primary">
-                    About
-                  </Link>
-                  <Link href="#artists" className="hover:text-primary">
-                    Artists
-                  </Link>
+                
+                <Link href="#services" className="hover:text-primary">
+                  Services
+                </Link>
+                <Link href="#about" className="hover:text-primary">
+                  About
+                </Link>
+                <Link href="#artists" className="hover:text-primary">
+                  Artists
+                </Link>
 
-                  <div className="h-6 w-px bg-secondary mx-4" /> {/* Línea separadora vertical */}
-                  
-                  <div className="flex items-center space-x-8">
-                    <Link href="/chat" className="hover:text-primary">
-                      Chat
-                    </Link>
-                    {currentUser && (
-                      <>
-                        <a 
-                          href="/profile" 
-                          className="hover:text-primary"
-                          onClick={(e) => handleNavigation(e, '/profile')}
-                        >
-                          My Profile
-                        </a>
-                        <a 
-                          href="/dashboard" 
-                          className="hover:text-primary"
-                          onClick={(e) => handleNavigation(e, '/dashboard')}
-                        >
-                          Dashboard
-                        </a>
-                        <button
-                          onClick={() => setIsCreditModalOpen(true)}
-                          className="hover:text-primary uppercase font-bold text-sm"
-                        >
-                          Add Kool Credits
-                        </button>
-                      </>
-                    )}
-                  </div>
+                <div className="h-6 w-px bg-secondary mx-4" />
+              </>
+            )}
+            
+            <div className="flex items-center space-x-8">
+              <Link href="/chat" className="hover:text-primary">
+                Chat
+              </Link>
+              {currentUser && (
+                <>
+                  <a 
+                    href="/profile" 
+                    className="hover:text-primary"
+                    onClick={(e) => handleNavigation(e, '/profile')}
+                  >
+                    My Profile
+                  </a>
+                  <a 
+                    href="/dashboard" 
+                    className="hover:text-primary"
+                    onClick={(e) => handleNavigation(e, '/dashboard')}
+                  >
+                    Dashboard
+                  </a>
+                  <button
+                    onClick={() => setIsCreditModalOpen(true)}
+                    className="hover:text-primary uppercase font-bold text-sm"
+                  >
+                    Add Kool Credits
+                  </button>
                 </>
               )}
-            </nav>
-          </div>
-        )}
+            </div>
+          </nav>
+        </div>
 
         {/* Mobile menu */}
         {isMenuOpen && (

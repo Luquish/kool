@@ -268,7 +268,7 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="container mx-auto py-8 flex flex-col h-[calc(100vh-200px)]">
+    <div className="px-4 sm:px-6 md:px-8 lg:px-40 xl:px-60 2xl:px-96 pt-16 pb-16">
       <OnboardingModal isOpen={showOnboardingModal} onClose={() => setShowOnboardingModal(false)} />
       
       <Breadcrumb 
