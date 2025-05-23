@@ -26,7 +26,7 @@ export default function MagazineHeader() {
   const [isCreditModalOpen, setIsCreditModalOpen] = useState(false)
   const [userCredits, setUserCredits] = useState<number | null>(null)
   const [showOnboardingAlert, setShowOnboardingAlert] = useState(false)
-  const [showOnboardingModal, setShowOnboardingModal] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const profileMenuRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
   const isHomePage = pathname === "/"
@@ -78,11 +78,12 @@ export default function MagazineHeader() {
   useEffect(() => {
     const checkUser = async () => {
       try {
+        setIsLoading(true);
         const { data: { user }, error: authError } = await supabase.auth.getUser();
-        console.log(user);
         
         if (authError || !user) {
           setCurrentUser(null);
+          setIsLoading(false);
           return;
         }
 
@@ -110,6 +111,8 @@ export default function MagazineHeader() {
         
       } catch (error) {
         console.error("Error al cargar datos del usuario:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
     
@@ -184,7 +187,7 @@ export default function MagazineHeader() {
 
   // Add effect to handle body scroll
   useEffect(() => {
-    if (showOnboardingAlert || showOnboardingModal) {
+    if (showOnboardingAlert) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
@@ -193,40 +196,18 @@ export default function MagazineHeader() {
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, [showOnboardingAlert, showOnboardingModal]);
+  }, [showOnboardingAlert]);
 
   return (
     <>
       {showOnboardingAlert && (
-        <div 
-          className="fixed inset-0 z-[100] bg-background/80 backdrop-blur-sm flex items-center justify-center"
-          onClick={() => setShowOnboardingAlert(false)}
-        >
-          <div 
-            className="bg-white p-6 rounded-lg shadow-lg max-w-md mx-4 z-[101]"
-            onClick={e => e.stopPropagation()}
-          >
-            <h2 className="text-2xl font-bold mb-4">Complete the onboarding process</h2>
-            <p className="text-muted-foreground mb-6">
-              To use this function, you need to complete the onboarding process first.
-            </p>
-            <div className="flex justify-end">
-              <Button onClick={() => {
-                setShowOnboardingAlert(false);
-                setShowOnboardingModal(true);
-              }}>
-                Complete Onboarding
-              </Button>
-            </div>
-          </div>
-        </div>
+        <OnboardingModal isOpen={true} onClose={() => setShowOnboardingAlert(false)} />
       )}
-      <OnboardingModal isOpen={showOnboardingModal} onClose={() => setShowOnboardingModal(false)} />
       <header className={`fixed top-0 left-0 right-0 bg-white z-50 transition-all duration-300 ease-in-out border-b-2 border-secondary ${
         hasScrolled ? 'shadow-lg' : ''
       } ${shouldHideNavigation ? 'shadow-[0_20px_40px_-2px_hsl(0_73%_37%_/_0.5)] pb-0' : 'pb-0'}`}>
         {/* Top utility bar */}
-        <div className="border-b-2 border-secondary py-4 md:py-8 px-4 md:px-8 flex justify-between items-center text-sm relative">
+        <div className="border-b-2 border-secondary py-4 md:py-8 px-4 md:px-8 flex justify-between items-center text-sm relative h-[72px] md:h-[100px]">
           <div className="w-[100px] hidden md:flex items-center">
             <Link 
               href="#" 
@@ -254,9 +235,17 @@ export default function MagazineHeader() {
             </Link>
           </div>
 
-          <div className="w-[100px] md:w-[200px] flex items-center justify-end space-x-4">
-            {currentUser ? (
-              <div className="relative" ref={profileMenuRef}>
+          <div className="w-[100px] md:w-[200px] flex items-center justify-end space-x-4 min-h-[40px]">
+            {isLoading ? (
+              <div className="w-8 h-8 rounded-full bg-primary/10 animate-pulse" />
+            ) : currentUser ? (
+              <div className="relative flex items-center space-x-3" ref={profileMenuRef}>
+                <div className="text-primary font-bold hidden md:block">
+                  {userCredits} credits
+                </div>
+                <div className="text-primary font-bold md:hidden">
+                  {userCredits}
+                </div>
                 <button
                   onClick={toggleProfileMenu}
                   className={`w-8 md:w-10 h-8 md:h-10 rounded-full bg-primary/10 flex items-center justify-center transition-all duration-300 ${
@@ -265,53 +254,17 @@ export default function MagazineHeader() {
                 >
                   <User size={18} className="text-primary" />
                 </button>
-                
                 {isProfileMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 rounded-lg bg-white shadow-lg border border-gray-200 overflow-hidden transform origin-top-right transition-transform duration-200 ease-out">
-                    <div className="py-1">
-                      <div className="px-4 py-2 border-b border-gray-200">
-                        <p className="text-sm text-gray-600">Kool Credits</p>
-                        <p className="text-lg font-bold text-primary">{userCredits} credits</p>
-                      </div>
-                      <a 
-                        href="/profile" 
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={(e) => {
-                          setIsProfileMenuOpen(false);
-                          handleNavigation(e, '/profile');
-                        }}
-                      >
-                        My Profile
-                      </a>
-                      <a 
-                        href="/dashboard" 
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={(e) => {
-                          setIsProfileMenuOpen(false);
-                          handleNavigation(e, '/dashboard');
-                        }}
-                      >
-                        Dashboard
-                      </a>
-                      <button
-                        onClick={() => {
-                          setIsProfileMenuOpen(false);
-                          setIsCreditModalOpen(true);
-                        }}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        Add Kool Credits
-                      </button>
-                      <button
-                        onClick={() => {
-                          setIsProfileMenuOpen(false);
-                          handleLogout();
-                        }}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        Sign Out
-                      </button>
-                    </div>
+                  <div className="absolute right-0 top-full mt-2 w-48 rounded-lg bg-white shadow-lg border border-gray-200 overflow-hidden z-50">
+                    <button
+                      onClick={() => {
+                        setIsProfileMenuOpen(false);
+                        handleLogout();
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Sign Out
+                    </button>
                   </div>
                 )}
                 <CreditModal
@@ -362,9 +315,38 @@ export default function MagazineHeader() {
                   <Link href="#artists" className="hover:text-primary">
                     Artists
                   </Link>
-                  <Link href="/chat" className="hover:text-primary">
-                    Chat
-                  </Link>
+
+                  <div className="h-6 w-px bg-secondary mx-4" /> {/* Línea separadora vertical */}
+                  
+                  <div className="flex items-center space-x-8">
+                    <Link href="/chat" className="hover:text-primary">
+                      Chat
+                    </Link>
+                    {currentUser && (
+                      <>
+                        <a 
+                          href="/profile" 
+                          className="hover:text-primary"
+                          onClick={(e) => handleNavigation(e, '/profile')}
+                        >
+                          My Profile
+                        </a>
+                        <a 
+                          href="/dashboard" 
+                          className="hover:text-primary"
+                          onClick={(e) => handleNavigation(e, '/dashboard')}
+                        >
+                          Dashboard
+                        </a>
+                        <button
+                          onClick={() => setIsCreditModalOpen(true)}
+                          className="hover:text-primary uppercase font-bold text-sm"
+                        >
+                          Add Kool Credits
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </>
               )}
             </nav>
@@ -375,7 +357,7 @@ export default function MagazineHeader() {
         {isMenuOpen && (
           <div className="md:hidden border-t-2 border-secondary">
             <nav className="container mx-auto px-4 py-4 flex flex-col items-center space-y-4 font-bold text-sm uppercase">          
-            {!currentUser && (
+              {!currentUser && (
                 <>
                   <Link href="/auth/signup" onClick={() => setIsMenuOpen(false)} className="hover:text-primary py-2 border-b-2 border-secondary w-full text-center text-primary">
                     Sign Up
@@ -399,9 +381,46 @@ export default function MagazineHeader() {
                   <Link href="#artists" onClick={() => setIsMenuOpen(false)} className="hover:text-primary py-2 border-b-2 border-secondary w-full text-center">
                     Artists
                   </Link>
+
+                  <div className="w-full border-t-2 border-secondary my-4" />
+
                   <Link href="/chat" onClick={() => setIsMenuOpen(false)} className="hover:text-primary py-2 border-b-2 border-secondary w-full text-center">
                     Chat
                   </Link>
+
+                  {currentUser && (
+                    <>
+                      <a 
+                        href="/profile" 
+                        onClick={(e) => {
+                          setIsMenuOpen(false);
+                          handleNavigation(e, '/profile');
+                        }}
+                        className="hover:text-primary py-2 border-b-2 border-secondary w-full text-center"
+                      >
+                        My Profile
+                      </a>
+                      <a 
+                        href="/dashboard" 
+                        onClick={(e) => {
+                          setIsMenuOpen(false);
+                          handleNavigation(e, '/dashboard');
+                        }}
+                        className="hover:text-primary py-2 border-b-2 border-secondary w-full text-center"
+                      >
+                        Dashboard
+                      </a>
+                      <button
+                        onClick={() => {
+                          setIsMenuOpen(false);
+                          setIsCreditModalOpen(true);
+                        }}
+                        className="hover:text-primary py-2 border-b-2 border-secondary w-full text-center"
+                      >
+                        Add Kool Credits
+                      </button>
+                    </>
+                  )}
                 </>
               )}
             </nav>
