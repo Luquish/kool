@@ -11,13 +11,13 @@ import { Separator } from '@/components/ui/separator';
 import { 
   Send, 
   Lock,
-  Share2, // Social
-  Music2, // Spotify
-  Target, // Marketing
-  Copyright, // Publishing
-  Mic2, // Live
-  FileText, // Contracts
-  HelpCircle // Free
+  Share2,
+  Music2,
+  Target,
+  Copyright,
+  Mic2,
+  FileText,
+  HelpCircle
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
@@ -37,6 +37,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { OnboardingModal } from "@/components/ui/onboarding-modal";
+import { TypingIndicator } from '@/components/TypingIndicator';
 
 // Mapa de iconos para cada agente
 const AGENT_ICONS: Record<AgentType, React.ReactNode> = {
@@ -71,6 +72,7 @@ export default function ChatPage() {
   const { toast } = useToast();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [isTyping, setIsTyping] = useState<boolean>(false);
 
   // Obtener el usuario actual y su perfil
   useEffect(() => {
@@ -112,15 +114,26 @@ export default function ChatPage() {
     fetchUserData();
   }, []);
 
-  // Desplazar al último mensaje cuando se añade uno nuevo
+  // Desplazar al último mensaje cuando se añade uno nuevo o cuando está escribiendo
   useEffect(() => {
     if (scrollAreaRef.current) {
-      const lastMessage = scrollAreaRef.current.querySelector('[data-message]:last-child');
-      lastMessage?.scrollIntoView({ behavior: 'smooth' });
+      const scrollArea = scrollAreaRef.current;
+      const lastMessage = scrollArea.querySelector('[data-message]:last-child');
+      const typingIndicator = scrollArea.querySelector('[data-typing-indicator]');
+      
+      // Scroll al último elemento (ya sea un mensaje o el indicador de escritura)
+      const elementToScrollTo = typingIndicator || lastMessage;
+      
+      if (elementToScrollTo) {
+        elementToScrollTo.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'end'
+        });
+      }
     }
     // Mantener el foco en el input
     inputRef.current?.focus();
-  }, [messages]);
+  }, [messages, isTyping]);
 
   // Guardar mensajes
   const saveMessages = async (newMessages: Message[]) => {
@@ -173,14 +186,20 @@ export default function ChatPage() {
   // Enviar mensaje
   const handleSendMessage = async () => {
     if (!message.trim() || isLoading) return;
-    setIsLoading(true);
-
-    console.log('🚀 Iniciando envío de mensaje:', {
-      message: message.trim(),
-      agentType: currentAgent,
-      isAgentPaid: AGENTS[currentAgent].isPaid,
-      currentUser
+    
+    console.log('🚀 [Chat] Iniciando envío de mensaje:', {
+      mensaje: message.trim(),
+      agente: currentAgent,
+      usuario: currentUser?.id,
+      estadoActual: {
+        isLoading,
+        isTyping,
+        mensajesActuales: messages.length
+      }
     });
+
+    setIsLoading(true);
+    setIsTyping(true);
 
     const userMessage: Message = {
       role: 'user',
@@ -192,15 +211,18 @@ export default function ChatPage() {
       }
     };
 
+    console.log('📝 [Chat] Mensaje del usuario creado:', userMessage);
+
     setMessage('');
     setMessages(prev => [...prev, userMessage]);
     
     try {
-      console.log('📤 Enviando solicitud a /api/chat');
-      
-      // Obtener la sesión actual
+      console.log('📤 [Chat] Obteniendo sesión y token...');
       const { data: { session } } = await supabase.auth.getSession();
       
+      console.log('🔑 [Chat] Token obtenido:', session?.access_token ? 'Presente' : 'Ausente');
+      
+      console.log('📡 [Chat] Enviando solicitud a /api/chat');
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -213,20 +235,26 @@ export default function ChatPage() {
         }),
       });
       
-      console.log('📥 Respuesta recibida:', {
+      console.log('📥 [Chat] Respuesta recibida:', {
         status: response.status,
         ok: response.ok
       });
       
       if (!response.ok) {
         const error = await response.json();
-        console.error('❌ Error en la respuesta:', error);
+        console.error('❌ [Chat] Error en la respuesta:', error);
         throw new Error(error.error || 'Error al enviar mensaje');
       }
       
       const data = await response.json();
+      console.log('✅ [Chat] Datos recibidos:', {
+        tieneError: !!data.error,
+        tieneRespuesta: !!data.response,
+        respuestaLength: data.response?.length
+      });
 
       if (data.error) {
+        console.error('⚠️ [Chat] Error en los datos:', data.error);
         toast({
           title: 'Error',
           description: data.error,
@@ -245,16 +273,24 @@ export default function ChatPage() {
         }
       };
       
+      console.log('💬 [Chat] Mensaje del asistente creado:', assistantMessage);
+      
+      setIsTyping(false);
       setMessages(prev => [...prev, assistantMessage]);
       
     } catch (error: any) {
-      console.error('Error en la conversación:', error);
+      console.error('🔥 [Chat] Error en la conversación:', {
+        mensaje: error.message,
+        error: error
+      });
+      setIsTyping(false);
       toast({
         title: 'Error',
         description: error.message || 'No se pudo procesar tu mensaje. Inténtalo de nuevo.',
         variant: 'destructive'
       });
     } finally {
+      console.log('🏁 [Chat] Finalizando proceso de mensaje');
       setIsLoading(false);
     }
   };
@@ -351,6 +387,21 @@ export default function ChatPage() {
                     )}
                   </div>
                 ))}
+                {isTyping && (
+                  <div 
+                    data-typing-indicator 
+                    className="flex gap-3 justify-start"
+                  >
+                    <Avatar className="h-8 w-8">
+                      <div className="bg-primary text-white rounded-full h-8 w-8 flex items-center justify-center">
+                        {AGENTS[currentAgent].name[0]}
+                      </div>
+                    </Avatar>
+                    <div className="max-w-[80%] rounded-lg p-4 bg-muted flex items-center">
+                      <TypingIndicator />
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </ScrollArea>

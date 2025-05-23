@@ -17,59 +17,68 @@ function processMarkdownFormat(text: string): string {
 }
 
 export async function POST(request: NextRequest) {
-  console.log('[Backend] Iniciando POST /api/chat');
+  console.log('🎯 [API] Iniciando POST /api/chat');
   
   try {
     const { message, agentType } = await request.json() as { message: string; agentType: AgentType };
-    console.log('[Backend] Datos recibidos:', { message, agentType, isPaid: AGENTS[agentType].isPaid });
+    console.log('📦 [API] Datos recibidos:', { 
+      mensaje: message,
+      agente: agentType,
+      agenteInfo: {
+        nombre: AGENTS[agentType].name,
+        esPago: AGENTS[agentType].isPaid,
+        creditos: AGENTS[agentType].credits
+      }
+    });
 
     let user = null;
     let authError = null;
 
     // Solo verificar autenticación si es un agente pago
     if (AGENTS[agentType].isPaid) {
-      console.log('[Backend] Verificando autenticación para agente pago');
+      console.log('🔒 [API] Verificando autenticación para agente pago');
       
-      // Obtener el token de autorización del header
       const authHeader = request.headers.get('Authorization');
+      console.log('🔑 [API] Header de autorización:', authHeader ? 'Presente' : 'Ausente');
+
       if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        console.error('[Backend] Token de autorización no encontrado');
+        console.error('❌ [API] Token de autorización no encontrado o inválido');
         return NextResponse.json({ 
           error: 'Usuario no autenticado' 
         }, { status: 401 });
       }
 
       const token = authHeader.split(' ')[1];
+      console.log('🎫 [API] Token extraído correctamente');
       
-      // Verificar el token y obtener el usuario
       const authResult = await supabase.auth.getUser(token);
       user = authResult.data.user;
       authError = authResult.error;
 
-      console.log('[Backend] Resultado auth.getUser:', {
-        user: user ? { id: user.id, email: user.email } : null,
-        error: authError ? { message: authError.message, status: authError.status } : null
+      console.log('👤 [API] Resultado autenticación:', {
+        usuarioEncontrado: !!user,
+        id: user?.id,
+        email: user?.email,
+        error: authError ? { mensaje: authError.message, estado: authError.status } : null
       });
 
       if (authError || !user) {
-        console.error('[Backend] Usuario no autenticado para agente pago');
+        console.error('❌ [API] Error de autenticación:', authError);
         return NextResponse.json({ 
           error: 'Usuario no autenticado',
           details: 'No se encontró información del usuario en la sesión'
         }, { status: 401 });
       }
 
-      // Verificar si el usuario tiene suficientes créditos
       const credits = await getUserCredits(user.id);
-      const hasCredits = credits >= AGENTS[agentType].credits;
-      console.log('[Backend] Verificación de créditos:', { 
-        userCredits: credits, 
-        requiredCredits: AGENTS[agentType].credits,
-        hasEnoughCredits: hasCredits 
+      console.log('💰 [API] Verificación de créditos:', { 
+        creditosUsuario: credits, 
+        creditosRequeridos: AGENTS[agentType].credits,
+        tieneCreditos: credits >= AGENTS[agentType].credits 
       });
       
-      if (!hasCredits) {
-        console.error('[Backend] Créditos insuficientes');
+      if (credits < AGENTS[agentType].credits) {
+        console.error('💸 [API] Créditos insuficientes');
         return NextResponse.json(
           { error: `No tienes suficientes créditos (${AGENTS[agentType].credits} requeridos)` },
           { status: 402 }
@@ -77,25 +86,29 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Procesar el mensaje con el agente seleccionado
+    console.log('🤖 [API] Procesando mensaje con el agente');
     const response = await processMessage(message, agentType, user?.id || null);
+    console.log('✅ [API] Respuesta del agente recibida:', {
+      tieneRespuesta: !!response?.response,
+      longitudRespuesta: response?.response?.length
+    });
 
     if (response?.response) {
-      // Aplicar formato al texto de respuesta
       response.response = processMarkdownFormat(response.response);
+      console.log('📝 [API] Formato markdown aplicado');
     }
 
-    // Solo guardar mensajes y actualizar créditos si es un agente pago y el usuario está autenticado
     if (response && user && AGENTS[agentType].isPaid) {
-      // Descontar créditos solo si la respuesta fue exitosa y es un agente pago
+      console.log('💳 [API] Actualizando créditos y guardando mensajes');
+      
       await updateCredits(
         user.id, 
         AGENTS[agentType].credits, 
         'use', 
         `Chat con agente ${AGENTS[agentType].name}`
       );
+      console.log('✅ [API] Créditos actualizados');
 
-      // Guardar los mensajes en la base de datos
       await saveChatMessage(
         user.id,
         message,
@@ -103,7 +116,6 @@ export async function POST(request: NextRequest) {
         agentType,
         AGENTS[agentType].name
       );
-
       await saveChatMessage(
         user.id,
         response.response || 'No response',
@@ -111,8 +123,10 @@ export async function POST(request: NextRequest) {
         agentType,
         AGENTS[agentType].name
       );
+      console.log('✅ [API] Mensajes guardados en la base de datos');
     }
 
+    console.log('🏁 [API] Enviando respuesta al cliente');
     return NextResponse.json({
       response: response.response,
       success: true,
@@ -122,7 +136,11 @@ export async function POST(request: NextRequest) {
       }
     });
   } catch (error) {
-    console.error('[Backend] Error en el chat:', error);
+    console.error('🔥 [API] Error en el procesamiento:', {
+      error,
+      mensaje: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    });
     return NextResponse.json(
       { error: 'Error en el servidor', details: String(error) },
       { status: 500 }
