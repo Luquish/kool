@@ -279,11 +279,19 @@ export default function DashboardPage() {
     setLoading(true);
     
     try {
+      // Obtener el token de sesión actual
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        throw new Error('No se pudo obtener la sesión del usuario');
+      }
+
       console.log('[Frontend] Haciendo llamada a /api/strategy');
       const response = await fetch('/api/strategy', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
         }
       });
       

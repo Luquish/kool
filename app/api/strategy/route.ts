@@ -17,9 +17,19 @@ export async function POST(request: NextRequest) {
   console.log('[Backend] Iniciando POST /api/strategy');
   
   try {
-    // Obtener el usuario autenticado
-    console.log('[Backend] Intentando obtener usuario autenticado...');
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    // Obtener el token de autorización del header
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.error('[Backend] Token de autorización no encontrado');
+      return NextResponse.json({ 
+        error: 'Token de autorización no proporcionado' 
+      }, { status: 401 });
+    }
+
+    const token = authHeader.split(' ')[1];
+    
+    // Verificar el token y obtener el usuario
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     console.log('[Backend] Resultado auth.getUser:', {
       user: user ? { id: user.id, email: user.email } : null,
       error: authError ? { message: authError.message, status: authError.status } : null
@@ -69,7 +79,6 @@ export async function POST(request: NextRequest) {
     // Obtener la fecha actual y calcular las fechas para el calendario
     const currentDate = new Date();
     const startDate = new Date(currentDate);
-    startDate.setDate(1); // Comenzar desde el primer día del mes actual
     const endDate = new Date(startDate);
     endDate.setMonth(endDate.getMonth() + 3); // 3 meses de calendario
 
