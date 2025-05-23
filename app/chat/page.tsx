@@ -158,7 +158,7 @@ export default function ChatPage() {
   const isAgentLocked = (agentType: AgentType): boolean => {
     if (!AGENTS[agentType].isPaid) return false; // Los agentes gratuitos siempre están disponibles
     if (!currentUser) return true; // Si no hay usuario, todos los agentes pagos están bloqueados
-    return !userProfile?.isOnboardingCompleted; // Si hay usuario pero no completó onboarding, están bloqueados
+    return !userProfile?.onboarding_completed; // Si hay usuario pero no completó onboarding, están bloqueados
   };
 
   // Función para manejar el cambio de agente
@@ -347,7 +347,7 @@ export default function ChatPage() {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               className="flex-1"
-              disabled={isLoading || (AGENTS[currentAgent].isPaid && !userProfile?.isOnboardingCompleted)}
+              disabled={isLoading || (AGENTS[currentAgent].isPaid && !userProfile?.onboarding_completed)}
             />
             <div className="relative group">
               <TooltipProvider>
@@ -363,7 +363,7 @@ export default function ChatPage() {
                         </SelectTrigger>
                         <SelectContent>
                           {Object.entries(AGENTS).map(([key, agent]) => {
-                            const isLocked = AGENTS[key as AgentType].isPaid && (!currentUser || (currentUser && !userProfile?.isOnboardingCompleted));
+                            const isLocked = AGENTS[key as AgentType].isPaid && (!currentUser || (currentUser && !userProfile?.onboarding_completed));
                             return (
                               <SelectItem 
                                 key={key} 
@@ -391,7 +391,7 @@ export default function ChatPage() {
                   <TooltipContent>
                     {!currentUser ? (
                       <p>Sign in to unlock all agents</p>
-                    ) : !userProfile?.isOnboardingCompleted ? (
+                    ) : !userProfile?.onboarding_completed ? (
                       <p>Complete onboarding to unlock all agents</p>
                     ) : (
                       <p>Select an agent to chat with</p>
@@ -403,7 +403,7 @@ export default function ChatPage() {
             <Button 
               type="submit" 
               size="icon"
-              disabled={isLoading || !message.trim() || (AGENTS[currentAgent].isPaid && !userProfile?.isOnboardingCompleted)}
+              disabled={isLoading || !message.trim() || (AGENTS[currentAgent].isPaid && !userProfile?.onboarding_completed)}
             >
               {isLoading ? (
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />

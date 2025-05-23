@@ -48,7 +48,7 @@ interface OnboardingState {
   };
   
   // Variable para guardar si el onboarding está completo
-  isOnboardingCompleted: boolean;
+  onboarding_completed: boolean;
   
   // Acciones
   reset: () => void;
@@ -142,7 +142,7 @@ const initialState = {
     annual_expenses_ars: 0,
     budget_per_launch_ars: 0
   },
-  isOnboardingCompleted: false
+  onboarding_completed: false
 };
 
 // Usuario actual (correo electrónico)
@@ -289,7 +289,7 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
             ...state.financials,
             ...(profile.financials || {})
           },
-          isOnboardingCompleted: profile.onboarding_completed || false
+          onboarding_completed: profile.onboarding_completed || false
         }));
       }
     } catch (error) {
@@ -306,7 +306,7 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
       const state = get();
       
       // Guardar datos de progreso en localStorage solo mientras no está completado
-      if (isClient && !state.isOnboardingCompleted) {
+      if (isClient && !state.onboarding_completed) {
         localStorage.setItem(`onboarding_progress_${user.id}`, JSON.stringify({
           project_type: state.project_type,
           artist_name: state.artist_name,
@@ -367,7 +367,7 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
       }
       
       // Actualizar estado
-      set({ isOnboardingCompleted: true });
+      set({ onboarding_completed: true });
       
       return true;
     } catch (error) {
