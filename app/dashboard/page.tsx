@@ -430,22 +430,6 @@ export default function DashboardPage() {
     }));
   };
 
-  // Si no hay usuario, mostrar mensaje
-  if (!currentUser) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Card className="w-[400px]">
-          <CardHeader>
-            <CardTitle>You are not logged in</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>Please log in to access the dashboard.</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   return (
     <div className="px-4 sm:px-6 md:px-8 lg:px-40 xl:px-60 2xl:px-96 pt-16 pb-16">
       <OnboardingModal isOpen={showOnboardingModal} onClose={() => setShowOnboardingModal(false)} />

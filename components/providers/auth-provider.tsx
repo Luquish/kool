@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { RealtimePostgresChangesPayload } from '@supabase/supabase-js'
+import { RealtimePostgresChangesPayload, RealtimeChannel } from '@supabase/supabase-js'
 
 interface AuthContextType {
   user: any
@@ -66,8 +66,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
-    let profileSubscription: any = null
-    let creditsSubscription: any = null
+    let profileSubscription: RealtimeChannel | null = null;
+    let creditsSubscription: RealtimeChannel | null = null;
     let authSubscription: any = null
 
     const init = async () => {
@@ -94,9 +94,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               schema: 'public',
               table: 'profiles',
               filter: `id=eq.${currentUser.id}`
-            }, (payload) => {
-              console.log('📝 [Auth] Cambio en perfil detectado:', payload.new)
-              setProfile(payload.new)
+            }, async (payload: RealtimePostgresChangesPayload<{ onboarding_completed: boolean }>) => {
+              console.log('👤 [Auth] Cambio en perfil detectado:', payload.new)
+              if (payload.new) {
+                setProfile(payload.new)
+                if ('onboarding_completed' in payload.new) {
+                  console.log('✅ [Auth] Estado de onboarding actualizado:', payload.new.onboarding_completed)
+                }
+              }
             })
             .subscribe()
 

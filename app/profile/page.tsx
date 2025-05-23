@@ -164,14 +164,6 @@ export default function ProfilePage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-primary">Loading profile...</div>
-      </div>
-    );
-  }
-
   if (!profile) {
     return null;
   }

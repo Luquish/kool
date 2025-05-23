@@ -355,23 +355,36 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
         discography: state.discography,
         live_history: state.live_history,
         financials: state.financials,
-        onboarding_completed: true
+        onboarding_completed: true,
+        updated_at: new Date().toISOString()
       };
       
+      console.log('🔄 [Onboarding] Guardando datos finales:', onboardingData);
+      
       // Guardar datos finales en el perfil del usuario
-      await updateProfile(user.id, onboardingData);
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update(onboardingData)
+        .eq('id', user.id);
+
+      if (updateError) {
+        console.error('❌ [Onboarding] Error actualizando perfil:', updateError);
+        throw updateError;
+      }
+
+      console.log('✅ [Onboarding] Perfil actualizado correctamente');
       
       // Limpiar datos temporales
       if (isClient) {
         localStorage.removeItem(`onboarding_progress_${user.id}`);
       }
       
-      // Actualizar estado
+      // Actualizar estado local
       set({ onboarding_completed: true });
       
       return true;
     } catch (error) {
-      console.error('Error finalizando onboarding:', error);
+      console.error('❌ [Onboarding] Error finalizando onboarding:', error);
       return false;
     }
   }
