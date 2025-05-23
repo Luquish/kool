@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import storage from "@/lib/storage";
+import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,18 +30,28 @@ export default function ProfilePage() {
     const loadUserProfile = async () => {
       try {
         setLoading(true);
-        const email = await storage.getCurrentUser();
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
         
-        if (!email) {
+        if (authError || !user) {
           router.push("/auth/login");
           return;
         }
         
-        const userProfile = await storage.getUserProfile(email);
+        // Obtener el perfil del usuario desde Supabase
+        const { data: userProfile, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (profileError) {
+          throw profileError;
+        }
+        
         if (userProfile) {
           setProfile(userProfile);
           // Si el onboarding no está completado, mostrar el modal
-          if (!userProfile.isOnboardingCompleted) {
+          if (!userProfile.onboarding_completed) {
             setShowOnboardingModal(true);
           }
         } else {
@@ -50,6 +60,11 @@ export default function ProfilePage() {
         }
       } catch (error) {
         console.error("Error al cargar el perfil:", error);
+        toast({
+          title: "Error",
+          description: "No se pudo cargar el perfil. Por favor, intenta de nuevo.",
+          variant: "destructive",
+        });
       } finally {
         setLoading(false);
       }
@@ -99,24 +114,43 @@ export default function ProfilePage() {
   const saveProfile = async () => {
     try {
       setSaving(true);
-      const email = await storage.getCurrentUser();
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
       
-      if (!email) {
+      if (authError || !user) {
         router.push("/auth/login");
         return;
       }
       
-      const success = await storage.saveUserProfile(email, profile);
+      // Actualizar el perfil en Supabase
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({
+          full_name: profile.name,
+          language: profile.language,
+          project_type: profile.project_type,
+          artist_name: profile.artist_name,
+          members: profile.members,
+          guest_members: profile.guest_members,
+          creative_team: profile.creative_team,
+          distributor: profile.distributor,
+          label_status: profile.label_status,
+          label_name: profile.label_name,
+          socials: profile.socials,
+          discography: profile.discography,
+          live_history: profile.live_history,
+          financials: profile.financials
+        })
+        .eq('id', user.id);
       
-      if (success) {
-        toast({
-          title: "Profile updated",
-          description: "Your changes have been saved successfully.",
-          variant: "default",
-        });
-      } else {
-        throw new Error("Error saving profile");
+      if (updateError) {
+        throw updateError;
       }
+
+      toast({
+        title: "Profile updated",
+        description: "Your changes have been saved successfully.",
+        variant: "default",
+      });
     } catch (error) {
       console.error("Error saving profile:", error);
       toast({
@@ -142,7 +176,7 @@ export default function ProfilePage() {
   }
 
   // Si el onboarding no está completado, mostrar solo el modal
-  if (!profile.isOnboardingCompleted) {
+  if (!profile.onboarding_completed) {
     return (
       <div className="min-h-screen bg-background">
         <OnboardingModal isOpen={showOnboardingModal} onClose={() => setShowOnboardingModal(false)} />

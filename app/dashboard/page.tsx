@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import storage from '@/lib/storage';
+import { supabase, getProfile } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -205,7 +205,7 @@ const Calendar = ({
 };
 
 export default function DashboardPage() {
-  const [currentUser, setCurrentUser] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [strategy, setStrategy] = useState<Strategy | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -218,36 +218,41 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const user = await storage.getCurrentUser();
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        if (authError) throw authError;
+        
         setCurrentUser(user);
         
         if (user) {
-          const profile = await storage.getUserProfile(user);
+          const profile = await getProfile(user.id);
           setUserProfile(profile);
           
-          if (!profile?.isOnboardingCompleted) {
+          if (!profile?.onboarding_completed) {
             setShowOnboardingModal(true);
             return;
           }
           
-          try {
-            const strategyData = await fetch(`/api/storage?path=storage/${user}/strategy.json`);
-            if (strategyData.ok) {
-              const data = await strategyData.json();
-              console.log('Datos de estrategia cargados:', data);
-              if (data.data?.calendar) {
-                const formattedCalendar = data.data.calendar.map((event: any) => ({
-                  ...event,
-                  date: new Date(event.date).toISOString()
-                }));
-                setStrategy({
-                  ...data.data,
-                  calendar: formattedCalendar
-                });
-              }
-            }
-          } catch (error) {
-            console.warn('No se encontró estrategia previa:', error);
+          // Obtener estrategia de Supabase
+          const { data: strategyData, error: strategyError } = await supabase
+            .from('strategies')
+            .select('*')
+            .eq('user_id', user.id)
+            .single();
+
+          if (strategyError) {
+            console.warn('No se encontró estrategia previa:', strategyError);
+            return;
+          }
+
+          if (strategyData) {
+            const formattedCalendar = strategyData.calendar.map((event: any) => ({
+              ...event,
+              date: new Date(event.date).toISOString()
+            }));
+            setStrategy({
+              calendar: formattedCalendar,
+              task_tracker: strategyData.task_tracker
+            });
           }
         }
       } catch (error) {
@@ -260,7 +265,9 @@ export default function DashboardPage() {
 
   // Generar estrategia
   const handleGenerateStrategy = async () => {
-    if (!currentUser || !userProfile) {
+    console.log('[Frontend] Estado inicial - currentUser:', currentUser);
+    
+    if (!currentUser) {
       toast({
         title: 'Error',
         description: 'No se pudo obtener el perfil del usuario',
@@ -272,22 +279,28 @@ export default function DashboardPage() {
     setLoading(true);
     
     try {
+      console.log('[Frontend] Haciendo llamada a /api/strategy');
       const response = await fetch('/api/strategy', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email: currentUser,
-          profileData: userProfile
-        })
+        }
+      });
+      
+      console.log('[Frontend] Respuesta recibida:', {
+        ok: response.ok,
+        status: response.status,
+        statusText: response.statusText
       });
       
       if (!response.ok) {
-        throw new Error('Error al generar estrategia');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('[Frontend] Error response:', errorData);
+        throw new Error(errorData.error || 'Error al generar estrategia');
       }
       
       const data = await response.json();
+      console.log('[Frontend] Datos recibidos:', data);
       setStrategy(data.strategy);
       
       toast({
@@ -295,11 +308,11 @@ export default function DashboardPage() {
         description: 'Estrategia generada correctamente',
         variant: 'default'
       });
-    } catch (error) {
-      console.error('Error al generar estrategia:', error);
+    } catch (error: any) {
+      console.error('[Frontend] Error al generar estrategia:', error);
       toast({
         title: 'Error',
-        description: 'No se pudo generar la estrategia',
+        description: error.message || 'No se pudo generar la estrategia',
         variant: 'destructive'
       });
     } finally {
@@ -345,16 +358,15 @@ export default function DashboardPage() {
       setStrategy(updatedStrategy);
       
       try {
-        await fetch('/api/storage', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            path: `storage/${currentUser}/strategy.json`,
-            data: updatedStrategy
-          }),
-        });
+        const { error } = await supabase
+          .from('strategies')
+          .update({
+            task_tracker: updatedStrategy.task_tracker,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', currentUser.id);
+
+        if (error) throw error;
         
         toast({
           title: 'Actualizado',

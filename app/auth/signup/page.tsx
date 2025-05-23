@@ -3,109 +3,167 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import storage from "@/lib/storage";
-import bcrypt from "bcryptjs";
+import { supabase } from "@/lib/supabase";
 
 export default function SignupPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState<{message: string, details?: string}>({ message: "" });
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError({ message: "" });
     
     if (!name.trim()) {
-      setError("El nombre es requerido");
+      setError({ message: "El nombre es requerido" });
+      setIsLoading(false);
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Las contraseñas no coinciden");
+      setError({ message: "Las contraseñas no coinciden" });
+      setIsLoading(false);
       return;
     }
 
     try {
-      // 1. Verificar si el usuario ya existe
-      const userExists = await storage.checkUserExists(email);
-      
-      if (userExists) {
-        setError("Este email ya está registrado");
-        return;
-      }
-
-      // 2. Hash de la contraseña
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
-
-      // 3. Crear el perfil inicial del usuario
-      const initialProfile = {
-        name,
+      // 1. Crear el usuario en Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
-        password: hashedPassword,
-        language: "es",
-        project_type: "",
-        artist_name: "",
-        members: [],
-        guest_members: [],
-        creative_team: [],
-        distributor: "",
-        label_status: "independent",
-        label_name: "",
-        isOnboardingCompleted: false,
-        socials: {
-          instagram_followers: 0,
-          spotify_monthly_listeners: 0,
-          tiktok_followers: 0,
-          youtube_subscribers: 0,
-          mailing_list_size: 0
-        },
-        discography: {
-          eps: [],
-          singles_released: [],
-          upcoming_releases: [],
-          visual_concept: ""
-        },
-        live_history: {
-          highlights: [],
-          avg_capacity: 0,
-          avg_ticket_price_ars: 0
-        },
-        financials: {
-          annual_expenses_ars: 0,
-          budget_per_launch_ars: 0
+        password,
+        options: {
+          data: {
+            full_name: name
+          }
         }
-      };
+      });
 
-      try {
-        // 4. Guardar el perfil del usuario
-        await storage.saveUserProfile(email, initialProfile);
-        
-        // 5. Crear los créditos iniciales
-        await storage.saveItem(`storage/${email}/credits.json`, {
-          credits: 3,
-          transactions: [{
-            date: new Date().toISOString(),
-            amount: 3,
-            type: 'purchase',
-            description: 'Welcome credits'
-          }]
-        });
-        
-        // 6. Establecer el usuario actual
-        await storage.setCurrentUser(email);
-        
-        // 7. Redirigir al usuario al onboarding
-        router.push('/');
-      } catch (error) {
-        console.error('Error al guardar datos:', error);
-        setError('Hubo un error al crear tu cuenta. Por favor, intenta de nuevo.');
+      if (authError) {
+        throw new Error(JSON.stringify({
+          step: "auth",
+          message: authError.message,
+          details: authError
+        }));
       }
-    } catch (err) {
-      setError("Error al crear la cuenta");
-      console.error(err);
+
+      if (!authData.user) {
+        throw new Error(JSON.stringify({
+          step: "auth",
+          message: "No se pudo crear el usuario",
+          details: "No user data returned"
+        }));
+      }
+
+      // 2. Crear el perfil inicial del usuario
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          id: authData.user.id,
+          email,
+          full_name: name,
+          language: "es",
+          project_type: "",
+          artist_name: "",
+          members: [],
+          guest_members: [],
+          creative_team: [],
+          distributor: "",
+          label_status: "independent",
+          label_name: "",
+          onboarding_completed: false,
+          socials: {
+            instagram_followers: 0,
+            spotify_monthly_listeners: 0,
+            tiktok_followers: 0,
+            youtube_subscribers: 0,
+            mailing_list_size: 0
+          },
+          discography: {
+            eps: [],
+            singles_released: [],
+            upcoming_releases: [],
+            visual_concept: ""
+          },
+          live_history: {
+            highlights: [],
+            avg_capacity: 0,
+            avg_ticket_price_ars: 0
+          },
+          financials: {
+            annual_expenses_ars: 0,
+            budget_per_launch_ars: 0
+          }
+        });
+
+      if (profileError) {
+        throw new Error(JSON.stringify({
+          step: "profile",
+          message: "Error al crear el perfil",
+          details: profileError
+        }));
+      }
+
+      // 3. Crear los créditos iniciales
+      const { error: creditsError } = await supabase
+        .from('credits')
+        .insert({
+          id: authData.user.id,
+          amount: 3
+        });
+
+      if (creditsError) {
+        throw new Error(JSON.stringify({
+          step: "credits",
+          message: "Error al crear los créditos iniciales",
+          details: creditsError
+        }));
+      }
+
+      // 4. Registrar la transacción inicial de créditos
+      const { error: transactionError } = await supabase
+        .from('credit_transactions')
+        .insert({
+          user_id: authData.user.id,
+          amount: 3,
+          type: 'purchase',
+          description: 'Welcome credits'
+        });
+
+      if (transactionError) {
+        throw new Error(JSON.stringify({
+          step: "transaction",
+          message: "Error al registrar la transacción",
+          details: transactionError
+        }));
+      }
+
+      // 5. Redirigir al usuario al onboarding
+      router.push('/');
+      router.refresh();
+    } catch (error: any) {
+      console.error('Error completo:', error);
+      
+      let errorData;
+      try {
+        errorData = JSON.parse(error.message);
+      } catch {
+        errorData = {
+          message: "Error desconocido",
+          details: error.message || error
+        };
+      }
+      
+      setError({
+        message: errorData.message,
+        details: JSON.stringify(errorData.details, null, 2)
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -121,8 +179,15 @@ export default function SignupPage() {
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSignup}>
-          {error && (
-            <div className="text-red-500 text-sm text-center">{error}</div>
+          {error.message && (
+            <div className="text-red-500 text-sm">
+              <p className="font-semibold">{error.message}</p>
+              {error.details && (
+                <pre className="mt-2 p-2 bg-red-50 rounded text-xs overflow-auto">
+                  {error.details}
+                </pre>
+              )}
+            </div>
           )}
           <div className="space-y-4">
             <div>
@@ -137,6 +202,7 @@ export default function SignupPage() {
                 className="mt-1 block w-full px-3 py-2 bg-background border border-input rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                disabled={isLoading}
               />
             </div>
             <div>
@@ -151,6 +217,7 @@ export default function SignupPage() {
                 className="mt-1 block w-full px-3 py-2 bg-background border border-input rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
               />
             </div>
             <div>
@@ -165,6 +232,7 @@ export default function SignupPage() {
                 className="mt-1 block w-full px-3 py-2 bg-background border border-input rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
               />
             </div>
             <div>
@@ -179,6 +247,7 @@ export default function SignupPage() {
                 className="mt-1 block w-full px-3 py-2 bg-background border border-input rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                disabled={isLoading}
               />
             </div>
           </div>
@@ -187,8 +256,9 @@ export default function SignupPage() {
             <button
               type="submit"
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+              disabled={isLoading}
             >
-              Create Account
+              {isLoading ? "Creando cuenta..." : "Create Account"}
             </button>
           </div>
         </form>

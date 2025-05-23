@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { supabase, getProfile } from '@/lib/supabase';
 
 // Función para extraer JSON de un posible formato markdown
 function extractJsonFromMarkdown(content: string): string {
@@ -15,21 +14,56 @@ function extractJsonFromMarkdown(content: string): string {
 }
 
 export async function POST(request: NextRequest) {
+  console.log('[Backend] Iniciando POST /api/strategy');
+  
   try {
-    const { email, profileData } = await request.json();
+    // Obtener el usuario autenticado
+    console.log('[Backend] Intentando obtener usuario autenticado...');
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    console.log('[Backend] Resultado auth.getUser:', {
+      user: user ? { id: user.id, email: user.email } : null,
+      error: authError ? { message: authError.message, status: authError.status } : null
+    });
     
-    if (!email || !profileData) {
-      return NextResponse.json({ error: 'Se requiere email y profileData' }, { status: 400 });
+    if (authError) {
+      console.error('[Backend] Error de autenticación:', authError);
+      return NextResponse.json({ 
+        error: 'Error de autenticación', 
+        details: authError.message 
+      }, { status: 401 });
+    }
+
+    if (!user) {
+      console.error('[Backend] Usuario no encontrado en la sesión');
+      return NextResponse.json({ 
+        error: 'Usuario no autenticado',
+        details: 'No se encontró información del usuario en la sesión'
+      }, { status: 401 });
     }
 
     // Comprobar que la API key existe
     const apiKey = process.env.OPENAI_API_KEY;
-    console.log("¿API Key definida?:", !!apiKey);
-    
     if (!apiKey) {
+      console.error('[Backend] API key de OpenAI no encontrada');
       return NextResponse.json({ 
-        error: 'API key de OpenAI no configurada. Por favor, configure OPENAI_API_KEY en las variables de entorno.' 
+        error: 'API key de OpenAI no configurada' 
       }, { status: 500 });
+    }
+
+    // Obtener el perfil del usuario
+    console.log('[Backend] Intentando obtener perfil del usuario:', user.id);
+    const userProfile = await getProfile(user.id);
+    console.log('[Backend] Perfil obtenido:', {
+      id: userProfile?.id,
+      socials: userProfile?.socials,
+      discography: userProfile?.discography,
+      live_history: userProfile?.live_history,
+      financials: userProfile?.financials
+    });
+
+    if (!userProfile) {
+      console.error('[Backend] Perfil no encontrado para usuario:', user.id);
+      return NextResponse.json({ error: 'Perfil no encontrado' }, { status: 404 });
     }
 
     // Obtener la fecha actual y calcular las fechas para el calendario
@@ -88,7 +122,7 @@ IMPORTANT: Reply ONLY with the JSON object, no markdown formatting, no code bloc
 ##  USER (PROFILE)    ##
 ########################
 Profile:
-${JSON.stringify(profileData, null, 2)}
+${JSON.stringify(userProfile, null, 2)}
 
 ########################
 ##  END OF PROFILE    ##
@@ -96,8 +130,6 @@ ${JSON.stringify(profileData, null, 2)}
 
 <<Now generate the personalised calendar and task tracker JSON starting from ${startDate.toISOString().split('T')[0]} to ${endDate.toISOString().split('T')[0]}>>`;
 
-    console.log("Enviando solicitud a OpenAI");
-    
     // Llamar a la API de OpenAI
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -106,7 +138,7 @@ ${JSON.stringify(profileData, null, 2)}
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
@@ -122,40 +154,37 @@ ${JSON.stringify(profileData, null, 2)}
       return NextResponse.json({ error: 'Error al generar la estrategia' }, { status: 500 });
     }
 
-    console.log("Respuesta recibida de OpenAI");
     const openaiData = await openaiResponse.json();
     const content = openaiData.choices[0].message.content;
     
-    // Debug para ver la respuesta
-    console.log("Contenido de la respuesta:", content.substring(0, 200) + "...");
-    
     // Extraer el JSON si viene en formato markdown
     const cleanedContent = extractJsonFromMarkdown(content);
-    console.log("Contenido limpio:", cleanedContent.substring(0, 200) + "...");
     
     let generatedStrategy;
     try {
       generatedStrategy = JSON.parse(cleanedContent);
     } catch (error) {
       console.error("Error al parsear JSON:", error);
-      console.error("Contenido que causó el error:", cleanedContent);
       return NextResponse.json({ 
         error: 'Error al parsear la respuesta JSON del modelo', 
         rawContent: content.substring(0, 1000) 
       }, { status: 500 });
     }
 
-    // Guardar la estrategia en el sistema de archivos
-    const strategyDir = path.join(process.cwd(), 'storage', email);
-    
-    // Asegurar que el directorio existe
-    if (!fs.existsSync(strategyDir)) {
-      fs.mkdirSync(strategyDir, { recursive: true });
+    // Guardar la estrategia en Supabase
+    const { error: strategyError } = await supabase
+      .from('strategies')
+      .upsert({
+        user_id: user.id,
+        calendar: generatedStrategy.calendar,
+        task_tracker: generatedStrategy.task_tracker,
+        updated_at: new Date().toISOString()
+      });
+
+    if (strategyError) {
+      console.error('Error al guardar estrategia:', strategyError);
+      return NextResponse.json({ error: 'Error al guardar la estrategia' }, { status: 500 });
     }
-    
-    const strategyPath = path.join(strategyDir, 'strategy.json');
-    fs.writeFileSync(strategyPath, JSON.stringify(generatedStrategy, null, 2));
-    console.log("Estrategia guardada en:", strategyPath);
 
     return NextResponse.json({ success: true, strategy: generatedStrategy });
   } catch (error) {

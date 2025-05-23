@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Search, Menu, X, User, Home } from "lucide-react"
-import storage from "@/lib/storage"
+import { supabase } from "@/lib/supabase"
 import { usePathname } from "next/navigation"
 import CreditModal from "@/components/credit-modal"
 import { toast } from "@/components/ui/use-toast"
@@ -13,14 +13,14 @@ import { OnboardingModal } from "@/components/ui/onboarding-modal"
 
 // Add this before the component
 interface UserProfile {
-  isOnboardingCompleted: boolean;
+  onboarding_completed: boolean;
 }
 
 export default function MagazineHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [showJoke, setShowJoke] = useState(false)
   const [hasScrolled, setHasScrolled] = useState(false)
-  const [currentUser, setCurrentUser] = useState<string | null>(null)
+  const [currentUser, setCurrentUser] = useState<any>(null)
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
   const [isCreditModalOpen, setIsCreditModalOpen] = useState(false)
@@ -33,14 +33,18 @@ export default function MagazineHeader() {
   const shouldHideNavigation = ['/chat', '/dashboard', '/profile'].includes(pathname)
 
   // Función para obtener los créditos actuales
-  const fetchCurrentCredits = async (userEmail: string) => {
+  const fetchCurrentCredits = async (userId: string) => {
     try {
-      const response = await fetch('/api/credits');
-      if (response.ok) {
-        const data = await response.json();
-        if (typeof data.credits === 'number') {
-          setUserCredits(data.credits);
-        }
+      const { data, error } = await supabase
+        .from('credits')
+        .select('amount')
+        .eq('id', userId)
+        .single();
+      
+      if (error) throw error;
+      
+      if (data) {
+        setUserCredits(data.amount);
       }
     } catch (error) {
       console.error("Error al obtener créditos:", error);
@@ -74,14 +78,36 @@ export default function MagazineHeader() {
   useEffect(() => {
     const checkUser = async () => {
       try {
-        const userEmail = await storage.getCurrentUser();
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        console.log(user);
         
-        if (userEmail) {
-          setCurrentUser(userEmail);
-          await fetchCurrentCredits(userEmail);
-          const profile = await storage.getUserProfile(userEmail);
-          setUserProfile(profile);
+        if (authError || !user) {
+          setCurrentUser(null);
+          return;
         }
+
+        setCurrentUser(user);
+        
+        // Obtener perfil y créditos
+        const [profileResponse, creditsResponse] = await Promise.all([
+          supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single(),
+          supabase
+            .from('credits')
+            .select('amount')
+            .eq('id', user.id)
+            .single()
+        ]);
+
+        if (profileResponse.error) throw profileResponse.error;
+        if (creditsResponse.error) throw creditsResponse.error;
+
+        setUserProfile(profileResponse.data);
+        setUserCredits(creditsResponse.data?.amount || 0);
+        
       } catch (error) {
         console.error("Error al cargar datos del usuario:", error);
       }
@@ -93,7 +119,7 @@ export default function MagazineHeader() {
     let interval: NodeJS.Timeout;
     if (currentUser) {
       interval = setInterval(() => {
-        fetchCurrentCredits(currentUser);
+        fetchCurrentCredits(currentUser.id);
       }, 30000);
     }
 
@@ -102,11 +128,11 @@ export default function MagazineHeader() {
         clearInterval(interval);
       }
     };
-  }, [currentUser]);
+  }, [currentUser?.id]);
 
   const refreshCredits = async () => {
     if (currentUser) {
-      await fetchCurrentCredits(currentUser);
+      await fetchCurrentCredits(currentUser.id);
     }
   };
 
@@ -116,15 +142,13 @@ export default function MagazineHeader() {
 
   const handleLogout = async () => {
     try {
-      const success = await storage.logout();
-      if (success) {
-        setCurrentUser(null);
-        setUserCredits(null);
-        setIsProfileMenuOpen(false);
-        window.location.href = "/";
-      } else {
-        throw new Error("Error al cerrar sesión");
-      }
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      setCurrentUser(null);
+      setUserCredits(null);
+      setIsProfileMenuOpen(false);
+      window.location.href = "/";
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
       toast({
@@ -151,7 +175,7 @@ export default function MagazineHeader() {
 
   const handleNavigation = (e: React.MouseEvent, path: string) => {
     e.preventDefault();
-    if (!userProfile?.isOnboardingCompleted) {
+    if (!userProfile?.onboarding_completed) {
       setShowOnboardingAlert(true);
       return;
     }

@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import storage from '@/lib/storage';
-import { getUserCredits } from '@/lib/credits';
+import { supabase, getChatHistory, getProfile, getUserCredits } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -62,7 +61,7 @@ interface Message {
 }
 
 export default function ChatPage() {
-  const [currentUser, setCurrentUser] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [message, setMessage] = useState<string>('');
   const [messages, setMessages] = useState<Message[]>([]);
@@ -77,21 +76,27 @@ export default function ChatPage() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const user = await storage.getCurrentUser();
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error) throw error;
+        
         setCurrentUser(user);
         
         if (user) {
-          const profile = await storage.getUserProfile(user);
+          const profile = await getProfile(user.id);
           setUserProfile(profile);
           
-          // Recuperar historial de chat si existe
+          // Recuperar historial de chat
           try {
-            const chatData = await fetch(`/api/storage?path=storage/${user}/chat.json`);
-            if (chatData.ok) {
-              const data = await chatData.json();
-              const formattedMessages = data.data.map((msg: any) => ({
-                ...msg, 
-                timestamp: new Date(msg.timestamp)
+            const chatHistory = await getChatHistory(user.id);
+            if (chatHistory) {
+              const formattedMessages = chatHistory.map((msg: any) => ({
+                role: msg.role,
+                content: msg.content,
+                timestamp: new Date(msg.created_at),
+                agent: {
+                  type: msg.agent_type,
+                  name: msg.agent_name
+                }
               }));
               setMessages(formattedMessages);
             }
@@ -180,18 +185,10 @@ export default function ChatPage() {
       }
     };
 
-    // Limpiar el input y actualizar mensajes localmente
     setMessage('');
-    const updatedMessages = [...messages, userMessage];
-    setMessages(updatedMessages);
+    setMessages(prev => [...prev, userMessage]);
     
     try {
-      // Solo guardar mensajes si el usuario está autenticado y es un agente pago
-      if (currentUser && AGENTS[currentAgent].isPaid) {
-        await saveMessages(updatedMessages);
-      }
-      
-      // Enviar mensaje a la API
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -199,8 +196,7 @@ export default function ChatPage() {
         },
         body: JSON.stringify({
           message: userMessage.content,
-          agentType: currentAgent,
-          userEmail: currentUser
+          agentType: currentAgent
         }),
       });
       
@@ -220,7 +216,6 @@ export default function ChatPage() {
         return;
       }
       
-      // Añadir respuesta del asistente
       const assistantMessage: Message = {
         role: 'assistant',
         content: data.response,
@@ -231,14 +226,8 @@ export default function ChatPage() {
         }
       };
       
-      const newMessages = [...updatedMessages, assistantMessage];
-      setMessages(newMessages);
+      setMessages(prev => [...prev, assistantMessage]);
       
-      // Solo guardar mensajes y actualizar créditos si el usuario está autenticado y es un agente pago
-      if (currentUser && AGENTS[currentAgent].isPaid) {
-        await saveMessages(newMessages);
-        await updateHeaderCredits();
-      }
     } catch (error: any) {
       console.error('Error en la conversación:', error);
       toast({

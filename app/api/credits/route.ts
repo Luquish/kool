@@ -1,35 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
-import storage from '@/lib/storage';
-import type { UserCredits, Transaction } from '@/lib/credits';
+import { supabase, getUserCredits, updateCredits } from '@/lib/supabase';
 
 export async function GET(request: NextRequest) {
   try {
-    const currentUser = await storage.getCurrentUser();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
     
-    if (!currentUser) {
+    if (authError || !user) {
       return NextResponse.json({ error: 'Usuario no autenticado' }, { status: 401 });
     }
 
-    const creditsPath = `storage/${currentUser}/credits.json`;
-    const credits = await storage.getItem(creditsPath);
+    const credits = await getUserCredits(user.id);
     
-    if (!credits) {
+    if (credits === 0) {
       // Si no existen créditos, crear los iniciales
-      const initialCredits: UserCredits = {
-        credits: 3,
-        transactions: [{
-          date: new Date().toISOString(),
-          amount: 3,
-          type: 'purchase',
-          description: 'Welcome credits'
-        }]
-      };
-      
-      await storage.saveItem(creditsPath, initialCredits);
-      return NextResponse.json(initialCredits);
+      await updateCredits(user.id, 3, 'purchase', 'Welcome credits');
+      return NextResponse.json({ credits: 3 });
     }
     
-    return NextResponse.json(credits);
+    return NextResponse.json({ credits });
   } catch (error) {
     console.error('Error al obtener créditos:', error);
     return NextResponse.json(
@@ -41,9 +29,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const currentUser = await storage.getCurrentUser();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
     
-    if (!currentUser) {
+    if (authError || !user) {
       return NextResponse.json({ error: 'Usuario no autenticado' }, { status: 401 });
     }
     
@@ -53,28 +41,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Cantidad inválida' }, { status: 400 });
     }
 
-    const creditsPath = `storage/${currentUser}/credits.json`;
-    const currentCredits = await storage.getItem(creditsPath) || {
-      credits: 0,
-      transactions: []
-    };
-    
-    const newTransaction: Transaction = {
-      date: new Date().toISOString(),
-      amount,
-      type,
-      description
-    };
-
-    const updatedCredits: UserCredits = {
-      credits: type === 'purchase' 
-        ? currentCredits.credits + amount 
-        : currentCredits.credits - amount,
-      transactions: [...currentCredits.transactions, newTransaction]
-    };
-
-    await storage.saveItem(creditsPath, updatedCredits);
-    return NextResponse.json(updatedCredits);
+    const newAmount = await updateCredits(user.id, amount, type, description);
+    return NextResponse.json({ credits: newAmount });
   } catch (error) {
     console.error('Error al procesar la operación:', error);
     return NextResponse.json(

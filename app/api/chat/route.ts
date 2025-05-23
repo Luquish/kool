@@ -1,17 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import storage from '@/lib/storage';
-import { hasEnoughCredits, updateUserCredits } from '@/lib/credits';
+import { supabase, getUserCredits, updateCredits, saveChatMessage } from '@/lib/supabase';
 import { processMessage } from '@/lib/agents';
 import { AGENTS, AgentType } from '@/lib/agent-prompts';
 
 export async function POST(request: NextRequest) {
   try {
-    const currentUser = await storage.getCurrentUser();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
     const { message, agentType } = await request.json() as { message: string; agentType: AgentType };
 
     // Si es un agente pago, verificar autenticación y créditos
     if (AGENTS[agentType].isPaid) {
-      if (!currentUser) {
+      if (authError || !user) {
         return NextResponse.json(
           { error: 'Usuario no autenticado' },
           { status: 401 }
@@ -19,7 +18,8 @@ export async function POST(request: NextRequest) {
       }
 
       // Verificar si el usuario tiene suficientes créditos
-      const hasCredits = await hasEnoughCredits(currentUser, 1);
+      const credits = await getUserCredits(user.id);
+      const hasCredits = credits >= AGENTS[agentType].credits;
       
       if (!hasCredits) {
         return NextResponse.json(
@@ -30,44 +30,33 @@ export async function POST(request: NextRequest) {
     }
 
     // Procesar el mensaje con el agente seleccionado
-    const response = await processMessage(message, agentType, currentUser);
+    const response = await processMessage(message, agentType, user?.email || null);
 
-    if (response && currentUser && AGENTS[agentType].isPaid) {
-      // Descontar un crédito solo si la respuesta fue exitosa y es un agente pago
-      await updateUserCredits(
-        currentUser, 
+    if (response && user && AGENTS[agentType].isPaid) {
+      // Descontar créditos solo si la respuesta fue exitosa y es un agente pago
+      await updateCredits(
+        user.id, 
         AGENTS[agentType].credits, 
         'use', 
         `Chat con agente ${AGENTS[agentType].name}`
       );
 
-      // Guardar el mensaje en el historial
-      const chatPath = `storage/${currentUser}/chat.json`;
-      const currentChat = await storage.getItem(chatPath) || [];
-      
-      const updatedChat = [
-        ...currentChat,
-        {
-          role: 'user',
-          content: message,
-          timestamp: new Date().toISOString(),
-          agent: {
-            type: agentType,
-            name: AGENTS[agentType].name
-          }
-        },
-        {
-          role: 'assistant',
-          content: response,
-          timestamp: new Date().toISOString(),
-          agent: {
-            type: agentType,
-            name: AGENTS[agentType].name
-          }
-        }
-      ];
+      // Guardar los mensajes en la base de datos
+      await saveChatMessage(
+        user.id,
+        message,
+        'user',
+        agentType,
+        AGENTS[agentType].name
+      );
 
-      await storage.saveItem(chatPath, updatedChat);
+      await saveChatMessage(
+        user.id,
+        response.response || 'No response',
+        'assistant',
+        agentType,
+        AGENTS[agentType].name
+      );
     }
 
     return NextResponse.json({

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import storage from "@/lib/storage";
+import { supabase } from "@/lib/supabase";
 import { useOnboardingStore } from "@/lib/store/onboarding-store";
 import BasicInfoStep from "./steps/basic-info/page";
 import SocialsStep from "./steps/socials/page";
@@ -19,22 +19,22 @@ const steps = [
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const [currentUser, setCurrentUser] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [progress, setProgress] = useState(0);
   const { reset, loadFromStorage, saveToStorage, finishOnboarding } = useOnboardingStore();
 
   useEffect(() => {
     const checkUser = async () => {
-      const user = await storage.getCurrentUser();
-      if (!user) {
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error || !user) {
         router.push("/auth/login");
         return;
       }
       setCurrentUser(user);
       
       // Cargar datos existentes del perfil si existen
-      await loadFromStorage(user);
+      await loadFromStorage(user.id);
     };
     checkUser();
   }, [router, reset, loadFromStorage]);
@@ -47,7 +47,6 @@ export default function OnboardingPage() {
   useEffect(() => {
     if (currentUser && currentStep > 1) {
       // Solo guardamos automáticamente después del primer paso
-      // Guardamos el progreso temporal, no el definitivo
       saveToStorage();
     }
   }, [currentStep, currentUser, saveToStorage]);
@@ -56,25 +55,16 @@ export default function OnboardingPage() {
     if (!currentUser) return;
     
     try {
-      // Obtener el perfil actual
-      const currentProfile = await storage.getUserProfile(currentUser);
+      // Finalizar onboarding usando la función del store que ya usa Supabase
+      const success = await finishOnboarding();
       
-      if (!currentProfile) {
-        throw new Error('No se encontró el perfil del usuario');
+      if (!success) {
+        throw new Error('No se pudo completar el onboarding');
       }
-      
-      // Actualizar el perfil con los datos del onboarding y marcar como completado
-      const updatedProfile = {
-        ...currentProfile,
-        ...useOnboardingStore.getState(),
-        isOnboardingCompleted: true
-      };
-      
-      // Guardar el perfil actualizado
-      await storage.saveUserProfile(currentUser, updatedProfile);
       
       // Redirigir al dashboard
       router.push('/dashboard');
+      router.refresh();
     } catch (error) {
       console.error('Error al finalizar onboarding:', error);
       toast({

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import storage from '@/lib/storage';
+import { supabase, updateCredits } from '@/lib/supabase';
 
 interface CreditModalProps {
   isOpen: boolean;
@@ -21,45 +21,17 @@ export default function CreditModal({ isOpen, onClose, onSuccess }: CreditModalP
     try {
       setIsLoading(true);
 
-      // Obtener el usuario actual
-      const currentUser = await storage.getCurrentUser();
-      if (!currentUser) {
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
         throw new Error('Usuario no autenticado');
       }
 
-      // Obtener los créditos actuales
-      const creditsPath = `storage/${currentUser}/credits.json`;
-      let currentCredits = await storage.getItem(creditsPath);
-      
-      // Si no existen créditos, inicializar con créditos de bienvenida
-      if (!currentCredits) {
-        currentCredits = {
-          credits: 3,
-          transactions: [{
-            date: new Date().toISOString(),
-            amount: 3,
-            type: 'purchase',
-            description: 'Welcome credits'
-          }]
-        };
-      }
-
-      // Crear la nueva transacción
-      const newTransaction = {
-        date: new Date().toISOString(),
-        amount: amount,
-        type: 'purchase',
-        description: `Compra de ${amount} crédito${amount !== 1 ? 's' : ''}`
-      };
-
-      // Actualizar los créditos
-      const updatedCredits = {
-        credits: currentCredits.credits + amount,
-        transactions: [...currentCredits.transactions, newTransaction]
-      };
-
-      // Guardar los créditos actualizados
-      await storage.saveItem(creditsPath, updatedCredits);
+      await updateCredits(
+        user.id,
+        amount,
+        'purchase',
+        `Compra de ${amount} crédito${amount !== 1 ? 's' : ''}`
+      );
       
       toast({
         title: "¡Compra exitosa!",

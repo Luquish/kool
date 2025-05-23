@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import storage from '@/lib/storage';
+import { supabase, getProfile, updateProfile } from '@/lib/supabase';
 
 // Comprobar si estamos en el cliente (navegador)
 const isClient = typeof window !== 'undefined';
@@ -252,14 +252,15 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
     }
   })),
   
-  // Cargar datos desde almacenamiento
-  loadFromStorage: async (email) => {
+  // Cargar datos desde Supabase
+  loadFromStorage: async (email: string) => {
     try {
-      currentUserEmail = email;
-      const profile = await storage.getUserProfile(email);
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) throw new Error('No hay usuario autenticado');
+      
+      const profile = await getProfile(user.id);
       
       if (profile) {
-        // Actualizar estado con los datos del perfil
         set((state) => ({
           ...state,
           project_type: profile.project_type || state.project_type,
@@ -288,9 +289,7 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
             ...state.financials,
             ...(profile.financials || {})
           },
-          isOnboardingCompleted: profile.isOnboardingCompleted !== undefined 
-            ? profile.isOnboardingCompleted 
-            : false
+          isOnboardingCompleted: profile.onboarding_completed || false
         }));
       }
     } catch (error) {
@@ -298,27 +297,17 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
     }
   },
   
-  // Guardar datos en almacenamiento (solo para guardar progreso temporal)
+  // Guardar datos en Supabase (solo para guardar progreso temporal)
   saveToStorage: async () => {
     try {
-      if (!currentUserEmail) {
-        const email = await storage.getCurrentUser();
-        if (!email) {
-          throw new Error('No hay usuario autenticado');
-        }
-        currentUserEmail = email;
-      }
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) throw new Error('No hay usuario autenticado');
       
       const state = get();
-      const email = currentUserEmail;
-      
-      if (!email) {
-        throw new Error('No hay usuario autenticado');
-      }
       
       // Guardar datos de progreso en localStorage solo mientras no está completado
       if (isClient && !state.isOnboardingCompleted) {
-        localStorage.setItem(`onboarding_progress_${email}`, JSON.stringify({
+        localStorage.setItem(`onboarding_progress_${user.id}`, JSON.stringify({
           project_type: state.project_type,
           artist_name: state.artist_name,
           members: state.members,
@@ -332,7 +321,7 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
           discography: state.discography,
           live_history: state.live_history,
           financials: state.financials,
-          isOnboardingCompleted: false
+          onboarding_completed: false
         }));
       }
       
@@ -346,20 +335,10 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
   // Finalizar onboarding y guardar datos definitivos al perfil
   finishOnboarding: async () => {
     try {
-      if (!currentUserEmail) {
-        const email = await storage.getCurrentUser();
-        if (!email) {
-          throw new Error('No hay usuario autenticado');
-        }
-        currentUserEmail = email;
-      }
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) throw new Error('No hay usuario autenticado');
       
       const state = get();
-      const email = currentUserEmail;
-      
-      if (!email) {
-        throw new Error('No hay usuario autenticado');
-      }
       
       // Preparar los datos finales a guardar
       const onboardingData = {
@@ -376,15 +355,15 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
         discography: state.discography,
         live_history: state.live_history,
         financials: state.financials,
-        isOnboardingCompleted: true
+        onboarding_completed: true
       };
       
       // Guardar datos finales en el perfil del usuario
-      await storage.saveOnboardingData(email, onboardingData);
+      await updateProfile(user.id, onboardingData);
       
       // Limpiar datos temporales
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem(`onboarding_progress_${email}`);
+      if (isClient) {
+        localStorage.removeItem(`onboarding_progress_${user.id}`);
       }
       
       // Actualizar estado

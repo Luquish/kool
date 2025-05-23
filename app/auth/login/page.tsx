@@ -3,41 +3,40 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import storage from "@/lib/storage";
-import bcrypt from "bcryptjs";
+import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
     try {
-      const userPath = `storage/${email}/profile.json`;
-      const userData = await storage.getItem(userPath);
-      
-      if (!userData) {
-        setError("User not found");
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        setError(error.message);
         return;
       }
 
-      // Verificar la contraseña hasheada
-      const isValidPassword = await bcrypt.compare(password, userData.password);
-      
-      if (isValidPassword) {
-        await storage.saveItem("currentUser", email);
-        // Establecer el usuario actual
-        await storage.setCurrentUser(email);
-        
+      if (data?.user) {
         router.push("/");
-      } else {
-        setError("Incorrect password");
+        router.refresh();
       }
     } catch (err) {
-      setError("Error logging in");
+      setError("Error al iniciar sesión");
       console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -69,6 +68,7 @@ export default function LoginPage() {
                 className="mt-1 block w-full px-3 py-2 bg-background border border-input rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
               />
             </div>
             <div>
@@ -83,6 +83,7 @@ export default function LoginPage() {
                 className="mt-1 block w-full px-3 py-2 bg-background border border-input rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
               />
             </div>
           </div>
@@ -91,8 +92,9 @@ export default function LoginPage() {
             <button
               type="submit"
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+              disabled={isLoading}
             >
-              Login
+              {isLoading ? "Iniciando sesión..." : "Login"}
             </button>
           </div>
         </form>
