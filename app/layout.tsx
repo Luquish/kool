@@ -2,12 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
 import HeaderManager from '@/components/header-manager'
-import { StagewiseToolbar } from '@stagewise/toolbar-next'
 import { AuthProvider } from '@/components/providers/auth-provider'
-
-const stagewiseConfig = {
-  plugins: []
-}
 
 export const metadata: Metadata = {
   title: 'Kool - Music Management Platform',
@@ -26,9 +21,6 @@ export default function RootLayout({
           <AuthProvider>
             <HeaderManager />
             {children}
-            {process.env.NODE_ENV === 'development' && (
-              <StagewiseToolbar config={stagewiseConfig} />
-            )}
           </AuthProvider>
         </ThemeProvider>
       </body>
