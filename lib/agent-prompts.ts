@@ -1,4 +1,5 @@
 export type AgentType = 
+  | 'free'
   | 'social'
   | 'spotify'
   | 'marketing'
@@ -11,9 +12,34 @@ interface AgentConfig {
   description: string;
   systemPrompt: string;
   features: string[];
+  isPaid: boolean;
+  credits: number;
 }
 
 export const AGENTS: Record<AgentType, AgentConfig> = {
+  free: {
+    name: 'Free Assistant',
+    description: 'Get basic guidance and tips for your music career.',
+    features: [
+      'Basic tips',
+      'General advice',
+      'Simple guidance',
+      'Quick answers'
+    ],
+    isPaid: false,
+    credits: 0,
+    systemPrompt: `You are KoolAI's Free Assistant, providing basic guidance for artists.
+Your goal is to help artists with general music industry questions and basic advice.
+
+Focus areas:
+1. Basic Tips - Simple but effective suggestions
+2. General Advice - Universal music industry guidance
+3. Career Tips - Basic career development advice
+4. Quick Answers - Simple solutions to common questions
+
+Keep responses general and avoid personalized advice.
+Focus on universal principles and best practices.`
+  },
   social: {
     name: 'Social Media Campaign',
     description: 'Develop an effective strategy for your social media and increase your engagement.',
@@ -23,6 +49,8 @@ export const AGENTS: Record<AgentType, AgentConfig> = {
       'Content ideas',
       'General tips'
     ],
+    isPaid: true,
+    credits: 1,
     systemPrompt: `You are KoolAI's Social Media Strategist, specialized in general social media tips for artists.
 Your goal is to help artists improve their social media presence with basic tips and best practices.
 
@@ -44,6 +72,8 @@ Emphasize authentic artist-fan connections.`
       'Pitch strategy',
       'Personalized follow-up'
     ],
+    isPaid: true,
+    credits: 1,
     systemPrompt: `You are KoolAI's Spotify Specialist, an expert in music streaming optimization and playlist pitching.
 Your goal is to help artists maximize their Spotify presence and increase their chances of playlist inclusion.
 
@@ -65,6 +95,8 @@ Be specific and actionable in your recommendations.`
       'Content strategy',
       'Recommended budget'
     ],
+    isPaid: true,
+    credits: 1,
     systemPrompt: `You are KoolAI's Marketing Strategist, specialized in music industry marketing campaigns.
 Your goal is to help artists create and execute effective marketing strategies.
 
@@ -86,6 +118,8 @@ Focus on cost-effective strategies with measurable results.`
       'Monetization strategy',
       'Royalty reports'
     ],
+    isPaid: true,
+    credits: 1,
     systemPrompt: `You are KoolAI's Publishing Expert, specialized in music rights and royalties.
 Your goal is to help artists understand and maximize their publishing revenue.
 
@@ -107,6 +141,8 @@ Focus on practical steps for rights management.`
       'Promotion plan',
       'Pre-show checklist'
     ],
+    isPaid: true,
+    credits: 1,
     systemPrompt: `You are KoolAI's Live Performance Specialist, an expert in concert and tour planning.
 Your goal is to help artists plan and execute successful live shows.
 
@@ -128,6 +164,8 @@ Focus on practical, actionable advice for successful shows.`
       'Main terms',
       'Negotiation guide'
     ],
+    isPaid: true,
+    credits: 1,
     systemPrompt: `You are KoolAI's Music Business Advisor, specialized in music industry contracts.
 Your goal is to help artists understand and navigate common music industry agreements.
 

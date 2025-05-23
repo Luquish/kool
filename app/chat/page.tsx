@@ -17,7 +17,8 @@ import {
   Target, // Marketing
   Copyright, // Publishing
   Mic2, // Live
-  FileText // Contracts
+  FileText, // Contracts
+  HelpCircle // Free
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
@@ -40,6 +41,7 @@ import { OnboardingModal } from "@/components/ui/onboarding-modal";
 
 // Mapa de iconos para cada agente
 const AGENT_ICONS: Record<AgentType, React.ReactNode> = {
+  free: <HelpCircle className="h-4 w-4" />,
   social: <Share2 className="h-4 w-4" />,
   spotify: <Music2 className="h-4 w-4" />,
   marketing: <Target className="h-4 w-4" />,
@@ -65,7 +67,7 @@ export default function ChatPage() {
   const [message, setMessage] = useState<string>('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [currentAgent, setCurrentAgent] = useState<AgentType>('social');
+  const [currentAgent, setCurrentAgent] = useState<AgentType>('free');
   const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(false);
   const { toast } = useToast();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -145,8 +147,8 @@ export default function ChatPage() {
 
   // Función para verificar si un agente está bloqueado
   const isAgentLocked = (agentType: AgentType): boolean => {
-    if (agentType === 'social') return false; // El agente social siempre está disponible
-    if (!currentUser) return true; // Si no hay usuario, todos los demás agentes están bloqueados
+    if (!AGENTS[agentType].isPaid) return false; // Los agentes gratuitos siempre están disponibles
+    if (!currentUser) return true; // Si no hay usuario, todos los agentes pagos están bloqueados
     return !userProfile?.isOnboardingCompleted; // Si hay usuario pero no completó onboarding, están bloqueados
   };
 
@@ -180,8 +182,8 @@ export default function ChatPage() {
     setMessages(updatedMessages);
     
     try {
-      // Solo guardar mensajes si el usuario está autenticado y no es el agente social
-      if (currentUser && currentAgent !== 'social') {
+      // Solo guardar mensajes si el usuario está autenticado y es un agente pago
+      if (currentUser && AGENTS[currentAgent].isPaid) {
         await saveMessages(updatedMessages);
       }
       
@@ -228,8 +230,8 @@ export default function ChatPage() {
       const newMessages = [...updatedMessages, assistantMessage];
       setMessages(newMessages);
       
-      // Solo guardar mensajes y actualizar créditos si el usuario está autenticado y no es el agente social
-      if (currentUser && currentAgent !== 'social') {
+      // Solo guardar mensajes y actualizar créditos si el usuario está autenticado y es un agente pago
+      if (currentUser && AGENTS[currentAgent].isPaid) {
         await saveMessages(newMessages);
         await updateHeaderCredits();
       }
@@ -287,8 +289,8 @@ export default function ChatPage() {
               <div className="flex flex-col items-center justify-center h-full text-center p-4">
                 <p className="text-muted-foreground">
                   {!currentUser 
-                    ? 'You are now talking to the free social media chat' 
-                    : `You are now talking to the agent of ${AGENTS[currentAgent].name}`}
+                    ? 'You are talking to the free assistant' 
+                    : `You are talking to the agent of ${AGENTS[currentAgent].name}`}
                 </p>
               </div>
             ) : (
@@ -350,7 +352,7 @@ export default function ChatPage() {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               className="flex-1"
-              disabled={isLoading || (currentAgent !== 'social' && !userProfile?.isOnboardingCompleted)}
+              disabled={isLoading || (AGENTS[currentAgent].isPaid && !userProfile?.isOnboardingCompleted)}
             />
             <div className="relative group">
               <TooltipProvider>
@@ -366,17 +368,22 @@ export default function ChatPage() {
                         </SelectTrigger>
                         <SelectContent>
                           {Object.entries(AGENTS).map(([key, agent]) => {
-                            const isLocked = key !== 'social' && (!currentUser || (currentUser && !userProfile?.isOnboardingCompleted));
+                            const isLocked = AGENTS[key as AgentType].isPaid && (!currentUser || (currentUser && !userProfile?.isOnboardingCompleted));
                             return (
                               <SelectItem 
                                 key={key} 
                                 value={key}
                                 className={`flex items-center justify-between ${isLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                disabled={isLocked || false}
+                                disabled={isLocked ? true : undefined}
                               >
                                 <div className="flex items-center gap-2">
                                   {AGENT_ICONS[key as AgentType]}
                                   <span>{agent.name}</span>
+                                  {agent.credits > 0 && (
+                                    <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full ml-2">
+                                      {agent.credits} credit{agent.credits !== 1 ? 's' : ''}
+                                    </span>
+                                  )}
                                   {isLocked && <Lock size={16} className="ml-2" />}
                                 </div>
                               </SelectItem>
@@ -401,7 +408,7 @@ export default function ChatPage() {
             <Button 
               type="submit" 
               size="icon"
-              disabled={isLoading || !message.trim() || (currentAgent !== 'social' && !userProfile?.isOnboardingCompleted)}
+              disabled={isLoading || !message.trim() || (AGENTS[currentAgent].isPaid && !userProfile?.isOnboardingCompleted)}
             >
               {isLoading ? (
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />

@@ -16,13 +16,13 @@ export async function processMessage(message: string, agentType: AgentType, user
 
     let systemPrompt = AGENTS[agentType].systemPrompt;
 
-    // Solo cargar datos del usuario si está autenticado y no es el agente social
-    if (userEmail && agentType !== 'social') {
+    // Solo cargar datos del usuario si está autenticado y es un agente pago
+    if (userEmail && AGENTS[agentType].isPaid) {
       try {
         const userProfile = await storage.getItem(`storage/${userEmail}/profile.json`);
         const userStrategy = await storage.getItem(`storage/${userEmail}/strategy.json`);
 
-        // Verificar si el onboarding está completo
+        // Verificar si el onboarding está completo para agentes pagos
         if (!userProfile?.isOnboardingCompleted) {
           return {
             response: null,
@@ -60,10 +60,10 @@ ${JSON.stringify(userStrategy || {}, null, 2)}`;
       }
     }
 
-    // Para el agente social, asegurarse de que sea una experiencia genérica
-    if (agentType === 'social') {
-      systemPrompt = `${AGENTS.social.systemPrompt}
-NOTA: Esta es una conversación con un usuario no registrado. Proporciona consejos y recomendaciones generales sobre redes sociales para músicos.`;
+    // Para el agente gratuito, asegurarse de que sea una experiencia genérica
+    if (!AGENTS[agentType].isPaid) {
+      systemPrompt = `${AGENTS[agentType].systemPrompt}
+NOTA: Esta es una conversación con el agente gratuito. Proporciona consejos y recomendaciones generales sobre la industria musical.`;
     }
 
     // Llamar a la API de OpenAI
