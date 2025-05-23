@@ -330,7 +330,10 @@ export default function ChatPage() {
                           {msg.agent.name}
                         </div>
                       )}
-                      <div className="text-sm whitespace-pre-wrap">{msg.content}</div>
+                      <div 
+                        className="text-sm whitespace-pre-wrap"
+                        dangerouslySetInnerHTML={{ __html: msg.content }}
+                      />
                       <div className={`text-xs mt-1 ${
                         msg.role === 'user' 
                           ? 'text-primary-foreground/80' 

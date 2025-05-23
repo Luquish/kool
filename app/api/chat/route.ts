@@ -3,6 +3,19 @@ import { supabase, getUserCredits, updateCredits, saveChatMessage } from '@/lib/
 import { processMessage } from '@/lib/agents';
 import { AGENTS, AgentType } from '@/lib/agent-prompts';
 
+// Función para procesar el formato Markdown básico
+function processMarkdownFormat(text: string): string {
+  return text
+    // Procesar negrita con doble asterisco
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    // Procesar cursiva con un asterisco
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    // Procesar listas con guiones
+    .replace(/^- (.*)/gm, '• $1')
+    // Procesar saltos de línea
+    .replace(/\n/g, '<br>');
+}
+
 export async function POST(request: NextRequest) {
   console.log('[Backend] Iniciando POST /api/chat');
   
@@ -60,6 +73,11 @@ export async function POST(request: NextRequest) {
 
     // Procesar el mensaje con el agente seleccionado
     const response = await processMessage(message, agentType, user?.id || null);
+
+    if (response?.response) {
+      // Aplicar formato al texto de respuesta
+      response.response = processMarkdownFormat(response.response);
+    }
 
     if (response && user && AGENTS[agentType].isPaid) {
       // Descontar créditos solo si la respuesta fue exitosa y es un agente pago
