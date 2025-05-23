@@ -10,6 +10,7 @@ import CreditModal from "@/components/credit-modal"
 import { toast } from "@/components/ui/use-toast"
 import { Button } from "@/components/ui/button"
 import { OnboardingModal } from "@/components/ui/onboarding-modal"
+import { useAuth } from "@/components/providers/auth-provider"
 
 // Add this before the component
 interface UserProfile {
@@ -20,36 +21,24 @@ export default function MagazineHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [showJoke, setShowJoke] = useState(false)
   const [hasScrolled, setHasScrolled] = useState(false)
-  const [currentUser, setCurrentUser] = useState<any>(null)
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
   const [isCreditModalOpen, setIsCreditModalOpen] = useState(false)
-  const [userCredits, setUserCredits] = useState<number | null>(null)
   const [showOnboardingAlert, setShowOnboardingAlert] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
   const profileMenuRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
   const isHomePage = pathname === "/"
   const shouldHideNavigation = ['/chat', '/dashboard', '/profile'].includes(pathname)
+  const { user: currentUser, profile: userProfile, credits: userCredits, isLoading } = useAuth()
 
-  // Función para obtener los créditos actuales
-  const fetchCurrentCredits = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('credits')
-        .select('amount')
-        .eq('id', userId)
-        .single();
-      
-      if (error) throw error;
-      
-      if (data) {
-        setUserCredits(data.amount);
-      }
-    } catch (error) {
-      console.error("Error al obtener créditos:", error);
-    }
-  };
+  // Add debug logs
+  useEffect(() => {
+    console.log('MagazineHeader - Current state:', {
+      currentUser,
+      userProfile,
+      userCredits,
+      isLoading
+    })
+  }, [currentUser, userProfile, userCredits, isLoading])
 
   // Efecto para manejar el scroll
   useEffect(() => {
@@ -61,95 +50,11 @@ export default function MagazineHeader() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Efecto para escuchar actualizaciones de créditos
-  useEffect(() => {
-    const handleCreditsUpdate = (event: CustomEvent<{ credits: number }>) => {
-      setUserCredits(event.detail.credits);
-    };
-
-    window.addEventListener('updateCredits', handleCreditsUpdate as EventListener);
-
-    return () => {
-      window.removeEventListener('updateCredits', handleCreditsUpdate as EventListener);
-    };
-  }, []);
-
-  // Efecto para cargar datos del usuario y refrescar créditos periódicamente
-  useEffect(() => {
-    const checkUser = async () => {
-      try {
-        setIsLoading(true);
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
-        
-        if (authError || !user) {
-          setCurrentUser(null);
-          setIsLoading(false);
-          return;
-        }
-
-        setCurrentUser(user);
-        
-        // Obtener perfil y créditos
-        const [profileResponse, creditsResponse] = await Promise.all([
-          supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', user.id)
-            .single(),
-          supabase
-            .from('credits')
-            .select('amount')
-            .eq('id', user.id)
-            .single()
-        ]);
-
-        if (profileResponse.error) throw profileResponse.error;
-        if (creditsResponse.error) throw creditsResponse.error;
-
-        setUserProfile(profileResponse.data);
-        setUserCredits(creditsResponse.data?.amount || 0);
-        
-      } catch (error) {
-        console.error("Error al cargar datos del usuario:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    checkUser();
-
-    // Refrescar créditos cada 30 segundos si hay un usuario activo
-    let interval: NodeJS.Timeout;
-    if (currentUser) {
-      interval = setInterval(() => {
-        fetchCurrentCredits(currentUser.id);
-      }, 30000);
-    }
-
-    return () => {
-      if (interval) {
-        clearInterval(interval);
-      }
-    };
-  }, [currentUser?.id]);
-
-  const refreshCredits = async () => {
-    if (currentUser) {
-      await fetchCurrentCredits(currentUser.id);
-    }
-  };
-
-  const toggleProfileMenu = () => {
-    setIsProfileMenuOpen(!isProfileMenuOpen);
-  };
-
   const handleLogout = async () => {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
-      setCurrentUser(null);
-      setUserCredits(null);
       setIsProfileMenuOpen(false);
       window.location.href = "/";
     } catch (error) {
@@ -240,17 +145,12 @@ export default function MagazineHeader() {
               <div className="w-8 h-8 rounded-full bg-primary/10 animate-pulse" />
             ) : currentUser ? (
               <div className="relative flex items-center space-x-3" ref={profileMenuRef}>
-                <div className="text-primary font-bold hidden md:block">
+                <div className="text-primary font-bold block">
                   {userCredits} credits
                 </div>
-                <div className="text-primary font-bold md:hidden">
-                  {userCredits}
-                </div>
                 <button
-                  onClick={toggleProfileMenu}
-                  className={`w-8 md:w-10 h-8 md:h-10 rounded-full bg-primary/10 flex items-center justify-center transition-all duration-300 ${
-                    isProfileMenuOpen ? 'rounded-lg' : 'hover:bg-primary/20'
-                  }`}
+                  onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                  className="w-8 md:w-10 h-8 md:h-10 rounded-full bg-primary/10 flex items-center justify-center transition-all duration-300 hover:bg-primary/20"
                 >
                   <User size={18} className="text-primary" />
                 </button>
@@ -270,7 +170,7 @@ export default function MagazineHeader() {
                 <CreditModal
                   isOpen={isCreditModalOpen}
                   onClose={() => setIsCreditModalOpen(false)}
-                  onSuccess={refreshCredits}
+                  onSuccess={() => {}}
                 />
               </div>
             ) : (

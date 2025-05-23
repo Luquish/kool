@@ -3,6 +3,7 @@ import './globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
 import HeaderManager from '@/components/header-manager'
 import { StagewiseToolbar } from '@stagewise/toolbar-next'
+import { AuthProvider } from '@/components/providers/auth-provider'
 
 const stagewiseConfig = {
   plugins: []
@@ -22,11 +23,13 @@ export default function RootLayout({
     <html lang="es" suppressHydrationWarning>
       <body suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-          <HeaderManager />
-          {children}
-          {process.env.NODE_ENV === 'development' && (
-            <StagewiseToolbar config={stagewiseConfig} />
-          )}
+          <AuthProvider>
+            <HeaderManager />
+            {children}
+            {process.env.NODE_ENV === 'development' && (
+              <StagewiseToolbar config={stagewiseConfig} />
+            )}
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>
