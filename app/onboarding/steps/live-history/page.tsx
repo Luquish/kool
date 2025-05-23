@@ -164,7 +164,7 @@ export default function LiveHistoryStep() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Average Ticket Price (ARS)</label>
+              <label className="text-sm font-medium">Average Ticket Price</label>
               <div className="relative">
                 <input
                   type="text"
@@ -185,7 +185,7 @@ export default function LiveHistoryStep() {
           <h3 className="text-xl font-semibold">Finances</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Estimated Annual Expenses (ARS)</label>
+              <label className="text-sm font-medium">Estimated Annual Expenses</label>
               <div className="relative">
                 <input
                   type="text"
@@ -203,7 +203,7 @@ export default function LiveHistoryStep() {
             </div>
             
             <div className="space-y-2">
-              <label className="text-sm font-medium">Budget per Release (ARS)</label>
+              <label className="text-sm font-medium">Budget per Release</label>
               <div className="relative">
                 <input
                   type="text"

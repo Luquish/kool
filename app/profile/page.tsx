@@ -110,18 +110,18 @@ export default function ProfilePage() {
       
       if (success) {
         toast({
-          title: "Perfil actualizado",
-          description: "Tus cambios se han guardado correctamente.",
+          title: "Profile updated",
+          description: "Your changes have been saved successfully.",
           variant: "default",
         });
       } else {
-        throw new Error("Error al guardar el perfil");
+        throw new Error("Error saving profile");
       }
     } catch (error) {
-      console.error("Error al guardar el perfil:", error);
+      console.error("Error saving profile:", error);
       toast({
         title: "Error",
-        description: "No se pudo guardar tu perfil. Inténtalo de nuevo.",
+        description: "Unable to save your profile. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -132,7 +132,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-primary">Cargando perfil...</div>
+        <div className="text-primary">Loading profile...</div>
       </div>
     );
   }
@@ -152,7 +152,7 @@ export default function ProfilePage() {
 
   return (
     <div className="container py-10 max-w-5xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Mi Perfil</h1>
+      <h1 className="text-3xl font-bold mb-6">My Profile</h1>
       
       <div className="flex justify-end mb-4">
         <Button 
@@ -161,32 +161,32 @@ export default function ProfilePage() {
           className="flex items-center gap-2"
         >
           <Save size={16} />
-          {saving ? "Guardando..." : "Guardar cambios"}
+          {saving ? "Saving..." : "Save changes"}
         </Button>
       </div>
 
       <Tabs defaultValue="info">
         <TabsList className="grid w-full grid-cols-5 mb-6">
-          <TabsTrigger value="info">Información Básica</TabsTrigger>
-          <TabsTrigger value="socials">Redes Sociales</TabsTrigger>
-          <TabsTrigger value="discography">Discografía</TabsTrigger>
-          <TabsTrigger value="live">Historia en Vivo</TabsTrigger>
-          <TabsTrigger value="financials">Financiero</TabsTrigger>
+          <TabsTrigger value="info">Basic Info</TabsTrigger>
+          <TabsTrigger value="socials">Social Media</TabsTrigger>
+          <TabsTrigger value="discography">Discography</TabsTrigger>
+          <TabsTrigger value="live">Live History</TabsTrigger>
+          <TabsTrigger value="financials">Financial</TabsTrigger>
         </TabsList>
 
-        {/* Información Básica */}
+        {/* Basic Info */}
         <TabsContent value="info">
           <Card>
             <CardHeader>
-              <CardTitle>Información Básica</CardTitle>
+              <CardTitle>Basic Information</CardTitle>
               <CardDescription>
-                Actualiza tu información personal y detalles del proyecto
+                Update your personal information and project details
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Nombre</Label>
+                  <Label htmlFor="name">Name</Label>
                   <Input 
                     id="name" 
                     value={profile.name} 
@@ -205,22 +205,22 @@ export default function ProfilePage() {
               
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="language">Idioma</Label>
+                  <Label htmlFor="language">Language</Label>
                   <Select 
                     value={profile.language} 
                     onValueChange={(value) => handleInputChange("root", "language", value)}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecciona el idioma" />
+                      <SelectValue placeholder="Select language" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="es">Español</SelectItem>
-                      <SelectItem value="en">Inglés</SelectItem>
+                      <SelectItem value="es">Spanish</SelectItem>
+                      <SelectItem value="en">English</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="project_type">Tipo de Proyecto</Label>
+                  <Label htmlFor="project_type">Project Type</Label>
                   <Input 
                     id="project_type" 
                     value={profile.project_type} 
@@ -230,7 +230,7 @@ export default function ProfilePage() {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="artist_name">Nombre Artístico</Label>
+                <Label htmlFor="artist_name">Artist Name</Label>
                 <Input 
                   id="artist_name" 
                   value={profile.artist_name} 
@@ -240,9 +240,9 @@ export default function ProfilePage() {
               
               <Separator />
               
-              {/* Miembros */}
+              {/* Members */}
               <div className="space-y-4">
-                <Label>Miembros</Label>
+                <Label>Members</Label>
                 <div className="flex flex-wrap gap-2">
                   {profile.members.map((member: string, index: number) => (
                     <Badge key={index} variant="secondary" className="flex items-center gap-1">
@@ -258,7 +258,7 @@ export default function ProfilePage() {
                 </div>
                 <div className="flex gap-2">
                   <Input 
-                    placeholder="Añadir miembro" 
+                    placeholder="Add member" 
                     value={newMember}
                     onChange={(e) => setNewMember(e.target.value)}
                     onKeyDown={(e) => {
@@ -281,9 +281,9 @@ export default function ProfilePage() {
                 </div>
               </div>
               
-              {/* Miembros Invitados */}
+              {/* Guest Members */}
               <div className="space-y-4">
-                <Label>Miembros Invitados</Label>
+                <Label>Guest Members</Label>
                 <div className="flex flex-wrap gap-2">
                   {profile.guest_members.map((member: string, index: number) => (
                     <Badge key={index} variant="secondary" className="flex items-center gap-1">
@@ -299,7 +299,7 @@ export default function ProfilePage() {
                 </div>
                 <div className="flex gap-2">
                   <Input 
-                    placeholder="Añadir miembro invitado" 
+                    placeholder="Add guest member" 
                     value={newGuestMember}
                     onChange={(e) => setNewGuestMember(e.target.value)}
                     onKeyDown={(e) => {
@@ -322,9 +322,9 @@ export default function ProfilePage() {
                 </div>
               </div>
               
-              {/* Equipo Creativo */}
+              {/* Creative Team */}
               <div className="space-y-4">
-                <Label>Equipo Creativo</Label>
+                <Label>Creative Team</Label>
                 <div className="flex flex-wrap gap-2">
                   {profile.creative_team.map((member: string, index: number) => (
                     <Badge key={index} variant="secondary" className="flex items-center gap-1">
@@ -340,7 +340,7 @@ export default function ProfilePage() {
                 </div>
                 <div className="flex gap-2">
                   <Input 
-                    placeholder="Añadir miembro al equipo creativo" 
+                    placeholder="Add creative team member" 
                     value={newCreativeTeamMember}
                     onChange={(e) => setNewCreativeTeamMember(e.target.value)}
                     onKeyDown={(e) => {
@@ -367,7 +367,7 @@ export default function ProfilePage() {
               
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="distributor">Distribuidor</Label>
+                  <Label htmlFor="distributor">Distributor</Label>
                   <Input 
                     id="distributor" 
                     value={profile.distributor} 
@@ -375,17 +375,17 @@ export default function ProfilePage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="label_status">Estado de Sello</Label>
+                  <Label htmlFor="label_status">Label Status</Label>
                   <Select 
                     value={profile.label_status} 
                     onValueChange={(value) => handleInputChange("root", "label_status", value)}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecciona el estado" />
+                      <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="independent">Independiente</SelectItem>
-                      <SelectItem value="signed">Firmado</SelectItem>
+                      <SelectItem value="independent">Independent</SelectItem>
+                      <SelectItem value="signed">Signed</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -393,7 +393,7 @@ export default function ProfilePage() {
               
               {profile.label_status === "signed" && (
                 <div className="space-y-2">
-                  <Label htmlFor="label_name">Nombre del Sello</Label>
+                  <Label htmlFor="label_name">Label Name</Label>
                   <Input 
                     id="label_name" 
                     value={profile.label_name} 
@@ -405,19 +405,19 @@ export default function ProfilePage() {
           </Card>
         </TabsContent>
 
-        {/* Redes Sociales */}
+        {/* Social Media */}
         <TabsContent value="socials">
           <Card>
             <CardHeader>
-              <CardTitle>Redes Sociales</CardTitle>
+              <CardTitle>Social Media</CardTitle>
               <CardDescription>
-                Actualiza tus métricas en plataformas sociales
+                Update your social media metrics
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="instagram_followers">Seguidores en Instagram</Label>
+                  <Label htmlFor="instagram_followers">Instagram Followers</Label>
                   <Input 
                     id="instagram_followers" 
                     type="number"
@@ -426,7 +426,7 @@ export default function ProfilePage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="spotify_monthly_listeners">Oyentes Mensuales en Spotify</Label>
+                  <Label htmlFor="spotify_monthly_listeners">Spotify Monthly Listeners</Label>
                   <Input 
                     id="spotify_monthly_listeners" 
                     type="number"
@@ -438,7 +438,7 @@ export default function ProfilePage() {
               
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="tiktok_followers">Seguidores en TikTok</Label>
+                  <Label htmlFor="tiktok_followers">TikTok Followers</Label>
                   <Input 
                     id="tiktok_followers" 
                     type="number"
@@ -447,7 +447,7 @@ export default function ProfilePage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="youtube_subscribers">Suscriptores en YouTube</Label>
+                  <Label htmlFor="youtube_subscribers">YouTube Subscribers</Label>
                   <Input 
                     id="youtube_subscribers" 
                     type="number"
@@ -458,7 +458,7 @@ export default function ProfilePage() {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="mailing_list_size">Tamaño de Lista de Correo</Label>
+                <Label htmlFor="mailing_list_size">Mailing List Size</Label>
                 <Input 
                   id="mailing_list_size" 
                   type="number"
@@ -470,13 +470,13 @@ export default function ProfilePage() {
           </Card>
         </TabsContent>
 
-        {/* Discografía */}
+        {/* Discography */}
         <TabsContent value="discography">
           <Card>
             <CardHeader>
-              <CardTitle>Discografía</CardTitle>
+              <CardTitle>Discography</CardTitle>
               <CardDescription>
-                Información sobre tus lanzamientos musicales
+                Information about your music releases
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -503,11 +503,11 @@ export default function ProfilePage() {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-muted-foreground">No hay EPs registrados</p>
+                    <p className="text-sm text-muted-foreground">No EPs registered</p>
                   )}
                   <div className="flex gap-2 mt-2">
                     <Input 
-                      placeholder="Añadir nuevo EP"
+                      placeholder="Add new EP"
                       onKeyDown={(e) => {
                         if (e.key === "Enter" && e.currentTarget.value.trim()) {
                           handleInputChange("discography", "eps", [...profile.discography.eps, e.currentTarget.value]);
@@ -533,7 +533,7 @@ export default function ProfilePage() {
               </div>
               
               <div className="space-y-4">
-                <Label>Singles Lanzados</Label>
+                <Label>Released Singles</Label>
                 <div className="space-y-2">
                   {profile.discography.singles_released.length > 0 ? (
                     <div className="grid gap-2">
@@ -555,11 +555,11 @@ export default function ProfilePage() {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-muted-foreground">No hay singles registrados</p>
+                    <p className="text-sm text-muted-foreground">No singles registered</p>
                   )}
                   <div className="flex gap-2 mt-2">
                     <Input 
-                      placeholder="Añadir nuevo single"
+                      placeholder="Add new single"
                       onKeyDown={(e) => {
                         if (e.key === "Enter" && e.currentTarget.value.trim()) {
                           handleInputChange("discography", "singles_released", [...profile.discography.singles_released, e.currentTarget.value]);
@@ -585,7 +585,7 @@ export default function ProfilePage() {
               </div>
               
               <div className="space-y-4">
-                <Label>Próximos Lanzamientos</Label>
+                <Label>Upcoming Releases</Label>
                 <div className="space-y-2">
                   {profile.discography.upcoming_releases.length > 0 ? (
                     <div className="grid gap-2">
@@ -607,11 +607,11 @@ export default function ProfilePage() {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-muted-foreground">No hay próximos lanzamientos registrados</p>
+                    <p className="text-sm text-muted-foreground">No upcoming releases registered</p>
                   )}
                   <div className="flex gap-2 mt-2">
                     <Input 
-                      placeholder="Añadir próximo lanzamiento"
+                      placeholder="Add upcoming release"
                       onKeyDown={(e) => {
                         if (e.key === "Enter" && e.currentTarget.value.trim()) {
                           handleInputChange("discography", "upcoming_releases", [...profile.discography.upcoming_releases, e.currentTarget.value]);
@@ -637,7 +637,7 @@ export default function ProfilePage() {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="visual_concept">Concepto Visual</Label>
+                <Label htmlFor="visual_concept">Visual Concept</Label>
                 <Textarea 
                   id="visual_concept" 
                   value={profile.discography.visual_concept} 
@@ -649,18 +649,18 @@ export default function ProfilePage() {
           </Card>
         </TabsContent>
 
-        {/* Historia en Vivo */}
+        {/* Live History */}
         <TabsContent value="live">
           <Card>
             <CardHeader>
-              <CardTitle>Historia en Vivo</CardTitle>
+              <CardTitle>Live History</CardTitle>
               <CardDescription>
-                Detalles sobre tus actuaciones en vivo
+                Details about your live performances
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
-                <Label>Momentos Destacados</Label>
+                <Label>Highlights</Label>
                 <div className="space-y-2">
                   {profile.live_history.highlights.length > 0 ? (
                     <div className="grid gap-2">
@@ -682,11 +682,11 @@ export default function ProfilePage() {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-muted-foreground">No hay momentos destacados registrados</p>
+                    <p className="text-sm text-muted-foreground">No highlights registered</p>
                   )}
                   <div className="flex gap-2 mt-2">
                     <Input 
-                      placeholder="Añadir momento destacado"
+                      placeholder="Add highlight"
                       onKeyDown={(e) => {
                         if (e.key === "Enter" && e.currentTarget.value.trim()) {
                           handleInputChange("live_history", "highlights", [...profile.live_history.highlights, e.currentTarget.value]);
@@ -713,7 +713,7 @@ export default function ProfilePage() {
               
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="avg_capacity">Capacidad Promedio</Label>
+                  <Label htmlFor="avg_capacity">Average Capacity</Label>
                   <Input 
                     id="avg_capacity" 
                     type="number"
@@ -722,7 +722,7 @@ export default function ProfilePage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="avg_ticket_price_ars">Precio Promedio de Entradas (ARS)</Label>
+                  <Label htmlFor="avg_ticket_price_ars">Average Ticket Price</Label>
                   <Input 
                     id="avg_ticket_price_ars" 
                     type="number"
@@ -735,19 +735,19 @@ export default function ProfilePage() {
           </Card>
         </TabsContent>
 
-        {/* Financiero */}
+        {/* Financial */}
         <TabsContent value="financials">
           <Card>
             <CardHeader>
-              <CardTitle>Información Financiera</CardTitle>
+              <CardTitle>Financial Information</CardTitle>
               <CardDescription>
-                Detalles sobre tu presupuesto y gastos
+                Details about your budget and expenses
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="annual_expenses_ars">Gastos Anuales (ARS)</Label>
+                  <Label htmlFor="annual_expenses_ars">Estimated Annual Expenses</Label>
                   <Input 
                     id="annual_expenses_ars" 
                     type="number"
@@ -756,7 +756,7 @@ export default function ProfilePage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="budget_per_launch_ars">Presupuesto por Lanzamiento (ARS)</Label>
+                  <Label htmlFor="budget_per_launch_ars">Budget per Release</Label>
                   <Input 
                     id="budget_per_launch_ars" 
                     type="number"
