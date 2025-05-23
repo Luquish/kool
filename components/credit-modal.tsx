@@ -1,12 +1,13 @@
-import { useState } from 'react';
+'use client';
+
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase, updateCredits } from '@/lib/supabase';
+import { useEffect, useState } from "react";
 
 interface CreditModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  onClose?: () => void;
   onSuccess: () => void;
 }
 
@@ -15,7 +16,25 @@ export default function CreditModal({ isOpen, onClose, onSuccess }: CreditModalP
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
+
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget && onClose && !isLoading) {
+      onClose();
+    }
+  };
 
   const handlePurchase = async () => {
     try {
@@ -39,7 +58,7 @@ export default function CreditModal({ isOpen, onClose, onSuccess }: CreditModalP
       });
 
       onSuccess();
-      onClose();
+      if (onClose) onClose();
     } catch (error) {
       console.error('Error en la compra:', error);
       toast({
@@ -53,52 +72,56 @@ export default function CreditModal({ isOpen, onClose, onSuccess }: CreditModalP
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-96 relative">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-          disabled={isLoading}
-        >
-          <X size={24} />
-        </button>
-        
-        <h2 className="text-2xl font-bold mb-4">Buy Credits</h2>
-        
-        <div className="mb-6">
-          <p className="text-gray-600 mb-2">1 credit = $3 USD</p>
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setAmount(Math.max(1, amount - 1))}
-              className="px-3 py-1 border rounded-md"
-              disabled={isLoading}
-            >
-              -
-            </button>
-            <span className="text-xl font-semibold">{amount} credit{amount !== 1 ? 's' : ''}</span>
-            <button
-              onClick={() => setAmount(amount + 1)}
-              className="px-3 py-1 border rounded-md"
-              disabled={isLoading}
-            >
-              +
-            </button>
-          </div>
-          <p className="text-lg font-semibold mt-2">Total: ${amount * 3} USD</p>
-        </div>
+    <>
+      <div className="fixed inset-0 z-[100] bg-background/80 backdrop-blur-sm" onClick={handleBackdropClick}>
+        <div className="fixed left-[50%] top-[50%] z-[101] grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200">
+          <div className="flex flex-col space-y-4">
+            <h2 className="text-2xl font-semibold tracking-tight">Buy Credits</h2>
+            
+            <div className="space-y-4">
+              <p className="text-muted-foreground">1 credit = $3 USD</p>
+              
+              <div className="flex items-center justify-center gap-4">
+                <Button
+                  onClick={() => setAmount(Math.max(1, amount - 1))}
+                  disabled={isLoading}
+                  variant="outline"
+                  size="icon"
+                >
+                  -
+                </Button>
+                <span className="text-xl font-semibold min-w-[100px] text-center">
+                  {amount} credit{amount !== 1 ? 's' : ''}
+                </span>
+                <Button
+                  onClick={() => setAmount(amount + 1)}
+                  disabled={isLoading}
+                  variant="outline"
+                  size="icon"
+                >
+                  +
+                </Button>
+              </div>
+              
+              <p className="text-lg font-semibold text-center">
+                Total: ${amount * 3} USD
+              </p>
+            </div>
 
-        <Button
-          onClick={handlePurchase}
-          className="w-full bg-primary text-white hover:bg-primary/90"
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-          ) : (
-            'Confirm Purchase'
-          )}
-        </Button>
+            <Button
+              onClick={handlePurchase}
+              className="w-full bg-primary text-white hover:bg-primary/90"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              ) : (
+                'Confirm Purchase'
+              )}
+            </Button>
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 } 

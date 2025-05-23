@@ -2,13 +2,11 @@
 
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
-import Image from "next/image"
-import { Search, Menu, X, User, Home } from "lucide-react"
+import { Menu, X, User } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { usePathname } from "next/navigation"
 import CreditModal from "@/components/credit-modal"
 import { toast } from "@/components/ui/use-toast"
-import { Button } from "@/components/ui/button"
 import { OnboardingModal } from "@/components/ui/onboarding-modal"
 import { useAuth } from "@/components/providers/auth-provider"
 
