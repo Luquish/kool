@@ -175,6 +175,13 @@ export default function ChatPage() {
     if (!message.trim() || isLoading) return;
     setIsLoading(true);
 
+    console.log('🚀 Iniciando envío de mensaje:', {
+      message: message.trim(),
+      agentType: currentAgent,
+      isAgentPaid: AGENTS[currentAgent].isPaid,
+      currentUser
+    });
+
     const userMessage: Message = {
       role: 'user',
       content: message.trim(),
@@ -189,10 +196,16 @@ export default function ChatPage() {
     setMessages(prev => [...prev, userMessage]);
     
     try {
+      console.log('📤 Enviando solicitud a /api/chat');
+      
+      // Obtener la sesión actual
+      const { data: { session } } = await supabase.auth.getSession();
+      
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token || ''}`
         },
         body: JSON.stringify({
           message: userMessage.content,
@@ -200,8 +213,14 @@ export default function ChatPage() {
         }),
       });
       
+      console.log('📥 Respuesta recibida:', {
+        status: response.status,
+        ok: response.ok
+      });
+      
       if (!response.ok) {
         const error = await response.json();
+        console.error('❌ Error en la respuesta:', error);
         throw new Error(error.error || 'Error al enviar mensaje');
       }
       
