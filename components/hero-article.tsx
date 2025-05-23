@@ -25,7 +25,7 @@ export default function HeroArticle() {
         We give you the insights and tools a pro manager would - without the middleman.
         </p>
         
-        <Link href="/auth/signup">
+        <Link href="/chat">
           <Button className="bg-primary hover:bg-primary/90 text-white px-8 py-4 text-lg">
             Strategize Now
           </Button>

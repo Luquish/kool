@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronUp, Calendar as CalendarIcon, Clock, ListTodo, Target, BarChart, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { OnboardingModal } from "@/components/ui/onboarding-modal";
@@ -152,7 +152,7 @@ const Calendar = ({
     return days;
   };
 
-  const weekDays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const days = getDaysInMonth(currentDate);
   const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
   const startingDayIndex = firstDayOfMonth.getDay();
@@ -214,6 +214,15 @@ export default function DashboardPage() {
   const router = useRouter();
   const taskListRef = useRef<HTMLDivElement>(null);
   const [expandedTasks, setExpandedTasks] = useState<Record<string, boolean>>({});
+  const [currentIcon, setCurrentIcon] = useState(0);
+  const icons = [
+    { icon: CalendarIcon, label: "Creating your calendar..." },
+    { icon: Clock, label: "Optimizing timelines..." },
+    { icon: ListTodo, label: "Organizing tasks..." },
+    { icon: Target, label: "Setting objectives..." },
+    { icon: BarChart, label: "Analyzing metrics..." },
+    { icon: Sparkles, label: "Polishing strategy..." }
+  ];
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -262,6 +271,16 @@ export default function DashboardPage() {
     
     fetchUserData();
   }, []);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (loading) {
+      interval = setInterval(() => {
+        setCurrentIcon((prev) => (prev + 1) % icons.length);
+      }, 2000);
+    }
+    return () => clearInterval(interval);
+  }, [loading]);
 
   // Generar estrategia
   const handleGenerateStrategy = async () => {
@@ -316,6 +335,18 @@ export default function DashboardPage() {
         description: 'Estrategia generada correctamente',
         variant: 'default'
       });
+
+      // Esperar un momento para que el DOM se actualice
+      setTimeout(() => {
+        const calendarElement = document.querySelector('[data-tab="calendar"]');
+        if (calendarElement) {
+          calendarElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center'
+          });
+        }
+      }, 100);
+
     } catch (error: any) {
       console.error('[Frontend] Error al generar estrategia:', error);
       toast({
@@ -428,21 +459,68 @@ export default function DashboardPage() {
       {!strategy && (
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle>Crear tu estrategia personalizada</CardTitle>
+            <CardTitle>Create your personalized strategy</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="mb-4">Genera un plan de crecimiento personalizado basado en tu perfil de artista.</p>
+            <p className="mb-4">Generate a personalized growth plan based on your artist profile.</p>
             <Button 
               onClick={handleGenerateStrategy} 
               disabled={loading}
+              className={cn(
+                "relative",
+                loading && "hidden"
+              )}
             >
-              {loading ? 'Generando...' : 'Construir Estrategia'}
+              Build Strategy
             </Button>
             
             {loading && (
-              <div className="mt-4">
-                <p className="mb-2">Generando tu estrategia personalizada. Esto puede tomar un minuto...</p>
-                <Progress value={undefined} className="h-2" />
+              <div className="mt-12 space-y-8">
+                <div className="flex flex-col items-center justify-center space-y-6">
+                  <div className="relative h-16 w-16">
+                    {icons.map(({ icon: Icon }, index) => (
+                      <div
+                        key={index}
+                        className={cn(
+                          "absolute top-0 left-0 transition-all duration-500",
+                          index === currentIcon 
+                            ? "opacity-100 transform scale-100" 
+                            : "opacity-0 transform scale-75"
+                        )}
+                      >
+                        <Icon className="h-16 w-16 text-primary animate-bounce" />
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-base text-muted-foreground animate-fade-in">
+                    {icons[currentIcon].label}
+                  </p>
+                </div>
+                <div className="space-y-6">
+                  <p className="text-center text-xl font-medium">
+                    Generating your personalized strategy...
+                  </p>
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
+                    <div 
+                      className="h-full bg-primary transition-all duration-500 ease-in-out"
+                      style={{
+                        width: '100%',
+                        animation: 'progress 2s ease-in-out infinite'
+                      }}
+                    />
+                  </div>
+                </div>
+                <style jsx>{`
+                  @keyframes progress {
+                    0% { transform: translateX(-100%); }
+                    50% { transform: translateX(0); }
+                    100% { transform: translateX(100%); }
+                  }
+                  @keyframes fade-in {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                  }
+                `}</style>
               </div>
             )}
           </CardContent>
@@ -453,7 +531,7 @@ export default function DashboardPage() {
       {strategy && (
         <Tabs defaultValue="calendar" className="w-full">
           <TabsList className="mb-4">
-            <TabsTrigger value="calendar">Task Calendar</TabsTrigger>
+            <TabsTrigger value="calendar" data-tab="calendar">Task Calendar</TabsTrigger>
             <TabsTrigger value="tasks">Task Tracker</TabsTrigger>
           </TabsList>
           
@@ -513,17 +591,17 @@ export default function DashboardPage() {
                                   <SelectContent>
                                     <SelectItem value="pending">
                                       <span className="px-2 py-1 rounded text-xs bg-gray-100 text-gray-800">
-                                        Pendiente
+                                        Pending
                                       </span>
                                     </SelectItem>
                                     <SelectItem value="in-progress">
                                       <span className="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
-                                        En progreso
+                                        In progress
                                       </span>
                                     </SelectItem>
                                     <SelectItem value="done">
                                       <span className="px-2 py-1 rounded text-xs bg-green-100 text-green-800">
-                                        Completado
+                                        Completed
                                       </span>
                                     </SelectItem>
                                   </SelectContent>
