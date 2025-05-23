@@ -17,17 +17,17 @@ export default function HeroArticle() {
       
       {/* Contenido centrado */}
       <div className="relative z-10 text-center max-w-4xl mx-auto px-6">
-        <h1 className="text-5xl md:text-7xl font-black text-white mb-6">
+        <h1 className="text-5xl md:text-8xl font-black text-white mb-6">
           Strategy Never Looked This <span className="text-primary">KOOL</span>
         </h1>
         
         <p className="text-xl md:text-2xl font-medium mb-10 text-white">
-          Kool is your AI-powered strategist — built to grow your project. We give you the insights and tools a pro manager would — without the middleman. Your music. Your vision. Your strategy.
+        We give you the insights and tools a pro manager would - without the middleman.
         </p>
         
-        <Link href="/chat">
+        <Link href="/auth/signup">
           <Button className="bg-primary hover:bg-primary/90 text-white px-8 py-4 text-lg">
-            Get Started
+            Strategize Now
           </Button>
         </Link>
       </div>
