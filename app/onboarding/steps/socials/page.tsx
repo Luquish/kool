@@ -54,14 +54,14 @@ export default function SocialsStep() {
   return (
     <div className="space-y-6">
       <div className="space-y-4">
-        <h2 className="text-2xl font-bold">Presencia en Redes Sociales</h2>
-        <p className="text-muted-foreground">Cuéntanos sobre tu alcance en las redes sociales</p>
+        <h2 className="text-2xl font-bold">Social Media Presence</h2>
+        <p className="text-muted-foreground">Tell us about your reach on social media</p>
       </div>
 
       <div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Seguidores en Instagram</label>
+            <label className="text-sm font-medium">Instagram Followers</label>
             <input
               type="number"
               name="instagram_followers"
@@ -74,7 +74,7 @@ export default function SocialsStep() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Oyentes Mensuales en Spotify</label>
+            <label className="text-sm font-medium">Spotify Monthly Listeners</label>
             <input
               type="number"
               name="spotify_monthly_listeners"
@@ -87,7 +87,7 @@ export default function SocialsStep() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Seguidores en TikTok</label>
+            <label className="text-sm font-medium">TikTok Followers</label>
             <input
               type="number"
               name="tiktok_followers"
@@ -100,7 +100,7 @@ export default function SocialsStep() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Suscriptores en YouTube</label>
+            <label className="text-sm font-medium">YouTube Subscribers</label>
             <input
               type="number"
               name="youtube_subscribers"
@@ -113,7 +113,7 @@ export default function SocialsStep() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Tamaño Lista de Correo</label>
+            <label className="text-sm font-medium">Mailing List Size</label>
             <input
               type="number"
               name="mailing_list_size"

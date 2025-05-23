@@ -66,17 +66,17 @@ export default function DiscographyStep() {
     setUpcomingError("");
     
     if (!newUpcoming.title && !newUpcoming.type) {
-      setUpcomingError("Por favor, ingresa el título y selecciona el tipo de lanzamiento");
+      setUpcomingError("Please enter the title and select the release type");
       return;
     }
     
     if (!newUpcoming.title) {
-      setUpcomingError("Por favor, ingresa el título del lanzamiento");
+      setUpcomingError("Please enter the title of the release");
       return;
     }
     
     if (!newUpcoming.type) {
-      setUpcomingError("Por favor, selecciona el tipo de lanzamiento");
+      setUpcomingError("Please select the release type");
       return;
     }
     
@@ -95,8 +95,8 @@ export default function DiscographyStep() {
   return (
     <div className="space-y-6">
       <div className="space-y-4">
-        <h2 className="text-2xl font-bold">Discografía</h2>
-        <p className="text-muted-foreground">Cuéntanos sobre tu música y lanzamientos</p>
+        <h2 className="text-2xl font-bold">Discography</h2>
+        <p className="text-muted-foreground">Tell us about your music and releases</p>
       </div>
 
       <div className="space-y-8">
@@ -109,28 +109,28 @@ export default function DiscographyStep() {
               value={newEP.title}
               onChange={(e) => setNewEP((prev) => ({ ...prev, title: e.target.value }))}
               className="p-2 border rounded-md bg-background"
-              placeholder="Título del EP"
+              placeholder="EP Title"
             />
             <input
               type="number"
               value={newEP.tracks || ""}
               onChange={(e) => setNewEP((prev) => ({ ...prev, tracks: parseInt(e.target.value) || undefined }))}
               className="p-2 border rounded-md bg-background"
-              placeholder="Número de tracks"
+              placeholder="Number of tracks"
             />
             <input
               type="number"
               value={newEP.year || ""}
               onChange={(e) => setNewEP((prev) => ({ ...prev, year: parseInt(e.target.value) || undefined }))}
               className="p-2 border rounded-md bg-background"
-              placeholder="Año"
+              placeholder="Year"
             />
           </div>
           <button
             onClick={handleAddEP}
             className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
           >
-            Agregar EP
+            Add EP
           </button>
           <div className="mt-4">
             {formData.eps.map((ep, index) => (
@@ -158,21 +158,21 @@ export default function DiscographyStep() {
               value={newSingle.title}
               onChange={(e) => setNewSingle((prev) => ({ ...prev, title: e.target.value }))}
               className="p-2 border rounded-md bg-background"
-              placeholder="Título del single"
+              placeholder="Single Title"
             />
             <input
               type="number"
               value={newSingle.year || ""}
               onChange={(e) => setNewSingle((prev) => ({ ...prev, year: parseInt(e.target.value) || undefined }))}
               className="p-2 border rounded-md bg-background"
-              placeholder="Año"
+              placeholder="Year"
             />
           </div>
           <button
             onClick={handleAddSingle}
             className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
           >
-            Agregar Single
+            Add Single
           </button>
           <div className="mt-4">
             {formData.singles_released.map((single, index) => (
@@ -191,9 +191,9 @@ export default function DiscographyStep() {
           </div>
         </div>
 
-        {/* Próximos Lanzamientos */}
+        {/* Upcoming Releases */}
         <div className="space-y-4">
-          <h3 className="text-xl font-semibold">Próximos Lanzamientos</h3>
+          <h3 className="text-xl font-semibold">Upcoming Releases</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <input
               type="text"
@@ -203,7 +203,7 @@ export default function DiscographyStep() {
                 setNewUpcoming((prev) => ({ ...prev, title: e.target.value }));
               }}
               className={`p-2 border rounded-md bg-background ${!newUpcoming.title && upcomingError ? 'border-red-500' : ''}`}
-              placeholder="Título"
+              placeholder="Title"
             />
             <select
               value={newUpcoming.type}
@@ -213,27 +213,27 @@ export default function DiscographyStep() {
               }}
               className={`p-2 border rounded-md bg-background ${!newUpcoming.type && upcomingError ? 'border-red-500' : ''}`}
             >
-              <option value="">Tipo de lanzamiento</option>
+              <option value="">Release Type</option>
               <option value="single">Single</option>
               <option value="ep">EP</option>
-              <option value="album">Álbum</option>
+              <option value="album">Album</option>
             </select>
             <input
               type="text"
               value={newUpcoming.concept}
               onChange={(e) => setNewUpcoming((prev) => ({ ...prev, concept: e.target.value }))}
               className="p-2 border rounded-md bg-background"
-              placeholder="Concepto"
+              placeholder="Concept"
             />
           </div>
           {upcomingError && (
-            <p className="text-sm text-red-500 mt-1">{upcomingError}</p>
+            <p className="text-sm text-red-500 mt-1">Please enter the title and select the release type</p>
           )}
           <button
             onClick={handleAddUpcoming}
             className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
           >
-            Agregar Próximo Lanzamiento
+            Add Upcoming Release
           </button>
           <div className="mt-4">
             {formData.upcoming_releases.map((release, index) => (
@@ -252,14 +252,14 @@ export default function DiscographyStep() {
           </div>
         </div>
 
-        {/* Concepto Visual */}
+        {/* Visual Concept */}
         <div className="space-y-4">
-          <h3 className="text-xl font-semibold">Concepto Visual</h3>
+          <h3 className="text-xl font-semibold">Visual Concept</h3>
           <textarea
             value={formData.visual_concept}
             onChange={handleVisualConceptChange}
             className="w-full p-2 border rounded-md bg-background h-32"
-            placeholder="Describe el concepto visual de tu proyecto..."
+            placeholder="Describe the visual concept of your project..."
           />
         </div>
       </div>

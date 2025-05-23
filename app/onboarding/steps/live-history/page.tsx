@@ -100,35 +100,35 @@ export default function LiveHistoryStep() {
   return (
     <div className="space-y-6">
       <div className="space-y-4">
-        <h2 className="text-2xl font-bold">Historial de Shows</h2>
-        <p className="text-muted-foreground">Cuéntanos sobre tus presentaciones en vivo</p>
+        <h2 className="text-2xl font-bold">Live Show History</h2>
+        <p className="text-muted-foreground">Tell us about your live performances</p>
       </div>
 
       <div className="space-y-8">
         {/* Highlights */}
         <div className="space-y-4">
-          <h3 className="text-xl font-semibold">Shows Destacados</h3>
+          <h3 className="text-xl font-semibold">Featured Shows</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input
               type="text"
               value={newHighlight.venue}
               onChange={(e) => setNewHighlight((prev) => ({ ...prev, venue: e.target.value }))}
               className="p-2 border rounded-md bg-background"
-              placeholder="Nombre del venue"
+              placeholder="Venue name"
             />
             <input
               type="text"
               value={newHighlight.note}
               onChange={(e) => setNewHighlight((prev) => ({ ...prev, note: e.target.value }))}
               className="p-2 border rounded-md bg-background"
-              placeholder="Nota o detalle importante"
+              placeholder="Important note or detail"
             />
           </div>
           <button
             onClick={handleAddHighlight}
             className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
           >
-            Agregar Show Destacado
+            Add Featured Show
           </button>
           <div className="mt-4">
             {formData.live_highlights.map((highlight, index) => (
@@ -147,12 +147,12 @@ export default function LiveHistoryStep() {
           </div>
         </div>
 
-        {/* Estadísticas */}
+        {/* Statistics */}
         <div className="space-y-4">
-          <h3 className="text-xl font-semibold">Estadísticas de Shows</h3>
+          <h3 className="text-xl font-semibold">Show Statistics</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Capacidad Promedio</label>
+              <label className="text-sm font-medium">Average Capacity</label>
               <input
                 type="text"
                 name="avg_capacity"
@@ -164,7 +164,7 @@ export default function LiveHistoryStep() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Precio Promedio de Entrada (ARS)</label>
+              <label className="text-sm font-medium">Average Ticket Price (ARS)</label>
               <div className="relative">
                 <input
                   type="text"
@@ -174,18 +174,18 @@ export default function LiveHistoryStep() {
                   className="w-full p-2 pl-6 border rounded-md bg-background"
                   placeholder="0"
                 />
-                <div className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">$</div>
+                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">$</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Gastos */}
+        {/* Expenses */}
         <div className="space-y-4">
-          <h3 className="text-xl font-semibold">Finanzas</h3>
+          <h3 className="text-xl font-semibold">Finances</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Gastos Anuales Estimados (ARS)</label>
+              <label className="text-sm font-medium">Estimated Annual Expenses (ARS)</label>
               <div className="relative">
                 <input
                   type="text"
@@ -195,15 +195,15 @@ export default function LiveHistoryStep() {
                   className="w-full p-2 pl-6 border rounded-md bg-background"
                   placeholder="0"
                 />
-                <div className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">$</div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Incluye gastos de producción, ensayo, equipamiento, etc.
-                </p>
+                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">$</span>
               </div>
+              <p className="text-sm text-muted-foreground mt-1">
+                Includes production, rehearsal, equipment costs, etc.
+              </p>
             </div>
             
             <div className="space-y-2">
-              <label className="text-sm font-medium">Presupuesto por Lanzamiento (ARS)</label>
+              <label className="text-sm font-medium">Budget per Release (ARS)</label>
               <div className="relative">
                 <input
                   type="text"
@@ -213,11 +213,11 @@ export default function LiveHistoryStep() {
                   className="w-full p-2 pl-6 border rounded-md bg-background"
                   placeholder="0"
                 />
-                <div className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">$</div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Cuánto inviertes en cada lanzamiento musical
-                </p>
+                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">$</span>
               </div>
+              <p className="text-sm text-muted-foreground mt-1">
+                How much you invest in each music release
+              </p>
             </div>
           </div>
         </div>
