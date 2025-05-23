@@ -71,6 +71,7 @@ export default function ChatPage() {
   const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(false);
   const { toast } = useToast();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Obtener el usuario actual y su perfil
   useEffect(() => {
@@ -109,8 +110,11 @@ export default function ChatPage() {
   // Desplazar al último mensaje cuando se añade uno nuevo
   useEffect(() => {
     if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+      const lastMessage = scrollAreaRef.current.querySelector('[data-message]:last-child');
+      lastMessage?.scrollIntoView({ behavior: 'smooth' });
     }
+    // Mantener el foco en el input
+    inputRef.current?.focus();
   }, [messages]);
 
   // Guardar mensajes
@@ -297,7 +301,8 @@ export default function ChatPage() {
               <div className="space-y-4 py-4">
                 {messages.map((msg, index) => (
                   <div 
-                    key={index} 
+                    key={index}
+                    data-message 
                     className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
                     {msg.role === 'assistant' && (
@@ -348,6 +353,7 @@ export default function ChatPage() {
             className="flex w-full gap-2 items-center"
           >
             <Input
+              ref={inputRef}
               placeholder="Start your conversation..."
               value={message}
               onChange={(e) => setMessage(e.target.value)}
