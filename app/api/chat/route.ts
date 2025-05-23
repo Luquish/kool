@@ -20,31 +20,37 @@ export async function POST(request: NextRequest) {
   console.log('[Backend] Iniciando POST /api/chat');
   
   try {
-    // Obtener el token de autorización del header
-    const authHeader = request.headers.get('Authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.error('[Backend] Token de autorización no encontrado');
-      return NextResponse.json({ 
-        error: 'Usuario no autenticado' 
-      }, { status: 401 });
-    }
-
-    const token = authHeader.split(' ')[1];
-    
-    // Verificar el token y obtener el usuario
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    console.log('[Backend] Resultado auth.getUser:', {
-      user: user ? { id: user.id, email: user.email } : null,
-      error: authError ? { message: authError.message, status: authError.status } : null
-    });
-
     const { message, agentType } = await request.json() as { message: string; agentType: AgentType };
     console.log('[Backend] Datos recibidos:', { message, agentType, isPaid: AGENTS[agentType].isPaid });
 
-    // Si es un agente pago, verificar autenticación y créditos
+    let user = null;
+    let authError = null;
+
+    // Solo verificar autenticación si es un agente pago
     if (AGENTS[agentType].isPaid) {
-      console.log('[Backend] Verificando requisitos para agente pago');
+      console.log('[Backend] Verificando autenticación para agente pago');
       
+      // Obtener el token de autorización del header
+      const authHeader = request.headers.get('Authorization');
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        console.error('[Backend] Token de autorización no encontrado');
+        return NextResponse.json({ 
+          error: 'Usuario no autenticado' 
+        }, { status: 401 });
+      }
+
+      const token = authHeader.split(' ')[1];
+      
+      // Verificar el token y obtener el usuario
+      const authResult = await supabase.auth.getUser(token);
+      user = authResult.data.user;
+      authError = authResult.error;
+
+      console.log('[Backend] Resultado auth.getUser:', {
+        user: user ? { id: user.id, email: user.email } : null,
+        error: authError ? { message: authError.message, status: authError.status } : null
+      });
+
       if (authError || !user) {
         console.error('[Backend] Usuario no autenticado para agente pago');
         return NextResponse.json({ 
@@ -79,6 +85,7 @@ export async function POST(request: NextRequest) {
       response.response = processMarkdownFormat(response.response);
     }
 
+    // Solo guardar mensajes y actualizar créditos si es un agente pago y el usuario está autenticado
     if (response && user && AGENTS[agentType].isPaid) {
       // Descontar créditos solo si la respuesta fue exitosa y es un agente pago
       await updateCredits(
