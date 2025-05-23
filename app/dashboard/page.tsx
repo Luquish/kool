@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import React from 'react';
+import { useAuth } from '@/components/providers/auth-provider';
 
 interface CalendarEvent {
   id: string;
@@ -205,11 +206,10 @@ const Calendar = ({
 };
 
 export default function DashboardPage() {
-  const [currentUser, setCurrentUser] = useState<any>(null);
-  const [userProfile, setUserProfile] = useState<any>(null);
-  const [strategy, setStrategy] = useState<Strategy | null>(null);
+  const { user, profile, strategy: existingStrategy, isInitializing } = useAuth();
   const [loading, setLoading] = useState<boolean>(false);
   const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(false);
+  const [strategy, setStrategy] = useState<Strategy | null>(null);
   const { toast } = useToast();
   const router = useRouter();
   const taskListRef = useRef<HTMLDivElement>(null);
@@ -224,53 +224,18 @@ export default function DashboardPage() {
     { icon: Sparkles, label: "Polishing strategy..." }
   ];
 
+  // Usar useEffect para sincronizar el estado local con el estado global
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
-        if (authError) throw authError;
-        
-        setCurrentUser(user);
-        
-        if (user) {
-          const profile = await getProfile(user.id);
-          setUserProfile(profile);
-          
-          if (!profile?.onboarding_completed) {
-            setShowOnboardingModal(true);
-            return;
-          }
-          
-          // Obtener estrategia de Supabase
-          const { data: strategyData, error: strategyError } = await supabase
-            .from('strategies')
-            .select('*')
-            .eq('user_id', user.id)
-            .single();
+    if (existingStrategy) {
+      setStrategy(existingStrategy);
+    }
+  }, [existingStrategy]);
 
-          if (strategyError) {
-            console.warn('No se encontró estrategia previa:', strategyError);
-            return;
-          }
-
-          if (strategyData) {
-            const formattedCalendar = strategyData.calendar.map((event: any) => ({
-              ...event,
-              date: new Date(event.date).toISOString()
-            }));
-            setStrategy({
-              calendar: formattedCalendar,
-              task_tracker: strategyData.task_tracker
-            });
-          }
-        }
-      } catch (error) {
-        console.error('Error al cargar datos del usuario:', error);
-      }
-    };
-    
-    fetchUserData();
-  }, []);
+  useEffect(() => {
+    if (profile && !profile.onboarding_completed) {
+      setShowOnboardingModal(true);
+    }
+  }, [profile]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -284,9 +249,7 @@ export default function DashboardPage() {
 
   // Generar estrategia
   const handleGenerateStrategy = async () => {
-    console.log('[Frontend] Estado inicial - currentUser:', currentUser);
-    
-    if (!currentUser) {
+    if (!user) {
       toast({
         title: 'Error',
         description: 'No se pudo obtener el perfil del usuario',
@@ -314,20 +277,12 @@ export default function DashboardPage() {
         }
       });
       
-      console.log('[Frontend] Respuesta recibida:', {
-        ok: response.ok,
-        status: response.status,
-        statusText: response.statusText
-      });
-      
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.error('[Frontend] Error response:', errorData);
         throw new Error(errorData.error || 'Error al generar estrategia');
       }
       
       const data = await response.json();
-      console.log('[Frontend] Datos recibidos:', data);
       setStrategy(data.strategy);
       
       toast({
@@ -387,7 +342,7 @@ export default function DashboardPage() {
   };
 
   const handleTaskStatusChange = async (taskId: string, newStatus: string) => {
-    if (!strategy || !currentUser) return;
+    if (!strategy || !user) return;
 
     const updatedStrategy = JSON.parse(JSON.stringify(strategy));
     const taskIndex = updatedStrategy.task_tracker.findIndex((task: any) => task.id === taskId);
@@ -403,7 +358,7 @@ export default function DashboardPage() {
             task_tracker: updatedStrategy.task_tracker,
             updated_at: new Date().toISOString()
           })
-          .eq('user_id', currentUser.id);
+          .eq('user_id', user.id);
 
         if (error) throw error;
         
@@ -430,6 +385,17 @@ export default function DashboardPage() {
     }));
   };
 
+  if (isInitializing) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="space-y-4 text-center">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="text-primary font-medium">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="px-4 sm:px-6 md:px-8 lg:px-40 xl:px-60 2xl:px-96 pt-16 pb-16">
       <OnboardingModal isOpen={showOnboardingModal} onClose={() => setShowOnboardingModal(false)} />
@@ -439,8 +405,8 @@ export default function DashboardPage() {
         className="mb-4" 
       />
       
-      {/* Mostrar botón si no hay estrategia */}
-      {!strategy && (
+      {/* Mostrar botón solo si no hay estrategia y no está cargando */}
+      {!strategy && !loading && (
         <Card className="mb-8">
           <CardHeader>
             <CardTitle>Create your personalized strategy</CardTitle>

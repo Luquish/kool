@@ -8,6 +8,7 @@ interface AuthContextType {
   user: any
   profile: any
   credits: number | null
+  strategy: any | null
   isLoading: boolean
   isInitializing: boolean
 }
@@ -16,6 +17,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   profile: null,
   credits: null,
+  strategy: null,
   isLoading: true,
   isInitializing: true
 })
@@ -26,6 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<any>(null)
   const [credits, setCredits] = useState<number | null>(null)
+  const [strategy, setStrategy] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isInitializing, setIsInitializing] = useState(true)
 
@@ -34,7 +37,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log('🔄 [Auth] Cargando datos del usuario:', userId)
       setIsLoading(true)
-      const [profileResponse, creditsResponse] = await Promise.all([
+      const [profileResponse, creditsResponse, strategyResponse] = await Promise.all([
         supabase
           .from('profiles')
           .select('*')
@@ -44,12 +47,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .from('credits')
           .select('amount')
           .eq('id', userId)
+          .single(),
+        supabase
+          .from('strategies')
+          .select('*')
+          .eq('user_id', userId)
           .single()
       ])
 
       console.log('📊 [Auth] Respuestas recibidas:', {
         profile: profileResponse.error ? 'error' : 'ok',
-        credits: creditsResponse.error ? 'error' : 'ok'
+        credits: creditsResponse.error ? 'error' : 'ok',
+        strategy: strategyResponse.error ? 'error' : 'ok'
       })
 
       if (!profileResponse.error) {
@@ -57,6 +66,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       if (!creditsResponse.error) {
         setCredits(creditsResponse.data?.amount || 0)
+      }
+      if (!strategyResponse.error && strategyResponse.data) {
+        const formattedCalendar = strategyResponse.data.calendar.map((event: any) => ({
+          ...event,
+          date: new Date(event.date).toISOString()
+        }));
+        setStrategy({
+          calendar: formattedCalendar,
+          task_tracker: strategyResponse.data.task_tracker
+        });
       }
     } catch (error) {
       console.error('❌ [Auth] Error cargando datos:', error)
@@ -68,6 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let profileSubscription: RealtimeChannel | null = null;
     let creditsSubscription: RealtimeChannel | null = null;
+    let strategySubscription: RealtimeChannel | null = null;
     let authSubscription: any = null
 
     const init = async () => {
@@ -133,6 +153,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               }
             })
             .subscribe()
+
+          strategySubscription = supabase
+            .channel('strategy-changes')
+            .on('postgres_changes' as any, {
+              event: '*',
+              schema: 'public',
+              table: 'strategies',
+              filter: `user_id=eq.${currentUser.id}`
+            }, async (payload: any) => {
+              console.log('📈 [Auth] Cambio en estrategia detectado:', payload.new)
+              if (payload.new) {
+                const formattedCalendar = payload.new.calendar.map((event: any) => ({
+                  ...event,
+                  date: new Date(event.date).toISOString()
+                }));
+                setStrategy({
+                  calendar: formattedCalendar,
+                  task_tracker: payload.new.task_tracker
+                });
+              }
+            })
+            .subscribe()
         }
 
         // 4. Configurar suscripción a cambios de autenticación
@@ -146,6 +188,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           } else {
             setProfile(null)
             setCredits(null)
+            setStrategy(null)
           }
         })
 
@@ -153,7 +196,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.error('❌ [Auth] Error en configuración:', error)
       } finally {
         console.log('✅ [Auth] Finalizando inicialización')
-        setIsInitializing(false)
+        setTimeout(() => {
+          setIsInitializing(false)
+        }, 500)
       }
     }
 
@@ -165,6 +210,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('🧹 [Auth] Limpiando suscripciones')
       profileSubscription?.unsubscribe()
       creditsSubscription?.unsubscribe()
+      strategySubscription?.unsubscribe()
       authSubscription?.unsubscribe?.()
     }
   }, [])
@@ -174,6 +220,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isLoading,
     hasUser: !!user,
     hasProfile: !!profile,
+    hasStrategy: !!strategy,
     credits
   })
 
@@ -189,7 +236,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, profile, credits, isLoading, isInitializing }}>
+    <AuthContext.Provider value={{ user, profile, credits, strategy, isLoading, isInitializing }}>
       {children}
     </AuthContext.Provider>
   )
