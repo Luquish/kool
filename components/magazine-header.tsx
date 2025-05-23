@@ -187,7 +187,7 @@ export default function MagazineHeader() {
         {/* Main navigation */}
         <div className="container mx-auto px-4 py-3 flex items-center justify-center relative">
           <nav className="hidden md:flex items-center space-x-8 font-bold text-sm uppercase">
-            {isHomePage && (
+            {(isHomePage || isTutorialsPage) && (
               <>
                 <Link href="#how-it-works" className="hover:text-primary">
                   How It Works
@@ -257,7 +257,7 @@ export default function MagazineHeader() {
                   </Link>
                 </>
               )}
-              {isHomePage && (
+              {(isHomePage || isTutorialsPage) && (
                 <>
                   <Link href="#how-it-works" onClick={() => setIsMenuOpen(false)} className="hover:text-primary py-2 border-b-2 border-secondary w-full text-center">
                     How It Works
