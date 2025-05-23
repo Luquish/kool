@@ -35,59 +35,79 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Función para cargar datos del usuario
   const loadUserData = async (userId: string) => {
     try {
-      console.log('🔄 [Auth] Cargando datos del usuario:', userId)
+      console.log('🔄 [Auth] Iniciando carga de datos del usuario:', userId)
       setIsLoading(true)
-      const [profileResponse, creditsResponse, strategyResponse] = await Promise.all([
-        supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', userId)
-          .single(),
-        supabase
-          .from('credits')
-          .select('amount')
-          .eq('id', userId)
-          .single(),
-        supabase
-          .from('strategies')
-          .select('*')
-          .eq('user_id', userId)
-          .single()
-      ])
 
-      console.log('📊 [Auth] Respuestas recibidas:', {
-        profile: profileResponse.error ? 'error' : 'ok',
-        credits: creditsResponse.error ? 'error' : 'ok',
-        strategy: strategyResponse.error ? 'error' : 'ok'
-      })
+      // 1. Cargar perfil primero para verificar onboarding
+      const profileResponse = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single()
 
-      if (!profileResponse.error) {
+      if (profileResponse.error) {
+        console.error('❌ [Auth] Error cargando perfil:', profileResponse.error)
+      } else {
+        console.log('👤 [Auth] Perfil cargado:', {
+          id: profileResponse.data.id,
+          onboarding_completed: profileResponse.data.onboarding_completed
+        })
         setProfile(profileResponse.data)
       }
-      if (!creditsResponse.error) {
-        setCredits(creditsResponse.data?.amount || 0)
+
+      // 2. Cargar créditos
+      const creditsResponse = await supabase
+        .from('credits')
+        .select('amount')
+        .eq('id', userId)
+        .single()
+
+      if (creditsResponse.error) {
+        console.error('❌ [Auth] Error cargando créditos:', creditsResponse.error)
+      } else {
+        const newCredits = creditsResponse.data?.amount || 0
+        console.log('💰 [Auth] Créditos cargados:', newCredits)
+        setCredits(newCredits)
       }
-      if (!strategyResponse.error && strategyResponse.data) {
+
+      // 3. Cargar estrategia
+      const strategyResponse = await supabase
+        .from('strategies')
+        .select('*')
+        .eq('user_id', userId)
+        .single()
+
+      if (strategyResponse.error) {
+        if (strategyResponse.error.code === 'PGRST116') {
+          console.log('📊 [Auth] No se encontró estrategia para el usuario')
+          setStrategy(null)
+        } else {
+          console.error('❌ [Auth] Error cargando estrategia:', strategyResponse.error)
+        }
+      } else if (strategyResponse.data) {
+        console.log('📈 [Auth] Estrategia cargada')
         const formattedCalendar = strategyResponse.data.calendar.map((event: any) => ({
           ...event,
           date: new Date(event.date).toISOString()
-        }));
+        }))
         setStrategy({
           calendar: formattedCalendar,
           task_tracker: strategyResponse.data.task_tracker
-        });
+        })
       }
+
     } catch (error) {
-      console.error('❌ [Auth] Error cargando datos:', error)
+      console.error('❌ [Auth] Error general cargando datos:', error)
     } finally {
       setIsLoading(false)
     }
   }
 
+  // Configurar suscripciones y estado inicial
   useEffect(() => {
-    let profileSubscription: RealtimeChannel | null = null;
-    let creditsSubscription: RealtimeChannel | null = null;
-    let strategySubscription: RealtimeChannel | null = null;
+    let profileSubscription: RealtimeChannel | null = null
+    let creditsSubscription: RealtimeChannel | null = null
+    let strategySubscription: RealtimeChannel | null = null
     let authSubscription: any = null
 
     const init = async () => {
@@ -95,110 +115,133 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.log('🚀 [Auth] Iniciando configuración')
         
         // 1. Verificar sesión actual
-        const { data: { user: currentUser }, error: sessionError } = await supabase.auth.getUser()
-        if (sessionError) throw sessionError
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
         
-        console.log('👤 [Auth] Usuario actual:', currentUser?.id || 'no autenticado')
-        setUser(currentUser)
-
-        if (currentUser) {
-          // 2. Cargar datos del usuario
-          await loadUserData(currentUser.id)
-
-          // 3. Configurar suscripciones
-          console.log('📡 [Auth] Configurando suscripciones...')
-          profileSubscription = supabase
-            .channel('profile-changes')
-            .on('postgres_changes' as any, {
-              event: '*',
-              schema: 'public',
-              table: 'profiles',
-              filter: `id=eq.${currentUser.id}`
-            }, async (payload: RealtimePostgresChangesPayload<{ onboarding_completed: boolean }>) => {
-              console.log('👤 [Auth] Cambio en perfil detectado:', payload.new)
-              if (payload.new) {
-                setProfile(payload.new)
-                if ('onboarding_completed' in payload.new) {
-                  console.log('✅ [Auth] Estado de onboarding actualizado:', payload.new.onboarding_completed)
-                }
-              }
-            })
-            .subscribe()
-
-          creditsSubscription = supabase
-            .channel('credits-changes')
-            .on('postgres_changes' as any, {
-              event: '*',
-              schema: 'public',
-              table: 'credits',
-              filter: `id=eq.${currentUser.id}`
-            }, async (payload: RealtimePostgresChangesPayload<{ amount: number }>) => {
-              console.log('💰 [Auth] Cambio en créditos detectado:', payload.new)
-              if (payload.new && 'amount' in payload.new) {
-                setCredits(payload.new.amount)
-              }
-            })
-            .on('broadcast', { event: 'credits-update' }, async (payload) => {
-              console.log('🔄 [Auth] Actualizando créditos por broadcast:', payload)
-              if (payload.payload.userId === currentUser.id) {
-                const { data, error } = await supabase
-                  .from('credits')
-                  .select('amount')
-                  .eq('id', currentUser.id)
-                  .single()
-                
-                if (!error && data) {
-                  setCredits(data.amount)
-                }
-              }
-            })
-            .subscribe()
-
-          strategySubscription = supabase
-            .channel('strategy-changes')
-            .on('postgres_changes' as any, {
-              event: '*',
-              schema: 'public',
-              table: 'strategies',
-              filter: `user_id=eq.${currentUser.id}`
-            }, async (payload: any) => {
-              console.log('📈 [Auth] Cambio en estrategia detectado:', payload.new)
-              if (payload.new) {
-                const formattedCalendar = payload.new.calendar.map((event: any) => ({
-                  ...event,
-                  date: new Date(event.date).toISOString()
-                }));
-                setStrategy({
-                  calendar: formattedCalendar,
-                  task_tracker: payload.new.task_tracker
-                });
-              }
-            })
-            .subscribe()
+        if (sessionError) {
+          console.error('❌ [Auth] Error obteniendo sesión:', sessionError)
+          setUser(null)
+          setIsLoading(false)
+          setIsInitializing(false)
+          return
         }
 
-        // 4. Configurar suscripción a cambios de autenticación
+        // Si no hay sesión activa, establecer estado inicial
+        if (!session) {
+          console.log('👤 [Auth] No hay sesión activa')
+          setUser(null)
+          setProfile(null)
+          setCredits(null)
+          setStrategy(null)
+          setIsLoading(false)
+          setIsInitializing(false)
+          return
+        }
+
+        // Si hay sesión, configurar todo
+        const currentUser = session.user
+        console.log('👤 [Auth] Usuario autenticado:', currentUser.id)
+        setUser(currentUser)
+
+        // 2. Cargar datos iniciales
+        await loadUserData(currentUser.id)
+
+        // 3. Configurar suscripciones en tiempo real
+        console.log('📡 [Auth] Configurando suscripciones...')
+
+        // Suscripción a cambios en el perfil
+        profileSubscription = supabase
+          .channel('profile-changes')
+          .on('postgres_changes' as any, {
+            event: '*',
+            schema: 'public',
+            table: 'profiles',
+            filter: `id=eq.${currentUser.id}`
+          }, async (payload: RealtimePostgresChangesPayload<any>) => {
+            console.log('👤 [Auth] Cambio en perfil detectado:', {
+              onboarding_completed: payload.new?.onboarding_completed
+            })
+            if (payload.new) {
+              setProfile(payload.new)
+            }
+          })
+          .subscribe((status) => {
+            console.log('📡 [Auth] Estado de suscripción a perfil:', status)
+          })
+
+        // Suscripción a cambios en créditos
+        creditsSubscription = supabase
+          .channel('credits-changes')
+          .on('postgres_changes' as any, {
+            event: '*',
+            schema: 'public',
+            table: 'credits',
+            filter: `id=eq.${currentUser.id}`
+          }, async (payload: RealtimePostgresChangesPayload<any>) => {
+            console.log('💰 [Auth] Cambio en créditos detectado:', payload.new?.amount)
+            if (payload.new && 'amount' in payload.new) {
+              setCredits(payload.new.amount)
+            }
+          })
+          .subscribe((status) => {
+            console.log('📡 [Auth] Estado de suscripción a créditos:', status)
+          })
+
+        // Suscripción a cambios en estrategia
+        strategySubscription = supabase
+          .channel('strategy-changes')
+          .on('postgres_changes' as any, {
+            event: '*',
+            schema: 'public',
+            table: 'strategies',
+            filter: `user_id=eq.${currentUser.id}`
+          }, async (payload: any) => {
+            console.log('📈 [Auth] Cambio en estrategia detectado')
+            if (payload.new) {
+              const formattedCalendar = payload.new.calendar.map((event: any) => ({
+                ...event,
+                date: new Date(event.date).toISOString()
+              }))
+              setStrategy({
+                calendar: formattedCalendar,
+                task_tracker: payload.new.task_tracker
+              })
+            }
+          })
+          .subscribe((status) => {
+            console.log('📡 [Auth] Estado de suscripción a estrategia:', status)
+          })
+
+        // 4. Suscripción a cambios de autenticación
         authSubscription = supabase.auth.onAuthStateChange(async (event, session) => {
           console.log('🔐 [Auth] Cambio de estado de autenticación:', event)
-          const currentUser = session?.user
-          setUser(currentUser || null)
           
-          if (currentUser) {
-            await loadUserData(currentUser.id)
-          } else {
+          if (event === 'SIGNED_OUT') {
+            console.log('👋 [Auth] Usuario cerró sesión')
+            setUser(null)
             setProfile(null)
             setCredits(null)
             setStrategy(null)
+            return
+          }
+
+          const currentUser = session?.user
+          if (currentUser) {
+            console.log('🔑 [Auth] Usuario autenticado:', currentUser.id)
+            setUser(currentUser)
+            await loadUserData(currentUser.id)
           }
         })
 
       } catch (error) {
         console.error('❌ [Auth] Error en configuración:', error)
+        setUser(null)
+        setProfile(null)
+        setCredits(null)
+        setStrategy(null)
       } finally {
         console.log('✅ [Auth] Finalizando inicialización')
-        setTimeout(() => {
-          setIsInitializing(false)
-        }, 500)
+        setIsInitializing(false)
+        setIsLoading(false)
       }
     }
 
@@ -215,14 +258,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  console.log('🎯 [Auth] Estado actual:', {
-    isInitializing,
-    isLoading,
-    hasUser: !!user,
-    hasProfile: !!profile,
-    hasStrategy: !!strategy,
-    credits
-  })
+  // Log del estado actual para debugging
+  useEffect(() => {
+    console.log('🎯 [Auth] Estado actual:', {
+      isInitializing,
+      isLoading,
+      hasUser: !!user,
+      hasProfile: !!profile,
+      onboardingCompleted: profile?.onboarding_completed,
+      hasStrategy: !!strategy,
+      credits
+    })
+  }, [isInitializing, isLoading, user, profile, strategy, credits])
 
   if (isInitializing) {
     return (

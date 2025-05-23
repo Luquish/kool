@@ -10,7 +10,6 @@ import { toast } from "@/components/ui/use-toast"
 import { OnboardingModal } from "@/components/ui/onboarding-modal"
 import { useAuth } from "@/components/providers/auth-provider"
 
-
 export default function MagazineHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [showJoke, setShowJoke] = useState(false)
@@ -22,17 +21,19 @@ export default function MagazineHeader() {
   const pathname = usePathname()
   const isHomePage = pathname === "/"
   const isTutorialsPage = pathname === "/tutorials"
-  const { user: currentUser, profile: userProfile, credits: userCredits, isLoading, isInitializing } = useAuth()
+  const { user: currentUser, profile: userProfile, credits: userCredits, strategy: userStrategy, isLoading, isInitializing } = useAuth()
 
-  // Add debug logs
+  // Debug logs
   useEffect(() => {
-    console.log('MagazineHeader - Current state:', {
-      currentUser,
-      userProfile,
+    console.log('MagazineHeader - Estado actual:', {
+      currentUser: currentUser?.id,
+      userProfile: userProfile?.onboarding_completed,
       userCredits,
-      isLoading
+      hasStrategy: !!userStrategy,
+      isLoading,
+      isInitializing
     })
-  }, [currentUser, userProfile, userCredits, isLoading])
+  }, [currentUser, userProfile, userCredits, userStrategy, isLoading, isInitializing])
 
   // Efecto para manejar el scroll
   useEffect(() => {
@@ -77,14 +78,43 @@ export default function MagazineHeader() {
 
   const handleNavigation = (e: React.MouseEvent, path: string) => {
     e.preventDefault();
-    console.log('handleNavigation - userProfile:', userProfile);
-    console.log('handleNavigation - onboarding_completed:', userProfile?.onboarding_completed);
-    if (!userProfile?.onboarding_completed) {
-      console.log('Showing onboarding modal because onboarding is not completed');
+    
+    // Si el usuario no está autenticado, redirigir a login
+    if (!currentUser) {
+      window.location.href = "/auth/login";
+      return;
+    }
+
+    // Si estamos cargando o inicializando, no hacer nada
+    if (isLoading || isInitializing) {
+      console.log('🔄 [Header] Esperando carga de datos...');
+      return;
+    }
+
+    // Si el usuario no ha completado el onboarding y no estamos en el dashboard
+    if (!userProfile?.onboarding_completed && path !== '/dashboard') {
+      console.log('👤 [Header] Usuario sin onboarding - Estado:', userProfile);
       setShowOnboardingAlert(true);
       return;
     }
-    console.log('Navigation proceeding to:', path);
+
+    // Si es la página de dashboard, permitir acceso directo
+    if (path === '/dashboard') {
+      window.location.href = path;
+      return;
+    }
+
+    // Para otras páginas protegidas, verificar si tiene estrategia
+    if (!userStrategy && ['/profile', '/chat'].includes(path)) {
+      toast({
+        title: "Estrategia requerida",
+        description: "Primero debes crear tu estrategia en el dashboard.",
+        variant: "destructive",
+      });
+      window.location.href = '/dashboard';
+      return;
+    }
+
     window.location.href = path;
   };
 
@@ -100,6 +130,67 @@ export default function MagazineHeader() {
       document.body.style.overflow = 'unset';
     };
   }, [showOnboardingAlert]);
+
+  const renderAuthSection = () => {
+    if (isInitializing || isLoading) {
+      return (
+        <div className="flex items-center space-x-2">
+          <div className="w-16 h-8 bg-primary/10 animate-pulse rounded"></div>
+          <div className="w-8 h-8 rounded-full bg-primary/10 animate-pulse"></div>
+        </div>
+      );
+    }
+
+    if (!currentUser) {
+      return (
+        <div className="flex space-x-4">
+          <Link href="/auth/signup" className="text-secondary/70 hover:text-primary transition-colors duration-200">
+            Sign Up
+          </Link>
+          <Link href="/auth/login" className="text-secondary/70 hover:text-primary transition-colors duration-200">
+            Login
+          </Link>
+        </div>
+      );
+    }
+
+    return (
+      <div className="relative flex items-center space-x-3" ref={profileMenuRef}>
+        <div className="text-primary font-bold block transition-opacity duration-200">
+          {userCredits !== null ? `${userCredits} credits` : (
+            <div className="w-16 h-4 bg-primary/10 animate-pulse rounded"></div>
+          )}
+        </div>
+        <button
+          onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+          className="w-8 md:w-10 h-8 md:h-10 rounded-full bg-primary/10 flex items-center justify-center transition-all duration-300 hover:bg-primary/20"
+        >
+          <User size={18} className="text-primary" />
+        </button>
+        {isProfileMenuOpen && (
+          <div className="absolute right-0 top-full mt-2 w-48 rounded-lg bg-white shadow-lg border border-gray-200 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
+            <div className="px-4 py-2 text-sm text-gray-500 border-b">
+              {userProfile?.email}
+            </div>
+            <button
+              onClick={() => {
+                setIsProfileMenuOpen(false);
+                handleLogout();
+              }}
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+            >
+              Sign Out
+            </button>
+          </div>
+        )}
+        <CreditModal
+          isOpen={isCreditModalOpen}
+          onClose={() => setIsCreditModalOpen(false)}
+          onSuccess={() => {}}
+        />
+      </div>
+    );
+  };
 
   return (
     <>
@@ -139,53 +230,7 @@ export default function MagazineHeader() {
           </div>
 
           <div className="w-[100px] md:w-[200px] flex items-center justify-end space-x-4 min-h-[40px]">
-            {isInitializing ? (
-              <div className="flex items-center space-x-2">
-                <div className="w-16 h-8 bg-primary/10 animate-pulse rounded"></div>
-                <div className="w-8 h-8 rounded-full bg-primary/10 animate-pulse"></div>
-              </div>
-            ) : isLoading ? (
-              <div className="w-8 h-8 rounded-full bg-primary/10 animate-pulse" />
-            ) : currentUser ? (
-              <div className="relative flex items-center space-x-3" ref={profileMenuRef}>
-                <div className="text-primary font-bold block transition-opacity duration-200">
-                  {userCredits} credits
-                </div>
-                <button
-                  onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                  className="w-8 md:w-10 h-8 md:h-10 rounded-full bg-primary/10 flex items-center justify-center transition-all duration-300 hover:bg-primary/20"
-                >
-                  <User size={18} className="text-primary" />
-                </button>
-                {isProfileMenuOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-48 rounded-lg bg-white shadow-lg border border-gray-200 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
-                    <button
-                      onClick={() => {
-                        setIsProfileMenuOpen(false);
-                        handleLogout();
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
-                    >
-                      Sign Out
-                    </button>
-                  </div>
-                )}
-                <CreditModal
-                  isOpen={isCreditModalOpen}
-                  onClose={() => setIsCreditModalOpen(false)}
-                  onSuccess={() => {}}
-                />
-              </div>
-            ) : (
-              <div className="hidden md:flex space-x-4">
-                <Link href="/auth/signup" className="text-secondary/70 hover:text-primary transition-colors duration-200">
-                  Sign Up
-                </Link>
-                <Link href="/auth/login" className="text-secondary/70 hover:text-primary transition-colors duration-200">
-                  Login
-                </Link>
-              </div>
-            )}
+            {renderAuthSection()}
           </div>
         </div>
 

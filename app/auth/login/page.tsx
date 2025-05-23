@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/components/providers/auth-provider";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -30,7 +31,6 @@ export default function LoginPage() {
 
       if (data?.user) {
         router.push("/");
-        router.refresh();
       }
     } catch (err) {
       setError("Error al iniciar sesión");
