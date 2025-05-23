@@ -36,6 +36,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { OnboardingModal } from "@/components/ui/onboarding-modal";
 
 // Mapa de iconos para cada agente
 const AGENT_ICONS: Record<AgentType, React.ReactNode> = {
@@ -65,9 +66,9 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentAgent, setCurrentAgent] = useState<AgentType>('social');
+  const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(false);
   const { toast } = useToast();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const [isOnboardingCompleted, setIsOnboardingCompleted] = useState<boolean>(false);
 
   // Obtener el usuario actual y su perfil
   useEffect(() => {
@@ -79,7 +80,6 @@ export default function ChatPage() {
         if (user) {
           const profile = await storage.getUserProfile(user);
           setUserProfile(profile);
-          setIsOnboardingCompleted(!profile?.is_onboarding_in_progress);
           
           // Recuperar historial de chat si existe
           try {
@@ -147,25 +147,13 @@ export default function ChatPage() {
   const isAgentLocked = (agentType: AgentType): boolean => {
     if (agentType === 'social') return false; // El agente social siempre está disponible
     if (!currentUser) return true; // Si no hay usuario, todos los demás agentes están bloqueados
-    return !isOnboardingCompleted; // Si hay usuario pero no completó onboarding, están bloqueados
+    return !userProfile?.isOnboardingCompleted; // Si hay usuario pero no completó onboarding, están bloqueados
   };
 
   // Función para manejar el cambio de agente
   const handleAgentChange = (value: AgentType) => {
     if (isAgentLocked(value)) {
-      if (!currentUser) {
-        toast({
-          title: 'Agente bloqueado',
-          description: 'Inicia sesión para acceder a todos los agentes personalizados.',
-          variant: 'destructive'
-        });
-      } else {
-        toast({
-          title: 'Agente bloqueado',
-          description: 'Completa el onboarding para acceder a los agentes personalizados.',
-          variant: 'destructive'
-        });
-      }
+      setShowOnboardingModal(true);
       return;
     }
     setCurrentAgent(value);
@@ -267,6 +255,8 @@ export default function ChatPage() {
 
   return (
     <div className="container mx-auto py-8 flex flex-col h-[calc(100vh-200px)]">
+      <OnboardingModal isOpen={showOnboardingModal} />
+      
       <Breadcrumb 
         items={[{ href: '/chat', label: 'Chat' }]}
         className="mb-4" 
@@ -360,7 +350,7 @@ export default function ChatPage() {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               className="flex-1"
-              disabled={isLoading}
+              disabled={isLoading || (currentAgent !== 'social' && !userProfile?.isOnboardingCompleted)}
             />
             <div className="relative group">
               <Select
@@ -372,7 +362,7 @@ export default function ChatPage() {
                 </SelectTrigger>
                 <SelectContent>
                   {Object.entries(AGENTS).map(([key, agent]) => {
-                    const isLocked = key !== 'social' && (!currentUser || (currentUser && !isOnboardingCompleted));
+                    const isLocked = key !== 'social' && (!currentUser || (currentUser && !userProfile?.isOnboardingCompleted));
                     return (
                       <SelectItem 
                         key={key} 
@@ -390,16 +380,11 @@ export default function ChatPage() {
                   })}
                 </SelectContent>
               </Select>
-              {!currentUser && (
-                <div className="absolute hidden group-hover:block bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 text-sm bg-popover text-popover-foreground rounded-md shadow-md whitespace-nowrap">
-                  Sign in to access all personalized agents and save your chat history.
-                </div>
-              )}
             </div>
             <Button 
               type="submit" 
               size="icon"
-              disabled={isLoading || !message.trim()}
+              disabled={isLoading || !message.trim() || (currentAgent !== 'social' && !userProfile?.isOnboardingCompleted)}
             >
               {isLoading ? (
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />

@@ -1,0 +1,228 @@
+{
+  "calendar": [
+    {
+      "id": "task-1",
+      "date": "2023-10-01",
+      "title": "Crear contenido visual para redes sociales",
+      "description": "Desarrollar imágenes y videos que reflejen el concepto visual del próximo lanzamiento.",
+      "channel": "IG/TikTok",
+      "effort_hours": 5,
+      "goal": "brand",
+      "budget_ars": 0
+    },
+    {
+      "id": "task-2",
+      "date": "2023-10-05",
+      "title": "Publicar teaser del nuevo single",
+      "description": "Compartir un breve adelanto del nuevo single en Instagram y TikTok para generar expectativa.",
+      "channel": "IG/TikTok",
+      "effort_hours": 2,
+      "goal": "engagement",
+      "budget_ars": 0
+    },
+    {
+      "id": "task-3",
+      "date": "2023-10-10",
+      "title": "Enviar correo a la lista de contactos",
+      "description": "Informar a los seguidores sobre el próximo lanzamiento y compartir el teaser.",
+      "channel": "Email",
+      "effort_hours": 1,
+      "goal": "engagement",
+      "budget_ars": 0
+    },
+    {
+      "id": "task-4",
+      "date": "2023-10-15",
+      "title": "Planificar una sesión en vivo",
+      "description": "Organizar una transmisión en vivo para interactuar con los seguidores y hablar del nuevo single.",
+      "channel": "Live",
+      "effort_hours": 4,
+      "goal": "engagement",
+      "budget_ars": 0
+    },
+    {
+      "id": "task-5",
+      "date": "2023-10-20",
+      "title": "Lanzamiento del nuevo single",
+      "description": "Publicar oficialmente el nuevo single en todas las plataformas de streaming.",
+      "channel": "Other",
+      "effort_hours": 3,
+      "goal": "conversion",
+      "budget_ars": 0
+    },
+    {
+      "id": "task-6",
+      "date": "2023-10-25",
+      "title": "Crear contenido UGC",
+      "description": "Invitar a los seguidores a crear contenido usando el nuevo single y compartirlo en sus redes.",
+      "channel": "IG/TikTok",
+      "effort_hours": 3,
+      "goal": "engagement",
+      "budget_ars": 0
+    },
+    {
+      "id": "task-7",
+      "date": "2023-11-01",
+      "title": "Revisar métricas del lanzamiento",
+      "description": "Analizar el rendimiento del single en plataformas y redes sociales para ajustar la estrategia.",
+      "channel": "Other",
+      "effort_hours": 2,
+      "goal": "data-driven",
+      "budget_ars": 0
+    },
+    {
+      "id": "task-8",
+      "date": "2023-11-05",
+      "title": "Desarrollar un videoclip",
+      "description": "Planificar y grabar un videoclip que represente la esencia del nuevo single.",
+      "channel": "YT",
+      "effort_hours": 10,
+      "goal": "brand",
+      "budget_ars": 500
+    },
+    {
+      "id": "task-9",
+      "date": "2023-11-15",
+      "title": "Lanzamiento del videoclip",
+      "description": "Publicar el videoclip en YouTube y compartirlo en redes sociales.",
+      "channel": "YT/IG",
+      "effort_hours": 2,
+      "goal": "engagement",
+      "budget_ars": 0
+    },
+    {
+      "id": "task-10",
+      "date": "2023-11-20",
+      "title": "Organizar un concurso en redes sociales",
+      "description": "Crear un concurso relacionado con el nuevo single para aumentar la interacción.",
+      "channel": "IG/TikTok",
+      "effort_hours": 3,
+      "goal": "engagement",
+      "budget_ars": 0
+    },
+    {
+      "id": "task-11",
+      "date": "2023-12-01",
+      "title": "Revisar resultados del concurso",
+      "description": "Analizar la participación y el impacto del concurso en las métricas de redes sociales.",
+      "channel": "Other",
+      "effort_hours": 2,
+      "goal": "data-driven",
+      "budget_ars": 0
+    },
+    {
+      "id": "task-12",
+      "date": "2023-12-05",
+      "title": "Planificar próximo lanzamiento",
+      "description": "Comenzar a trabajar en el próximo single o EP, basado en el feedback y análisis reciente.",
+      "channel": "Other",
+      "effort_hours": 4,
+      "goal": "brand",
+      "budget_ars": 0
+    }
+  ],
+  "task_tracker": [
+    {
+      "id": "task-1",
+      "title": "Crear contenido visual para redes sociales",
+      "status": "done",
+      "owner": "artist",
+      "dependencies": []
+    },
+    {
+      "id": "task-2",
+      "title": "Publicar teaser del nuevo single",
+      "status": "done",
+      "owner": "artist",
+      "dependencies": [
+        "task-1"
+      ]
+    },
+    {
+      "id": "task-3",
+      "title": "Enviar correo a la lista de contactos",
+      "status": "done",
+      "owner": "artist",
+      "dependencies": [
+        "task-2"
+      ]
+    },
+    {
+      "id": "task-4",
+      "title": "Planificar una sesión en vivo",
+      "status": "done",
+      "owner": "artist",
+      "dependencies": []
+    },
+    {
+      "id": "task-5",
+      "title": "Lanzamiento del nuevo single",
+      "status": "done",
+      "owner": "artist",
+      "dependencies": [
+        "task-3"
+      ]
+    },
+    {
+      "id": "task-6",
+      "title": "Crear contenido UGC",
+      "status": "done",
+      "owner": "artist",
+      "dependencies": [
+        "task-5"
+      ]
+    },
+    {
+      "id": "task-7",
+      "title": "Revisar métricas del lanzamiento",
+      "status": "done",
+      "owner": "artist",
+      "dependencies": [
+        "task-5"
+      ]
+    },
+    {
+      "id": "task-8",
+      "title": "Desarrollar un videoclip",
+      "status": "done",
+      "owner": "artist",
+      "dependencies": [
+        "task-5"
+      ]
+    },
+    {
+      "id": "task-9",
+      "title": "Lanzamiento del videoclip",
+      "status": "done",
+      "owner": "artist",
+      "dependencies": [
+        "task-8"
+      ]
+    },
+    {
+      "id": "task-10",
+      "title": "Organizar un concurso en redes sociales",
+      "status": "done",
+      "owner": "artist",
+      "dependencies": []
+    },
+    {
+      "id": "task-11",
+      "title": "Revisar resultados del concurso",
+      "status": "done",
+      "owner": "artist",
+      "dependencies": [
+        "task-10"
+      ]
+    },
+    {
+      "id": "task-12",
+      "title": "Planificar próximo lanzamiento",
+      "status": "done",
+      "owner": "artist",
+      "dependencies": [
+        "task-7"
+      ]
+    }
+  ]
+}

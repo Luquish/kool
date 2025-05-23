@@ -38,6 +38,7 @@ export default function DiscographyStep() {
   const [newEP, setNewEP] = useState<Release>({ title: "", tracks: undefined, year: undefined });
   const [newSingle, setNewSingle] = useState<Release>({ title: "", year: undefined });
   const [newUpcoming, setNewUpcoming] = useState<Release>({ title: "", type: "", concept: "" });
+  const [upcomingError, setUpcomingError] = useState<string>("");
 
   const handleVisualConceptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { value } = e.target;
@@ -62,7 +63,23 @@ export default function DiscographyStep() {
   };
 
   const handleAddUpcoming = () => {
-    if (!newUpcoming.title || !newUpcoming.type) return;
+    setUpcomingError("");
+    
+    if (!newUpcoming.title && !newUpcoming.type) {
+      setUpcomingError("Por favor, ingresa el título y selecciona el tipo de lanzamiento");
+      return;
+    }
+    
+    if (!newUpcoming.title) {
+      setUpcomingError("Por favor, ingresa el título del lanzamiento");
+      return;
+    }
+    
+    if (!newUpcoming.type) {
+      setUpcomingError("Por favor, selecciona el tipo de lanzamiento");
+      return;
+    }
+    
     const updatedUpcoming = [...formData.upcoming_releases, newUpcoming];
     setFormData((prev) => ({ ...prev, upcoming_releases: updatedUpcoming }));
     store.setDiscography({ discography: { ...store.discography, upcoming_releases: updatedUpcoming } });
@@ -181,14 +198,20 @@ export default function DiscographyStep() {
             <input
               type="text"
               value={newUpcoming.title}
-              onChange={(e) => setNewUpcoming((prev) => ({ ...prev, title: e.target.value }))}
-              className="p-2 border rounded-md bg-background"
+              onChange={(e) => {
+                setUpcomingError("");
+                setNewUpcoming((prev) => ({ ...prev, title: e.target.value }));
+              }}
+              className={`p-2 border rounded-md bg-background ${!newUpcoming.title && upcomingError ? 'border-red-500' : ''}`}
               placeholder="Título"
             />
             <select
               value={newUpcoming.type}
-              onChange={(e) => setNewUpcoming((prev) => ({ ...prev, type: e.target.value }))}
-              className="p-2 border rounded-md bg-background"
+              onChange={(e) => {
+                setUpcomingError("");
+                setNewUpcoming((prev) => ({ ...prev, type: e.target.value }));
+              }}
+              className={`p-2 border rounded-md bg-background ${!newUpcoming.type && upcomingError ? 'border-red-500' : ''}`}
             >
               <option value="">Tipo de lanzamiento</option>
               <option value="single">Single</option>
@@ -203,6 +226,9 @@ export default function DiscographyStep() {
               placeholder="Concepto"
             />
           </div>
+          {upcomingError && (
+            <p className="text-sm text-red-500 mt-1">{upcomingError}</p>
+          )}
           <button
             onClick={handleAddUpcoming}
             className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"

@@ -45,7 +45,6 @@ export default function SignupPage() {
         name,
         email,
         password: hashedPassword,
-        subscription_plan: null,
         language: "es",
         project_type: "",
         artist_name: "",
@@ -55,6 +54,7 @@ export default function SignupPage() {
         distributor: "",
         label_status: "independent",
         label_name: "",
+        isOnboardingCompleted: false,
         socials: {
           instagram_followers: 0,
           spotify_monthly_listeners: 0,

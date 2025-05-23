@@ -48,7 +48,7 @@ interface OnboardingState {
   };
   
   // Variable para guardar si el onboarding está completo
-  is_onboarding_in_progress: boolean;
+  isOnboardingCompleted: boolean;
   
   // Acciones
   reset: () => void;
@@ -142,7 +142,7 @@ const initialState = {
     annual_expenses_ars: 0,
     budget_per_launch_ars: 0
   },
-  is_onboarding_in_progress: true
+  isOnboardingCompleted: false
 };
 
 // Usuario actual (correo electrónico)
@@ -279,7 +279,6 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
             ...state.discography,
             ...(profile.discography || {})
           },
-          // Para live_history, nos aseguramos de no crear estructuras anidadas
           live_history: {
             highlights: profile.live_history?.highlights || state.live_history.highlights,
             avg_capacity: profile.live_history?.avg_capacity || state.live_history.avg_capacity,
@@ -289,9 +288,9 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
             ...state.financials,
             ...(profile.financials || {})
           },
-          is_onboarding_in_progress: profile.is_onboarding_in_progress !== undefined 
-            ? profile.is_onboarding_in_progress 
-            : true
+          isOnboardingCompleted: profile.isOnboardingCompleted !== undefined 
+            ? profile.isOnboardingCompleted 
+            : false
         }));
       }
     } catch (error) {
@@ -311,14 +310,14 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
       }
       
       const state = get();
-      const email = currentUserEmail; // Crear variable para asegurar que no es null
+      const email = currentUserEmail;
       
       if (!email) {
         throw new Error('No hay usuario autenticado');
       }
       
-      // Guardar datos de progreso en localStorage solo mientras está en progreso
-      if (isClient && state.is_onboarding_in_progress) {
+      // Guardar datos de progreso en localStorage solo mientras no está completado
+      if (isClient && !state.isOnboardingCompleted) {
         localStorage.setItem(`onboarding_progress_${email}`, JSON.stringify({
           project_type: state.project_type,
           artist_name: state.artist_name,
@@ -333,7 +332,7 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
           discography: state.discography,
           live_history: state.live_history,
           financials: state.financials,
-          is_onboarding_in_progress: true
+          isOnboardingCompleted: false
         }));
       }
       
@@ -377,7 +376,7 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
         discography: state.discography,
         live_history: state.live_history,
         financials: state.financials,
-        is_onboarding_in_progress: false
+        isOnboardingCompleted: true
       };
       
       // Guardar datos finales en el perfil del usuario
@@ -389,7 +388,7 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
       }
       
       // Actualizar estado
-      set({ is_onboarding_in_progress: false });
+      set({ isOnboardingCompleted: true });
       
       return true;
     } catch (error) {

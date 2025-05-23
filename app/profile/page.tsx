@@ -14,12 +14,14 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Plus, X, Save } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
+import { OnboardingModal } from "@/components/ui/onboarding-modal";
 
 export default function ProfilePage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [profile, setProfile] = useState<any>(null);
+  const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(false);
   const [newMember, setNewMember] = useState("");
   const [newGuestMember, setNewGuestMember] = useState("");
   const [newCreativeTeamMember, setNewCreativeTeamMember] = useState("");
@@ -38,6 +40,10 @@ export default function ProfilePage() {
         const userProfile = await storage.getUserProfile(email);
         if (userProfile) {
           setProfile(userProfile);
+          // Si el onboarding no está completado, mostrar el modal
+          if (!userProfile.isOnboardingCompleted) {
+            setShowOnboardingModal(true);
+          }
         } else {
           // Si no hay perfil, redirigir al onboarding
           router.push("/onboarding");
@@ -133,6 +139,15 @@ export default function ProfilePage() {
 
   if (!profile) {
     return null;
+  }
+
+  // Si el onboarding no está completado, mostrar solo el modal
+  if (!profile.isOnboardingCompleted) {
+    return (
+      <div className="min-h-screen bg-background">
+        <OnboardingModal isOpen={showOnboardingModal} />
+      </div>
+    );
   }
 
   return (

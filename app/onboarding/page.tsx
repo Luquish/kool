@@ -8,6 +8,7 @@ import BasicInfoStep from "./steps/basic-info/page";
 import SocialsStep from "./steps/socials/page";
 import DiscographyStep from "./steps/discography/page";
 import LiveHistoryStep from "./steps/live-history/page";
+import { toast } from "@/components/ui/use-toast";
 
 const steps = [
   { id: 1, title: "Basic Info", description: "Project and artist details" },
@@ -51,36 +52,50 @@ export default function OnboardingPage() {
     }
   }, [currentStep, currentUser, saveToStorage]);
 
+  const handleFinishOnboarding = async () => {
+    if (!currentUser) return;
+    
+    try {
+      // Obtener el perfil actual
+      const currentProfile = await storage.getUserProfile(currentUser);
+      
+      if (!currentProfile) {
+        throw new Error('No se encontró el perfil del usuario');
+      }
+      
+      // Actualizar el perfil con los datos del onboarding y marcar como completado
+      const updatedProfile = {
+        ...currentProfile,
+        ...useOnboardingStore.getState(),
+        isOnboardingCompleted: true
+      };
+      
+      // Guardar el perfil actualizado
+      await storage.saveUserProfile(currentUser, updatedProfile);
+      
+      // Redirigir al dashboard
+      router.push('/dashboard');
+    } catch (error) {
+      console.error('Error al finalizar onboarding:', error);
+      toast({
+        title: 'Error',
+        description: 'No se pudo completar el proceso de onboarding',
+        variant: 'destructive'
+      });
+    }
+  };
+
   const nextStep = () => {
     if (currentStep < steps.length) {
       setCurrentStep(prev => prev + 1);
+    } else {
+      handleFinishOnboarding();
     }
   };
 
   const prevStep = () => {
     if (currentStep > 1) {
       setCurrentStep(prev => prev - 1);
-    }
-  };
-
-  const handleFinish = async () => {
-    try {
-      if (!currentUser) {
-        router.push("/auth/login");
-        return;
-      }
-      
-      // Guardar todos los datos de onboarding en el perfil de forma definitiva
-      const saved = await finishOnboarding();
-      
-      if (!saved) {
-        throw new Error("Error al guardar los datos");
-      }
-      
-      // Redirigir al usuario a la página principal
-      router.push("/");
-    } catch (error) {
-      console.error("Error al finalizar el onboarding:", error);
     }
   };
 
@@ -158,7 +173,7 @@ export default function OnboardingPage() {
               Previous
             </button>
             <button
-              onClick={currentStep === steps.length ? handleFinish : nextStep}
+              onClick={currentStep === steps.length ? handleFinishOnboarding : nextStep}
               className="px-6 py-3 bg-primary text-white rounded-md hover:bg-primary/90 text-sm font-medium"
             >
               {currentStep === steps.length ? "Finish" : "Next"}

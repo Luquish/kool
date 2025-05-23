@@ -23,7 +23,7 @@ export async function processMessage(message: string, agentType: AgentType, user
         const userStrategy = await storage.getItem(`storage/${userEmail}/strategy.json`);
 
         // Verificar si el onboarding está completo
-        if (userProfile?.is_onboarding_in_progress) {
+        if (!userProfile?.isOnboardingCompleted) {
           return {
             response: null,
             error: 'Debes completar el onboarding para usar este agente personalizado'

@@ -12,12 +12,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
+import { OnboardingModal } from "@/components/ui/onboarding-modal";
 
 export default function DashboardPage() {
   const [currentUser, setCurrentUser] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [strategy, setStrategy] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(false);
   const { toast } = useToast();
   const router = useRouter();
 
@@ -31,6 +33,12 @@ export default function DashboardPage() {
         if (user) {
           const profile = await storage.getUserProfile(user);
           setUserProfile(profile);
+          
+          // Si el onboarding no está completado, mostrar el modal
+          if (!profile?.isOnboardingCompleted) {
+            setShowOnboardingModal(true);
+            return;
+          }
           
           // Comprobar si ya tiene una estrategia generada
           try {
@@ -183,6 +191,8 @@ export default function DashboardPage() {
 
   return (
     <div className="container mx-auto py-8">
+      <OnboardingModal isOpen={showOnboardingModal} />
+      
       <Breadcrumb 
         items={[{ href: '/dashboard', label: 'Dashboard' }]}
         className="mb-4" 
