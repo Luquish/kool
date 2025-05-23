@@ -55,7 +55,7 @@ export default function HowItWorks() {
               <span className="font-bold">By KOOL TEAM</span> • May 8, 2025
             </div>
           </div>
-          <Link href="/chat" className="inline-block">
+          <Link href="/tutorials" className="inline-block">
             <Button variant="outline" className="border-secondary bg-primary text-white hover:bg-primary/90 w-full">
               See it in Action
             </Button>

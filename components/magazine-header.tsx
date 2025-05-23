@@ -21,6 +21,7 @@ export default function MagazineHeader() {
   const profileMenuRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
   const isHomePage = pathname === "/"
+  const isTutorialsPage = pathname === "/tutorials"
   const { user: currentUser, profile: userProfile, credits: userCredits, isLoading } = useAuth()
 
   // Add debug logs
@@ -202,6 +203,10 @@ export default function MagazineHeader() {
                   Artists
                 </Link>
 
+                <Link href="/tutorials" className="hover:text-primary">
+                  Tutorials
+                </Link>
+
                 <div className="h-6 w-px bg-secondary mx-4" />
               </>
             )}
@@ -265,6 +270,10 @@ export default function MagazineHeader() {
                   </Link>
                   <Link href="#artists" onClick={() => setIsMenuOpen(false)} className="hover:text-primary py-2 border-b-2 border-secondary w-full text-center">
                     Artists
+                  </Link>
+
+                  <Link href="/tutorials" onClick={() => setIsMenuOpen(false)} className="hover:text-primary py-2 border-b-2 border-secondary w-full text-center">
+                    Tutorials
                   </Link>
 
                   <div className="w-full border-t-2 border-secondary my-4" />
