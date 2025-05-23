@@ -84,12 +84,20 @@ export default function PricingSection() {
 
   return (
     <section id="services" className="my-12 border-t-2 border-secondary pt-12">
-      <div className="mb-8">
-        <div className="bg-primary text-white inline-block px-3 py-1 text-xs font-bold mb-3">THE KOOLKIT</div>
-        <h2 className="text-3xl md:text-4xl font-black mb-2">JOIN THE <span className="text-primary">KOOL</span>TURE</h2>
-        <p className="text-lg text-secondary/70">
-          Each service costs 1 credit ($3 USD). Buy credits and use them in any service when you need them.
-        </p>
+      <div className="mb-8 flex justify-between items-start">
+        <div>
+          <div className="bg-primary text-white inline-block px-3 py-1 text-xs font-bold mb-3">THE KOOLKIT</div>
+          <h2 className="text-3xl md:text-4xl font-black mb-2">JOIN THE <span className="text-primary">KOOL</span>TURE</h2>
+          <p className="text-lg text-secondary/70">
+            Each service costs 1 credit ($3 USD). Buy credits and use them in any service when you need them.
+          </p>
+        </div>
+        <Button
+          className="bg-primary hover:bg-primary/90 text-white py-3 px-8"
+          onClick={() => window.location.href = '#'}
+        >
+          Buy Credits
+        </Button>
       </div>
 
       <div className="flex flex-col space-y-3 max-w-3xl mx-auto">
