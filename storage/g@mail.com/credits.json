@@ -1,0 +1,17 @@
+{
+  "credits": 6,
+  "transactions": [
+    {
+      "date": "2025-05-23T02:30:04.727Z",
+      "amount": 3,
+      "type": "purchase",
+      "description": "Welcome credits"
+    },
+    {
+      "date": "2025-05-23T02:31:02.057Z",
+      "amount": 3,
+      "type": "purchase",
+      "description": "Compra de 3 créditos"
+    }
+  ]
+}

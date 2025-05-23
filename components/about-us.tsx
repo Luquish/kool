@@ -11,45 +11,45 @@ export default function AboutUs() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div>
-          <div className="aspect-[4/3] bg-background mb-4">
+          <div className="aspect-[4/3] bg-background mb-4 relative">
+            <div className="absolute top-4 left-4 bg-primary text-white inline-block px-4 py-2 text-sm font-bold">OUR MISSION</div>
             <img
               src="/images/accessibility.png"
               alt="Our Mission"
               className="w-full h-full object-cover"
             />
           </div>
-          <div className="bg-primary text-white inline-block px-3 py-1 text-xs font-bold mb-2">OUR MISSION</div>
-          <h3 className="text-xl font-bold mb-2">Accessibility</h3>
+          <h3 className="text-2xl font-bold mb-3">Accessibility</h3>
         </div>
 
         <div>
-          <div className="aspect-[4/3] bg-background mb-4">
+          <div className="aspect-[4/3] bg-background mb-4 relative">
+            <div className="absolute top-4 left-4 bg-secondary text-white inline-block px-4 py-2 text-sm font-bold">TECHNOLOGY</div>
             <img
               src="/images/sustainability_and_autonomy.png"
               alt="Our Technology"
               className="w-full h-full object-cover"
             />
           </div>
-          <div className="bg-secondary text-white inline-block px-3 py-1 text-xs font-bold mb-2">TECHNOLOGY</div>
-          <h3 className="text-xl font-bold mb-2">Sustainability and Autonomy</h3>
+          <h3 className="text-2xl font-bold mb-3">Sustainability and Autonomy</h3>
         </div>
 
         <div>
-          <div className="aspect-[4/3] bg-background mb-4">
+          <div className="aspect-[4/3] bg-background mb-4 relative">
+            <div className="absolute top-4 left-4 bg-primary text-white inline-block px-4 py-2 text-sm font-bold">OUR TEAM</div>
             <img
               src="/images/team.png"
               alt="Our Team"
               className="w-full h-full object-cover"
             />
           </div>
-          <div className="bg-primary text-white inline-block px-3 py-1 text-xs font-bold mb-2">OUR TEAM</div>
-          <h3 className="text-xl font-bold mb-2">
+          <h3 className="text-2xl font-bold mb-3">
             Multidisciplinary Business Experts
           </h3>
         </div>
       </div>
 
-      <div className="mt-12 bg-secondary text-white p-8">
+      <div className="mt-8 bg-secondary text-white p-8">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between">
           <div>
             <div className="text-primary font-bold mb-2">OUR VISION</div>
