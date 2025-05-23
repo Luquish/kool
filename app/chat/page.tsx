@@ -255,7 +255,7 @@ export default function ChatPage() {
 
   return (
     <div className="container mx-auto py-8 flex flex-col h-[calc(100vh-200px)]">
-      <OnboardingModal isOpen={showOnboardingModal} />
+      <OnboardingModal isOpen={showOnboardingModal} onClose={() => setShowOnboardingModal(false)} />
       
       <Breadcrumb 
         items={[{ href: '/chat', label: 'Chat' }]}
@@ -353,33 +353,50 @@ export default function ChatPage() {
               disabled={isLoading || (currentAgent !== 'social' && !userProfile?.isOnboardingCompleted)}
             />
             <div className="relative group">
-              <Select
-                value={currentAgent}
-                onValueChange={handleAgentChange}
-              >
-                <SelectTrigger className="w-[42px] px-2">
-                  {AGENT_ICONS[currentAgent]}
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(AGENTS).map(([key, agent]) => {
-                    const isLocked = key !== 'social' && (!currentUser || (currentUser && !userProfile?.isOnboardingCompleted));
-                    return (
-                      <SelectItem 
-                        key={key} 
-                        value={key}
-                        className={`flex items-center justify-between ${isLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        disabled={isLocked || false}
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div>
+                      <Select
+                        value={currentAgent}
+                        onValueChange={handleAgentChange}
                       >
-                        <div className="flex items-center gap-2">
-                          {AGENT_ICONS[key as AgentType]}
-                          <span>{agent.name}</span>
-                          {isLocked && <Lock size={16} className="ml-2" />}
-                        </div>
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
+                        <SelectTrigger className="w-[42px] px-2">
+                          {AGENT_ICONS[currentAgent]}
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(AGENTS).map(([key, agent]) => {
+                            const isLocked = key !== 'social' && (!currentUser || (currentUser && !userProfile?.isOnboardingCompleted));
+                            return (
+                              <SelectItem 
+                                key={key} 
+                                value={key}
+                                className={`flex items-center justify-between ${isLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                disabled={isLocked || false}
+                              >
+                                <div className="flex items-center gap-2">
+                                  {AGENT_ICONS[key as AgentType]}
+                                  <span>{agent.name}</span>
+                                  {isLocked && <Lock size={16} className="ml-2" />}
+                                </div>
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {!currentUser ? (
+                      <p>Sign in to unlock all agents</p>
+                    ) : !userProfile?.isOnboardingCompleted ? (
+                      <p>Complete onboarding to unlock all agents</p>
+                    ) : (
+                      <p>Select an agent to chat with</p>
+                    )}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
             <Button 
               type="submit" 

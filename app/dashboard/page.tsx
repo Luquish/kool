@@ -397,7 +397,7 @@ export default function DashboardPage() {
 
   return (
     <div className="container mx-auto py-8">
-      <OnboardingModal isOpen={showOnboardingModal} />
+      <OnboardingModal isOpen={showOnboardingModal} onClose={() => setShowOnboardingModal(false)} />
       
       <Breadcrumb 
         items={[{ href: '/dashboard', label: 'Dashboard' }]}

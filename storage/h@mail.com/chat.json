@@ -1,0 +1,22 @@
+[
+  {
+    "role": "user",
+    "content": "hola",
+    "timestamp": "2025-05-23T02:50:02.687Z",
+    "agent": {
+      "type": "social",
+      "name": "Social Media Campaign"
+    }
+  },
+  {
+    "role": "assistant",
+    "content": {
+      "response": "¡Hola! ¿En qué puedo ayudarte hoy con respecto a tus redes sociales como artista?"
+    },
+    "timestamp": "2025-05-23T02:50:02.687Z",
+    "agent": {
+      "type": "social",
+      "name": "Social Media Campaign"
+    }
+  }
+]

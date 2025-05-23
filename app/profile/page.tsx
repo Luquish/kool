@@ -145,7 +145,7 @@ export default function ProfilePage() {
   if (!profile.isOnboardingCompleted) {
     return (
       <div className="min-h-screen bg-background">
-        <OnboardingModal isOpen={showOnboardingModal} />
+        <OnboardingModal isOpen={showOnboardingModal} onClose={() => setShowOnboardingModal(false)} />
       </div>
     );
   }
