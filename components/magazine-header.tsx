@@ -22,7 +22,7 @@ export default function MagazineHeader() {
   const pathname = usePathname()
   const isHomePage = pathname === "/"
   const isTutorialsPage = pathname === "/tutorials"
-  const { user: currentUser, profile: userProfile, credits: userCredits, isLoading } = useAuth()
+  const { user: currentUser, profile: userProfile, credits: userCredits, isLoading, isInitializing } = useAuth()
 
   // Add debug logs
   useEffect(() => {
@@ -139,11 +139,16 @@ export default function MagazineHeader() {
           </div>
 
           <div className="w-[100px] md:w-[200px] flex items-center justify-end space-x-4 min-h-[40px]">
-            {isLoading ? (
+            {isInitializing ? (
+              <div className="flex items-center space-x-2">
+                <div className="w-16 h-8 bg-primary/10 animate-pulse rounded"></div>
+                <div className="w-8 h-8 rounded-full bg-primary/10 animate-pulse"></div>
+              </div>
+            ) : isLoading ? (
               <div className="w-8 h-8 rounded-full bg-primary/10 animate-pulse" />
             ) : currentUser ? (
               <div className="relative flex items-center space-x-3" ref={profileMenuRef}>
-                <div className="text-primary font-bold block">
+                <div className="text-primary font-bold block transition-opacity duration-200">
                   {userCredits} credits
                 </div>
                 <button
@@ -153,13 +158,13 @@ export default function MagazineHeader() {
                   <User size={18} className="text-primary" />
                 </button>
                 {isProfileMenuOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-48 rounded-lg bg-white shadow-lg border border-gray-200 overflow-hidden z-50">
+                  <div className="absolute right-0 top-full mt-2 w-48 rounded-lg bg-white shadow-lg border border-gray-200 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
                     <button
                       onClick={() => {
                         setIsProfileMenuOpen(false);
                         handleLogout();
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
                     >
                       Sign Out
                     </button>
@@ -173,10 +178,10 @@ export default function MagazineHeader() {
               </div>
             ) : (
               <div className="hidden md:flex space-x-4">
-                <Link href="/auth/signup" className="text-secondary/70 hover:text-primary">
+                <Link href="/auth/signup" className="text-secondary/70 hover:text-primary transition-colors duration-200">
                   Sign Up
                 </Link>
-                <Link href="/auth/login" className="text-secondary/70 hover:text-primary">
+                <Link href="/auth/login" className="text-secondary/70 hover:text-primary transition-colors duration-200">
                   Login
                 </Link>
               </div>
@@ -186,7 +191,7 @@ export default function MagazineHeader() {
 
         {/* Main navigation */}
         <div className="container mx-auto px-4 py-3 flex items-center justify-center relative">
-          <nav className="hidden md:flex items-center space-x-8 font-bold text-sm uppercase">
+          <nav className={`hidden md:flex items-center space-x-8 font-bold text-sm uppercase transition-opacity duration-300 ${isInitializing ? 'opacity-50' : 'opacity-100'}`}>
             {(isHomePage || isTutorialsPage) && (
               <>
                 <Link href="#how-it-works" className="hover:text-primary">

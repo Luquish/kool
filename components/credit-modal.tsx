@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase, updateCredits } from '@/lib/supabase';
 import { useEffect, useState } from "react";
+import { useAuth } from "@/components/providers/auth-provider";
 
 interface CreditModalProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ export default function CreditModal({ isOpen, onClose, onSuccess }: CreditModalP
   const [amount, setAmount] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   useEffect(() => {
     if (isOpen) {
@@ -40,17 +42,26 @@ export default function CreditModal({ isOpen, onClose, onSuccess }: CreditModalP
     try {
       setIsLoading(true);
 
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      if (authError || !user) {
+      if (!user) {
         throw new Error('Usuario no autenticado');
       }
 
+      // Actualizar créditos
       await updateCredits(
         user.id,
         amount,
         'purchase',
         `Compra de ${amount} crédito${amount !== 1 ? 's' : ''}`
       );
+
+      // Forzar actualización de los créditos en tiempo real
+      await supabase
+        .channel('credits-changes')
+        .send({
+          type: 'broadcast',
+          event: 'credits-update',
+          payload: { userId: user.id }
+        });
       
       toast({
         title: "¡Compra exitosa!",

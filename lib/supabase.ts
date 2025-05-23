@@ -12,49 +12,96 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   }
 });
 
+// Cache temporal para optimizar rendimiento
+const cache = {
+  profiles: new Map<string, any>(),
+  credits: new Map<string, number>(),
+  lastUpdated: new Map<string, number>()
+};
+
+const CACHE_DURATION = 5000; // 5 segundos
+
+// Helper para verificar si el caché es válido
+const isCacheValid = (key: string) => {
+  const lastUpdated = cache.lastUpdated.get(key);
+  return lastUpdated && Date.now() - lastUpdated < CACHE_DURATION;
+};
+
 // Helpers para manejo de créditos
 export async function getUserCredits(userId: string) {
-  const { data, error } = await supabase
-    .from('credits')
-    .select('amount')
-    .eq('id', userId)
-    .single();
+  const cacheKey = `credits-${userId}`;
+  
+  // Verificar caché
+  if (isCacheValid(cacheKey) && cache.credits.has(userId)) {
+    return cache.credits.get(userId);
+  }
 
-  if (error) throw error;
-  return data?.amount || 0;
+  try {
+    const { data, error } = await supabase
+      .from('credits')
+      .select('amount')
+      .eq('id', userId)
+      .single();
+
+    if (error) throw error;
+    
+    const credits = data?.amount || 0;
+    
+    // Actualizar caché
+    cache.credits.set(userId, credits);
+    cache.lastUpdated.set(cacheKey, Date.now());
+    
+    return credits;
+  } catch (error) {
+    console.error('Error fetching credits:', error);
+    return cache.credits.get(userId) || 0; // Fallback a caché si existe
+  }
 }
 
 export async function updateCredits(userId: string, amount: number, type: 'purchase' | 'use', description: string) {
-  const { data: credits, error: creditsError } = await supabase
-    .from('credits')
-    .select('amount')
-    .eq('id', userId)
-    .single();
+  try {
+    const { data: credits, error: creditsError } = await supabase
+      .from('credits')
+      .select('amount')
+      .eq('id', userId)
+      .single();
 
-  if (creditsError) throw creditsError;
+    if (creditsError) throw creditsError;
 
-  const newAmount = type === 'purchase' 
-    ? (credits?.amount || 0) + amount 
-    : (credits?.amount || 0) - amount;
+    const newAmount = type === 'purchase' 
+      ? (credits?.amount || 0) + amount 
+      : (credits?.amount || 0) - amount;
 
-  const { error: updateError } = await supabase
-    .from('credits')
-    .upsert({ id: userId, amount: newAmount });
+    // Actualizar caché optimistamente
+    cache.credits.set(userId, newAmount);
+    cache.lastUpdated.set(`credits-${userId}`, Date.now());
 
-  if (updateError) throw updateError;
+    const { error: updateError } = await supabase
+      .from('credits')
+      .upsert({ id: userId, amount: newAmount });
 
-  const { error: transactionError } = await supabase
-    .from('credit_transactions')
-    .insert({
-      user_id: userId,
-      amount,
-      type,
-      description
-    });
+    if (updateError) {
+      // Revertir caché si hay error
+      cache.credits.set(userId, credits?.amount || 0);
+      throw updateError;
+    }
 
-  if (transactionError) throw transactionError;
+    const { error: transactionError } = await supabase
+      .from('credit_transactions')
+      .insert({
+        user_id: userId,
+        amount,
+        type,
+        description
+      });
 
-  return newAmount;
+    if (transactionError) throw transactionError;
+
+    return newAmount;
+  } catch (error) {
+    console.error('Error updating credits:', error);
+    throw error;
+  }
 }
 
 // Helpers para chat
@@ -90,25 +137,62 @@ export async function getChatHistory(userId: string) {
 }
 
 // Helpers para perfil
-export async function updateProfile(userId: string, profile: any) {
-  const { error } = await supabase
-    .from('profiles')
-    .upsert({
-      id: userId,
-      ...profile,
-      updated_at: new Date().toISOString()
-    });
+export async function getProfile(userId: string) {
+  const cacheKey = `profile-${userId}`;
+  
+  // Verificar caché
+  if (isCacheValid(cacheKey) && cache.profiles.has(userId)) {
+    return cache.profiles.get(userId);
+  }
 
-  if (error) throw error;
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    if (error) throw error;
+    
+    // Actualizar caché
+    cache.profiles.set(userId, data);
+    cache.lastUpdated.set(cacheKey, Date.now());
+    
+    return data;
+  } catch (error) {
+    console.error('Error fetching profile:', error);
+    return cache.profiles.get(userId); // Fallback a caché si existe
+  }
 }
 
-export async function getProfile(userId: string) {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', userId)
-    .single();
+export async function updateProfile(userId: string, profile: any) {
+  try {
+    // Actualizar caché optimistamente
+    cache.profiles.set(userId, { ...cache.profiles.get(userId), ...profile });
+    cache.lastUpdated.set(`profile-${userId}`, Date.now());
 
-  if (error) throw error;
-  return data;
+    const { error } = await supabase
+      .from('profiles')
+      .upsert({
+        id: userId,
+        ...profile,
+        updated_at: new Date().toISOString()
+      });
+
+    if (error) {
+      // Invalidar caché si hay error
+      cache.profiles.delete(userId);
+      throw error;
+    }
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    throw error;
+  }
+}
+
+// Función para limpiar caché
+export function clearCache() {
+  cache.profiles.clear();
+  cache.credits.clear();
+  cache.lastUpdated.clear();
 } 
