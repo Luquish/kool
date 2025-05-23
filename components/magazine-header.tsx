@@ -202,35 +202,44 @@ export default function MagazineHeader() {
         hasScrolled ? 'shadow-lg' : ''
       } ${shouldHideNavigation ? 'shadow-[0_20px_40px_-2px_hsl(0_73%_37%_/_0.5)] pb-0' : 'pb-0'}`}>
         {/* Top utility bar */}
-        <div className="border-b-2 border-secondary py-8 px-8 flex justify-between items-center text-sm relative">
-          <div className="w-[100px] flex items-center">
+        <div className="border-b-2 border-secondary py-4 md:py-8 px-4 md:px-8 flex justify-between items-center text-sm relative">
+          <div className="w-[100px] hidden md:flex items-center">
             <Link 
               href="#" 
-              className="text-secondary/70 hover:text-primary trsansition-colors duration-200 whitespace-nowrap"
+              className="text-secondary/70 hover:text-primary transition-colors duration-200 whitespace-nowrap"
               onMouseEnter={() => setShowJoke(true)}
               onMouseLeave={() => setShowJoke(false)}
             >
               {showJoke ? "Just kidding!" : "Got a tip?"}
             </Link>
           </div>
+          
+          {/* Mobile menu button - left side */}
+          <div className="md:hidden">
+            <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
+              {isMenuOpen ? <X size={24} className="text-primary" /> : <Menu size={24} className="text-primary" />}
+            </button>
+          </div>
+
           <div className="absolute left-1/2 transform -translate-x-1/2">
             <Link href="/" className="block transition-transform hover:scale-105 duration-200">
-              <div className="font-logo text-6xl text-primary transform relative">
+              <div className="font-logo text-4xl md:text-6xl text-primary transform relative">
                 <span className="relative text-stroke-1 text-stroke-white">KOOL</span>
                 <div className="absolute inset-0 transform translate-x-0.5 translate-y-0.5 text-black -z-10">KOOL</div>
               </div>
             </Link>
           </div>
-          <div className="w-[200px] flex items-center justify-end space-x-4">
+
+          <div className="w-[100px] md:w-[200px] flex items-center justify-end space-x-4">
             {currentUser ? (
               <div className="relative" ref={profileMenuRef}>
                 <button
                   onClick={toggleProfileMenu}
-                  className={`w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center transition-all duration-300 ${
+                  className={`w-8 md:w-10 h-8 md:h-10 rounded-full bg-primary/10 flex items-center justify-center transition-all duration-300 ${
                     isProfileMenuOpen ? 'rounded-lg' : 'hover:bg-primary/20'
                   }`}
                 >
-                  <User size={20} className="text-primary" />
+                  <User size={18} className="text-primary" />
                 </button>
                 
                 {isProfileMenuOpen && (
@@ -288,14 +297,14 @@ export default function MagazineHeader() {
                 />
               </div>
             ) : (
-              <>
+              <div className="hidden md:flex space-x-4">
                 <Link href="/auth/signup" className="text-secondary/70 hover:text-primary">
                   Sign Up
                 </Link>
                 <Link href="/auth/login" className="text-secondary/70 hover:text-primary">
                   Login
                 </Link>
-              </>
+              </div>
             )}
           </div>
         </div>
@@ -303,10 +312,6 @@ export default function MagazineHeader() {
         {/* Main navigation */}
         {!shouldHideNavigation && (
           <div className="container mx-auto px-4 py-3 flex items-center justify-center relative">
-            <button className="md:hidden absolute left-4" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-
             <nav className="hidden md:flex items-center space-x-8 font-bold text-sm uppercase">
               {!isHomePage && (
                 <Link 
@@ -345,29 +350,32 @@ export default function MagazineHeader() {
         {/* Mobile menu */}
         {isMenuOpen && (
           <div className="md:hidden border-t-2 border-secondary">
-            <nav className="container mx-auto px-4 py-4 flex flex-col items-center space-y-4 font-bold text-sm uppercase">
-              {!isHomePage && (
-                <Link href="/" className="hover:text-primary py-2 border-b-2 border-secondary flex items-center gap-2">
-                  <Home size={16} />
-                  <span>Home</span>
-                </Link>
+            <nav className="container mx-auto px-4 py-4 flex flex-col items-center space-y-4 font-bold text-sm uppercase">          
+            {!currentUser && (
+                <>
+                  <Link href="/auth/signup" onClick={() => setIsMenuOpen(false)} className="hover:text-primary py-2 border-b-2 border-secondary w-full text-center text-primary">
+                    Sign Up
+                  </Link>
+                  <Link href="/auth/login" onClick={() => setIsMenuOpen(false)} className="hover:text-primary py-2 border-b-2 border-secondary w-full text-center text-primary">
+                    Login
+                  </Link>
+                </>
               )}
-              
               {isHomePage && (
                 <>
-                  <Link href="#features" className="hover:text-primary py-2 border-b-2 border-secondary">
-                    Features
-                  </Link>
-                  <Link href="#how-it-works" className="hover:text-primary py-2 border-b-2 border-secondary">
+                  <Link href="#how-it-works" onClick={() => setIsMenuOpen(false)} className="hover:text-primary py-2 border-b-2 border-secondary w-full text-center">
                     How It Works
                   </Link>
-                  <Link href="#artists" className="hover:text-primary py-2 border-b-2 border-secondary">
-                    Artists
+                  <Link href="#services" onClick={() => setIsMenuOpen(false)} className="hover:text-primary py-2 border-b-2 border-secondary w-full text-center">
+                    Services
                   </Link>
-                  <Link href="#about" className="hover:text-primary py-2 border-b-2 border-secondary">
+                  <Link href="#about" onClick={() => setIsMenuOpen(false)} className="hover:text-primary py-2 border-b-2 border-secondary w-full text-center">
                     About
                   </Link>
-                  <Link href="/chat" className="hover:text-primary py-2 border-b-2 border-secondary">
+                  <Link href="#artists" onClick={() => setIsMenuOpen(false)} className="hover:text-primary py-2 border-b-2 border-secondary w-full text-center">
+                    Artists
+                  </Link>
+                  <Link href="/chat" onClick={() => setIsMenuOpen(false)} className="hover:text-primary py-2 border-b-2 border-secondary w-full text-center">
                     Chat
                   </Link>
                 </>

@@ -1,7 +1,7 @@
 {
-  "name": "k",
-  "email": "k@mail.com",
-  "password": "$2b$10$CR2Mxw.dwrSCCDs.oMzbT.ia6Ec94w2c.15RvsJQrmE00tIms4ldu",
+  "name": "p",
+  "email": "p@mail.com",
+  "password": "$2b$10$uwMa5ef7acktq5FaEk01luJ/YuY03qr2pfhEcjppZSAtPlUr3m05O",
   "language": "es",
   "project_type": "",
   "artist_name": "",
@@ -11,7 +11,7 @@
   "distributor": "",
   "label_status": "independent",
   "label_name": "",
-  "isOnboardingCompleted": true,
+  "isOnboardingCompleted": false,
   "socials": {
     "instagram_followers": 0,
     "spotify_monthly_listeners": 0,

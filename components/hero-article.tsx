@@ -9,7 +9,7 @@ export default function HeroArticle() {
         <img
           src="/images/KOOL.png"
           alt="KOOL Background"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover object-[30%_center] md:object-center"
         />
         {/* Overlay para mejorar legibilidad del texto */}
         <div className="absolute inset-0 bg-black/40"></div>
