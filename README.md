@@ -108,3 +108,94 @@ El proyecto utiliza Tailwind CSS para los estilos, que puede ser configurado en:
 3. Commit tus cambios (\`git commit -m 'Add some AmazingFeature'\`)
 4. Push a la rama (\`git push origin feature/AmazingFeature\`)
 5. Abre un Pull Request
+
+## Tutorial: Crear una base de datos en Supabase y gestionar migraciones 🗄️
+
+A continuación, te explico cómo crear una base de datos en Supabase y cómo agregar y aplicar archivos de migración para gestionar el esquema de tu base de datos de forma profesional.
+
+### 1. Crear un proyecto en Supabase
+1. Ve a [https://app.supabase.com/](https://app.supabase.com/) y regístrate o inicia sesión.
+2. Haz clic en "New project".
+3. Completa los datos requeridos (nombre, contraseña, región, etc.) y espera a que se cree el proyecto.
+4. Una vez creado, accede al panel de tu proyecto y copia el `Project Reference` (lo necesitarás más adelante).
+
+### 2. Instalar Supabase CLI
+Necesitas la CLI de Supabase para gestionar migraciones localmente.
+
+```bash
+npm install -g supabase
+```
+
+O con PNPM:
+```bash
+pnpm add -g supabase
+```
+
+### 3. Inicializar Supabase en tu proyecto
+En la raíz de tu proyecto, ejecuta:
+
+```bash
+supabase init
+```
+
+Esto creará una carpeta `supabase/` con la configuración necesaria.
+
+### 4. Iniciar sesión y vincular tu proyecto local con Supabase
+Primero, inicia sesión:
+```bash
+supabase login
+```
+Sigue las instrucciones para autenticarte.
+
+Luego, vincula tu proyecto local con el remoto:
+```bash
+supabase link --project-ref TU_PROJECT_REF
+```
+Reemplaza `TU_PROJECT_REF` por el valor copiado desde el panel de Supabase.
+
+### 5. Crear un archivo de migración
+Para crear un nuevo archivo de migración, ejecuta:
+```bash
+supabase migration new nombre_de_la_migracion
+```
+Esto generará un archivo SQL en `supabase/migrations/` donde puedes definir los cambios de esquema (tablas, columnas, etc.).
+
+Ejemplo de contenido para una migración:
+```sql
+create table if not exists ejemplo (
+  id serial primary key,
+  nombre text not null
+);
+```
+
+### 6. Aplicar las migraciones a la base de datos
+Para aplicar todas las migraciones pendientes a tu base de datos remota:
+```bash
+supabase db push
+```
+
+Si quieres aplicar las migraciones en tu entorno local (por ejemplo, usando Docker):
+```bash
+supabase start
+```
+
+### 7. (Opcional) Poblar la base de datos con datos iniciales (seed)
+Puedes crear un archivo `supabase/seed.sql` con datos de ejemplo:
+```sql
+insert into ejemplo (nombre) values ('Dato 1'), ('Dato 2');
+```
+Luego, para aplicar migraciones y poblar la base de datos:
+```bash
+supabase db reset --include-seed
+```
+
+### 8. Buenas prácticas
+- Usa nombres descriptivos para tus migraciones.
+- Revisa y prueba tus migraciones en desarrollo antes de aplicarlas en producción.
+- Versiona tus archivos de migración en tu sistema de control de versiones (Git).
+
+### Recursos útiles
+- [Documentación oficial de Supabase sobre migraciones](https://supabase.com/docs/guides/deployment/database-migrations)
+- [Guía rápida de Supabase CLI](https://supabase.com/docs/guides/cli)
+
+¡Con esto tendrás tu base de datos en Supabase gestionada de forma profesional y lista para escalar! 🚀
